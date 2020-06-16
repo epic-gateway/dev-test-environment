@@ -1,0 +1,22 @@
+---
+
+- name: copy sysctl file
+  copy:
+    src: files/k8s.conf
+    dest: /etc/sysctl.d/k8s.conf
+  become: yes
+  
+- name: update sysctl
+  command: /sbin/sysctl --system
+  become: yes
+
+- name: disable swap
+  command: /sbin/swapoff -a
+  become: yes
+
+- name: edit fstab
+  lineinfile:
+    path: /etc/fstab
+    regexp: 'swap'
+    state: absent
+  become: yes

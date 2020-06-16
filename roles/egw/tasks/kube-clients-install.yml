@@ -1,0 +1,35 @@
+---
+
+- name: quick apt update
+  command: apt-get update
+  become: yes
+
+- name: check dependancies installed
+  command: apt-get install -y apt-transport-https curl ipvsadm
+  become: yes
+
+- name: get gpg key
+  shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+  become: yes
+
+- name: copy repo file
+  copy:
+    src: files/kubernetes.list
+    dest: /etc/apt/sources.list.d/kubernetes.list
+  become: yes
+
+- name: another apt update
+  command: apt-get update
+  become: yes
+
+- name: install k8s executables
+  shell: apt-get install -y kubelet kubeadm kubectl
+  become: yes
+
+- name: mark for version hold
+  shell: apt-mark hold kubelet kubeadm kubectl
+  become: yes
+
+
+
+

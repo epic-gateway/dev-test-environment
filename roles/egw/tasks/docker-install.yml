@@ -1,0 +1,41 @@
+---
+- name: idenify if docker is already installed
+  stat:
+    path: /etc/docker/daemon.json
+  register: docker_installed
+
+
+- name: install docker if not present
+  block: 
+    - name: quick apt update
+      command: apt-get update
+
+    - name: setup docker repository
+      command: apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
+
+    - name: get gpg key
+      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+    - name: add docker repo
+      shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu   $(lsb_release -cs) stable"
+
+    - name: apt update again
+      command: apt-get update
+
+    - name: Install Docker CE
+      shell: apt-get install -y  containerd.io=1.2.13-1 docker-ce=5:19.03.8~3-0~ubuntu-$(lsb_release -cs)  docker-ce-cli=5:19.03.8~3-0~ubuntu-$(lsb_release -cs)
+
+    - name: setup docker daemon
+      copy:
+        src: files/daemon.json
+        dest: /etc/docker/daemon.json
+
+    - name:  create directory
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+
+    - name: restart docker
+      shell: systemctl daemon-reload ; systemctl restart docker
+  when: docker_installed.stat.exists == False
+  become: yes

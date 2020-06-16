@@ -1,0 +1,39 @@
+---
+
+- name: create network-dispatch script for ipvlan
+  template:
+    src: linux-ipvlan.j2
+    dest: /etc/networkd-dispatcher/routable.d/ipvlan.sh
+  become: yes
+
+- name: apply network-dispatcher configuration for ipvlan
+  command: netplan apply
+  become: yes
+
+
+- name:  transfer multus yaml
+  copy:
+    src: files/multus-daemonset.yml
+    dest: /root/multus-daemonset.yml
+  become: yes
+
+- name:  Apply multus daemonset
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/multus-daemonset.yml
+  become: yes
+
+- name: create net-attach-def
+  template:
+    src: net-attach-ipvlan.j2
+    dest: /root/ipvlan.yml
+  become: yes
+
+- name: create multus namespace
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create namespace multus
+  become: yes
+
+- name: attach ipvlan def
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/ipvlan.yml
+  become: yes
+
+
+
