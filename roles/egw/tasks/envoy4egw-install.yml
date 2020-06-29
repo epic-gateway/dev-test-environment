@@ -4,6 +4,7 @@
 - name:  create envoy namespace
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create namespace envoy
   become: yes
+  ignore_errors: yes
 
 - name: create secret for acnodal private registry
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n envoy create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
