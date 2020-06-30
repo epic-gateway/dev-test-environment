@@ -13,11 +13,14 @@ Role Variables
 
 Located in hosts.yml
 
-master_int: enp1s0   - interface used on host by multus in the default net-attach-def called linux-ipvlan and configuring the ipvlan virtual interface -current version supports single interface
-      subnet: "192.168.101.0/24" - subnet used by Multus when creating the defaul net-attach-def called linux-ipvlan
-      rangeStart: "192.168.101.200" - range of addresses used by Multus when creating the defaul net-attach-def called linux-ipvlan
-      rangeEnd: "192.168.151.216" - range of addressed used by Multus when creating the default net-attach-def called linux-ipvlan
-      gateway: "192.168.101.1" - default gateway used by Multus when creating the default net-attach-def called linux-ipvlan and configuring the ipvlan virtual interface
+
+      bridge_name: multus0 - Used to identify the net-attach-def and create the bridge int
+      isGateway: true - identifies bridge as a router - adds gateway address bridge bridge int
+      subnet: "192.168.102.0/24" - subnet used by multus creating the net-attach-def
+      rangeStart: "192.168.102.200" - range of addresses used by mutlus creatiing net-attach-def
+      rangeEnd: "192.168.102.216"  - range of addresses used by multus creating net-attach-def
+      gateway: "192.168.102.1" -  default gateway used by multus creating net-attach-def
+
 
 
 

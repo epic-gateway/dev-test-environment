@@ -7,7 +7,7 @@ spec:
   type: ClusterIP
   ports:
   - port: 80
-    targetPort: 10000
+    targetPort: 10001
   selector:
     app: envoy4egw
 ---
@@ -24,8 +24,8 @@ spec:
   template:
     metadata:
       annotations:
-        k8s.v1.cni.cncf.io/networks: '[{ "name": "ipvlan-conf", "namespace": "multus",
-          "default-route": [ {{ gateway }} ] }]'
+        k8s.v1.cni.cncf.io/networks: '[{ "name": "{{ bridge_name }}", "namespace": "multus",
+          "default-route": [ "{{ gateway }}" ] }]'
       labels:
         app: envoy4egw
     spec:
@@ -34,7 +34,7 @@ spec:
         image: registry.gitlab.com/acnodal/envoy-for-egw
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 10000
+        - containerPort: 10001
         securityContext:
           capabilities:
             add:
