@@ -1,4 +1,4 @@
-module egw-web
+module acnodal.io/egw/web
 
 go 1.14
 

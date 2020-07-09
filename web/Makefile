@@ -6,12 +6,12 @@ TAG=registry.gitlab.com/acnodal/egw/controller:${USER}-dev
 ##@ Development
 
 run: ## Run the service using "go run"
-	go run ./main
+	go run main.go
 
 image: ## Build the Docker image
 	docker build --tag=${TAG} .
 
-runimage: ## Run the service using "docker run"
+runimage: image ## Run the service using "docker run"
 	docker run --rm --publish 8080:8080 ${TAG}
 
 push:	image ## Push the image to the repo
