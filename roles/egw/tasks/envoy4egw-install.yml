@@ -9,6 +9,11 @@
 - name: create secret for acnodal private registry
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n envoy create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   become: yes
+- name: Log in to Gitlab's private docker repo (for ad-hoc docker commands)
+  become: no
+  command: docker login --username {{ gitlab_user }} --password-stdin registry.gitlab.com
+  args:
+    stdin: "{{ gitlab_secret }}"
 
 - name: copy envoy configmap
   copy:

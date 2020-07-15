@@ -21,10 +21,11 @@
     state: absent
   become: yes
 
-- name: initial apt update
-  command: apt-get update
-  become: yes
-
 - name: install system tools
-  command: apt-get install -y ipset linux-tools-common
+  apt:
+    update_cache: yes
+    name:
+    - ipset
+    - linux-tools-common
+    install_recommends: no
   become: yes
