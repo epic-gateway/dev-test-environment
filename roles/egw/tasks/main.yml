@@ -2,6 +2,7 @@
 # tasks file for egw
 
 - include_tasks: osprepk8s.yml
+- include_tasks: postgresql-install.yml
 - include_tasks: docker-install.yml
 - include_tasks: kube-clients-install.yml
 - include_tasks: k8s-install.yml

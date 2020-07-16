@@ -1,0 +1,31 @@
+---
+- name: Install postgresql packages
+  apt:
+    package: postgresql
+
+- name: Tell postgresql to listen on *
+  copy:
+    dest: /etc/postgresql/10/main/conf.d/listen-on-all.conf
+    owner: postgres
+    group: postgres
+    content: |
+      # - Connection Settings -
+      listen_addresses = '*'
+  notify: postgres_restart
+
+- name: Allow egw to login to postgresql over the network
+  copy:
+    dest: /etc/postgresql/10/main/pg_hba.conf
+    owner: postgres
+    group: postgres
+    content: |
+      # TYPE  DATABASE        USER            ADDRESS                 METHOD
+      # "local" is for Unix domain socket connections only
+      local   all             all                                     peer
+      # IPv4 local connections:
+      host    all             all             127.0.0.1/32            md5
+      # IPv6 local connections:
+      host    all             all             ::1/128                 md5
+
+      host    sameuser        all             samenet                 md5
+  notify: postgres_restart

@@ -31,6 +31,9 @@ Located in hosts.yml
   vars:
     gitlab_user: "oz_adam"  - A version of Envoy is loaded from our private repository at gitlab, therefore a token is required
     gitlab_secret: "Qi4oXVKA1gzGdenTCd7G"
+    postgresql_egw_user: egw
+    postgresql_egw_password: {add a secure password here}
+    database_ip: {the IP address of the EGW host, where postgresql runs}
 
 Dependencies
 ------------
