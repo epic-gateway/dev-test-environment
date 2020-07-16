@@ -1,0 +1,20 @@
+---
+- name: Upload namespace manifest
+  copy:
+    src: files/acnodal-ns.yml
+    dest: /root/
+- name:  Create acnodal namespace
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/acnodal-ns.yml
+  become: yes
+
+- name: create secret for acnodal private registry
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n acnodal create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  become: yes
+
+- name: Upload web service manifest
+  copy:
+    src: files/egw-ws-demo.yml
+    dest: /root/
+- name:  Launch web service
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/egw-ws-demo.yml
+  become: yes
