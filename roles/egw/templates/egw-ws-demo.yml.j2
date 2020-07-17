@@ -28,13 +28,26 @@ spec:
     spec:
       containers:
       - name: web-service
-        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo-202007151316
+        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo-202007201145
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
         securityContext:
           allowPrivilegeEscalation: true
           readOnlyRootFilesystem: true
+        env:
+        - name: DATABASE_URL
+          value: postgresql://{{ database_ip }}:5432/egw
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: egw-db
+              key: username
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: egw-db
+              key: password
       imagePullSecrets:
       - name: gitlab
       serviceAccountName: egw-web-service
