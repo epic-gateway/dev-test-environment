@@ -1,4 +1,35 @@
 ---
+- name: Create egw account and database
+  command:
+    cmd: psql
+    stdin: |
+      DO $$
+      BEGIN
+        CREATE USER {{ postgresql_egw_user }} PASSWORD '{{ postgresql_egw_password }}';
+        EXCEPTION WHEN DUPLICATE_OBJECT THEN
+        RAISE NOTICE 'user "{{ postgresql_egw_user }}" already exists, skipping';
+      END
+      $$;
+
+      CREATE EXTENSION IF NOT EXISTS dblink;
+
+      DO $$
+      BEGIN
+        PERFORM dblink_exec('', 'CREATE DATABASE egw OWNER {{ postgresql_egw_user }}');
+        EXCEPTION WHEN duplicate_database THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
+      END
+      $$;
+  become: yes
+  become_user: postgres
+- name: Create egw schema and install moddatetime extension
+  command:
+    cmd: psql egw
+    stdin: |
+      CREATE SCHEMA IF NOT EXISTS AUTHORIZATION {{ postgresql_egw_user }};
+      CREATE EXTENSION IF NOT EXISTS moddatetime WITH SCHEMA egw;
+  become: yes
+  become_user: postgres
+
 - name: Upload namespace manifest
   copy:
     src: files/acnodal-ns.yml
@@ -11,10 +42,22 @@
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n acnodal create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   become: yes
 
+- name: Store postgres connection credentials in a secret
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n acnodal create secret generic egw-db --from-literal=username={{ postgresql_egw_user }} --from-literal=password='{{ postgresql_egw_password }}'
+  become: yes
+
+- name: Upload database setup job manifest
+  template:
+    src: egw-ws-db-setup.yml.j2
+    dest: /root/egw-ws-db-setup.yml
+- name:  Set up database (migrations and seeds)
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/egw-ws-db-setup.yml
+  become: yes
+
 - name: Upload web service manifest
-  copy:
-    src: files/egw-ws-demo.yml
-    dest: /root/
+  template:
+    src: templates/egw-ws-demo.yml.j2
+    dest: /root/egw-ws-demo.yml
 - name:  Launch web service
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/egw-ws-demo.yml
   become: yes

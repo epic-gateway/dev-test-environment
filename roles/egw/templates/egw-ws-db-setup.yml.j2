@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: egw
+    component: db-setup
+  name: db-setup
+  namespace: acnodal
+spec:
+  template:
+    metadata:
+      labels:
+        app: egw
+        component: db-setup
+    spec:
+      containers:
+      - name: db-setup
+        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo-202007201145
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c", "migrate -path=db/migrations -database=postgresql://{{ database_ip }}:5432/egw up && cat db/seeds/*sql | psql postgresql://{{ database_ip }}:5432/egw"]
+        env:
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: egw-db
+              key: username
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: egw-db
+              key: password
+      restartPolicy: Never
+      imagePullSecrets:
+      - name: gitlab
+  backoffLimit: 4
