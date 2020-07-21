@@ -27,5 +27,6 @@
     name:
     - ipset
     - linux-tools-common
+    - acl
     install_recommends: no
   become: yes
