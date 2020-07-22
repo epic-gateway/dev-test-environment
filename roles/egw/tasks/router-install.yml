@@ -1,0 +1,33 @@
+---
+
+
+- name:  create router namespace
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create namespace router
+  become: yes
+  ignore_errors: yes
+
+- name: create secret for acnodal private registry
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n router create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  become: yes
+
+- name: copy bird configmap
+  copy:
+    src: files/bird-cm.yml
+    dest: /root/bird-cm.yml
+  become: yes
+
+- name: create envoy configmap
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/bird-cm.yml
+  become: yes
+
+
+- name: create bird configuration
+  copy:
+    src: files/bird-egw.yml
+    dest: /root/bird-egw.yml
+  become: yes
+
+
+- name: create router - bird deployment
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/bird-egw.yml
+  become: yes

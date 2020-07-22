@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bird-egw
+  namespace: router
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bird-egw
+  template:
+    metadata:
+      labels:
+        app: bird-egw
+    spec:
+      containers:
+      - name: bird-egw
+        image: registry.gitlab.com/acnodal/egw-router/bird-egw:2.0.7
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+          privileged: false
+        volumeMounts:
+        - name: bird-cm
+          mountPath: /usr/local/etc
+      imagePullSecrets:
+      - name: gitlab
+      volumes:
+      - name: bird-cm
+        configMap:
+          name: bird-cm
+      hostNetwork: true
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true

@@ -7,5 +7,6 @@
 - include_tasks: kube-clients-install.yml
 - include_tasks: k8s-install.yml
 - include_tasks: multus-install.yml
+- include_tasks: router-install.yml
 - include_tasks: envoy4egw-install.yml
 - include_tasks: web-service-install.yml
