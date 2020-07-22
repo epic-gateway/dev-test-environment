@@ -1,6 +1,0 @@
----
-# handlers file for egw
-- name: postgres_restart
-  service:
-    name: postgresql
-    state: restarted

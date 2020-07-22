@@ -36,6 +36,15 @@
   shell: apt-mark hold kubelet kubeadm kubectl
   become: yes
 
+- name: add kubens
+  copy:
+    src: files/kubens
+    dest: /usr/local/bin/kubens
+    mode: '0755'
+  become: yes
+
+
+
 
 
 

@@ -2,6 +2,7 @@
 - name: Install postgresql packages
   apt:
     package: postgresql
+  become: yes
 
 - name: Tell postgresql to listen on *
   copy:
@@ -11,11 +12,11 @@
     content: |
       # - Connection Settings -
       listen_addresses = '*'
-  notify: postgres_restart
+  become: yes
 
 - name: Allow egw to login to postgresql over the network
   copy:
-    dest: /etc/postgresql/12/main/pg_hba.conf
+    dest: /etc/postgresql/12/main/pg_hba.conf 
     owner: postgres
     group: postgres
     content: |
@@ -23,9 +24,16 @@
       # "local" is for Unix domain socket connections only
       local   all             all                                     peer
       # IPv4 local connections:
-      host    all             all             127.0.0.1/32            md5
+      host    all             all             127.0.0.1/32            password
       # IPv6 local connections:
-      host    all             all             ::1/128                 md5
+      host    all             all             ::1/128                 password
 
-      host    sameuser        all             samenet                 md5
-  notify: postgres_restart
+      host    sameuser        all             samenet                 password
+  become: yes
+
+- name: postgres_restart
+  service:
+    name: postgresql
+    state: restarted
+  become: yes
+

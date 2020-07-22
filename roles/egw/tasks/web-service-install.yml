@@ -21,6 +21,8 @@
       $$;
   become: yes
   become_user: postgres
+
+
 - name: Create egw schema and install moddatetime extension
   command:
     cmd: psql egw
@@ -30,15 +32,12 @@
   become: yes
   become_user: postgres
 
-- name: Upload namespace manifest
-  copy:
-    src: files/acnodal-ns.yml
-    dest: /root/
 - name:  Create acnodal namespace
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/acnodal-ns.yml
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create namespace acnodal
   become: yes
+  ignore_errors: yes
 
-- name: create secret for acnodal private registry
+- name: create secret for acnodal private registry for acnodal namespace
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n acnodal create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   become: yes
 
@@ -50,6 +49,8 @@
   template:
     src: egw-ws-db-setup.yml.j2
     dest: /root/egw-ws-db-setup.yml
+  become: yes
+
 - name:  Set up database (migrations and seeds)
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/egw-ws-db-setup.yml
   become: yes
@@ -58,6 +59,8 @@
   template:
     src: templates/egw-ws-demo.yml.j2
     dest: /root/egw-ws-demo.yml
+  become: yes
+
 - name:  Launch web service
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/egw-ws-demo.yml
   become: yes
