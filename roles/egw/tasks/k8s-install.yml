@@ -48,7 +48,17 @@
     dest: /root/openebs-operator.yml
   become: yes
 
+- name: copy OpenEBS default jiva storage class
+  copy:
+    src: files/update-jiva-sc.yml
+    dest: /root/update-jiva-sc.yml
+  become: yes
+
 - name: Add OpenEBS - Persistant Storage System
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/openebs-operator.yml
-  
+  become: yes
+
+- name: update Jiva default storage class
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/update-jiva-sc.yml
+  become: yes
 
