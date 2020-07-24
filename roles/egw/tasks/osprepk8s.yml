@@ -28,5 +28,19 @@
     - ipset
     - linux-tools-common
     - acl
+    - open-iscsi
     install_recommends: no
+  become: yes
+  
+- name: enable & start iscsi client
+  systemd:
+    name: iscsid
+    state: started
+    enabled: yes
+  become: yes
+
+- name: add bash alises file to root
+  copy:
+    src: files/bash_aliases
+    dest: /root/.bash_aliases
   become: yes

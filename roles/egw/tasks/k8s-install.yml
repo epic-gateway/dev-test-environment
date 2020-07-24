@@ -38,7 +38,17 @@
     dest: /root/kube-flannel.yml
   become: yes
 
-- name: add flannel
+- name: add flannel - K8s CNI
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/kube-flannel.yml
   become: yes
+
+- name: copy OpenEBS file
+  copy:
+    src: files/openebs-operator.yaml
+    dest: /root/openebs-operator.yml
+  become: yes
+
+- name: Add OpenEBS - Persistant Storage System
+  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/openebs-operator.yml
+  
 
