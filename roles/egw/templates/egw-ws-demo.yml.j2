@@ -32,6 +32,7 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
+        - containerPort: 18000
         securityContext:
           allowPrivilegeEscalation: true
           readOnlyRootFilesystem: true
@@ -63,6 +64,10 @@ spec:
   ports:
   - port: 8080
     nodePort: 30080
+    name: ws
+  - port: 18000
+    nodePort: 30081
+    name: xds
   selector:
     app: egw
     component: web-service
