@@ -23,12 +23,13 @@
   become_user: postgres
 
 
-- name: Create egw schema and install moddatetime extension
+- name: Create egw schema and install extensions
   command:
     cmd: psql egw
     stdin: |
       CREATE SCHEMA IF NOT EXISTS AUTHORIZATION {{ postgresql_egw_user }};
       CREATE EXTENSION IF NOT EXISTS moddatetime WITH SCHEMA egw;
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA egw;
   become: yes
   become_user: postgres
 
