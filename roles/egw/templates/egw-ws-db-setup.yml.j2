@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: db-setup
-        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo-202007271122
+        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo202008021849
         imagePullPolicy: Always
         command: ["/bin/sh", "-c", "migrate -path=db/migrations -database=postgresql://{{ database_ip }}:5432/egw up && cat db/seeds/*sql | psql postgresql://{{ database_ip }}:5432/egw"]
         env:
