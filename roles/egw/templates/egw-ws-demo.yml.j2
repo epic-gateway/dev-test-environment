@@ -38,7 +38,7 @@ spec:
           readOnlyRootFilesystem: true
         env:
         - name: DATABASE_URL
-          value: postgresql://{{ database_ip }}:5432/egw
+          value: postgresql://{{ database_ip.stdout }}:5432/egw
         - name: PGUSER
           valueFrom:
             secretKeyRef:

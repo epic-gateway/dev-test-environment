@@ -10,3 +10,10 @@
 - include_tasks: router-install.yml
 - include_tasks: envoy4egw-install.yml
 - include_tasks: web-service-install.yml
+
+- name: Fetch the EGW admin kubeconfig # so we can use kubectl from the host
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: egw-admin.conf
+    flat: yes
+  become: yes
