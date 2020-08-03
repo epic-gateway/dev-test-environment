@@ -26,7 +26,7 @@ Located in hosts.yml
 
 # k8s configuration
 
-      pod_cidr: "10.245.0.0/16"  - kubernetes POD CIDR range, needs to be configured because this block is used by endpoints and in the prototype cannot conflict with cluster
+      pod_cidr: "10.246.0.0/16"  - kubernetes POD CIDR range, needs to be configured because this block is used by endpoints and in the prototype cannot conflict with cluster
   
   vars:
     gitlab_user: "oz_adam"  - A version of Envoy is loaded from our private repository at gitlab, therefore a token is required

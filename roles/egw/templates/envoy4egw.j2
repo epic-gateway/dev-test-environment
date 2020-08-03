@@ -8,6 +8,10 @@ spec:
   ports:
   - port: 80
     targetPort: 10001
+    name: web
+  - port: 9901
+    targetPort: 9901
+    name: admin
   selector:
     app: envoy4egw
 ---
@@ -48,4 +52,3 @@ spec:
       - name: envoy-cm
         configMap:
           name: envoy-cm
-        
