@@ -1,4 +1,8 @@
 ---
+- name: Pull in the secrets
+  include_vars: files/vault.yml
+  no_log: true
+
 - name: Create egw account and database
   command:
     cmd: psql

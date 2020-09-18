@@ -1,5 +1,7 @@
 ---
-
+- name: Pull in the secrets
+  include_vars: files/vault.yml
+  no_log: true
 
 - name:  create envoy namespace
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create namespace envoy

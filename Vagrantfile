@@ -1,6 +1,6 @@
 BOX='generic/ubuntu2004'
 EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
-
+VAULT_PASSWORD_FILE = '.ansible-vault-password'
 
 Vagrant.configure('2') do |config|
   config.vm.box = BOX
@@ -31,15 +31,12 @@ Vagrant.configure('2') do |config|
           rangeEnd: '192.168.128.216',
           gateway: '192.168.128.1',
           pod_cidr: '10.128.0.0/16',
-          gitlab_user: 'oz_adam',
-          gitlab_secret: 'Qi4oXVKA1gzGdenTCd7G',
-          postgresql_egw_user: 'egw',
-          postgresql_egw_password: '18companyOTHERbornSOON',
           ansible_python_interpreter: '/usr/bin/python3',
           postgresql_pref_int: 'eth1'
         }
       }
       ansible.verbose = true
+      ansible.vault_password_file = VAULT_PASSWORD_FILE
     end
     egw.trigger.after :destroy do |trigger|
       trigger.run = {inline: 'rm -f egw-admin.conf master.retry'}
