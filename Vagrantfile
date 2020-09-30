@@ -1,5 +1,5 @@
 BOX='generic/ubuntu2004'
-EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
+EGWINT = ENV.fetch('EGWINT', 'ens33')
 
 
 Vagrant.configure('2') do |config|
@@ -19,6 +19,8 @@ Vagrant.configure('2') do |config|
                    trust_guest_rx_filters: true
     egw.vm.provision 'shell',
                      inline: 'ip route | grep --quiet "^default via .* dev eth0" && ip route delete 0.0.0.0/0 dev eth0 || true'
+    egw.vm.provision 'shell',
+                     inline: 'echo "PATH=\"/tmp/.acnodal/bin:${PATH}\"" > /etc/environment'
     egw.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'master.yml'
       ansible.compatibility_mode = '2.0'
@@ -36,7 +38,13 @@ Vagrant.configure('2') do |config|
           postgresql_egw_user: 'egw',
           postgresql_egw_password: '18companyOTHERbornSOON',
           ansible_python_interpreter: '/usr/bin/python3',
-          postgresql_pref_int: 'eth1'
+          postgresql_pref_int: 'eth1',
+          pfc_src_path: '/home/marek/workspace/pfc',
+          pfc_remote_path: '/tmp/.acnodal/bin',
+          pfc_interface: 'eth1',
+          pfc_gue_port_min: 5000,
+          pfc_gue_port_max: 6000,
+          pfc_instance_name: 'egw'
         }
       }
       ansible.verbose = true
@@ -48,16 +56,16 @@ Vagrant.configure('2') do |config|
   end
 
 
-  config.trigger.before [:up, :resume, :reload] do |trigger|
-    trigger.info = "Setting EGWINT #{EGWINT} down"
-    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
-  end
+#  config.trigger.before [:up, :resume, :reload] do |trigger|
+#    trigger.info = "Setting EGWINT #{EGWINT} down"
+#    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
+#  end
 
 
 
-  config.trigger.after [:destroy, :halt, :suspend] do |trigger|
-    trigger.info = "setting EGWINT #{EGWINT} down"
-    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
-  end
+#  config.trigger.after [:destroy, :halt, :suspend] do |trigger|
+#    trigger.info = "setting EGWINT #{EGWINT} down"
+#    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
+#  end
 
 end

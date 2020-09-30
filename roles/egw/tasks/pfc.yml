@@ -1,0 +1,44 @@
+---
+
+- name: copy pfc ebpf
+  copy:
+    src: "{{ item }}"
+    dest: "{{ pfc_remote_path }}/"
+    mode: a+x
+  with_fileglob:
+    - "{{ pfc_src_path }}/src/*.o"
+  ignore_errors: yes
+
+- name: copy pfc deamon
+  copy:
+    src: "{{ pfc_src_path }}/test/docker/gue_ping_svc_auto"
+    dest: "{{ pfc_remote_path }}/"
+    mode: a+x
+  ignore_errors: yes
+
+- name: copy pfc cli
+  copy:
+    src: "{{ item }}"
+    dest: "{{ pfc_remote_path }}/"
+    mode: a+x
+  with_fileglob:
+    - "{{ pfc_src_path }}/src/cli_cfg"
+    - "{{ pfc_src_path }}/src/cli_service"
+    - "{{ pfc_src_path }}/src/cli_tunnel"
+    - "{{ pfc_src_path }}/src/cli_gc"
+  ignore_errors: yes
+
+- name: copy pfc helpers
+  copy:
+    src: "{{ item }}"
+    dest: "{{ pfc_remote_path }}/"
+    mode: a+x
+  with_fileglob:
+    - "{{ pfc_src_path }}/src/*.sh"
+    - "{{ pfc_src_path }}/test/port_*.sh"
+    - "{{ pfc_src_path }}/test/pfc_*.sh"
+  ignore_errors: yes
+
+- name: start pfc
+  shell: sudo env "PATH=$PATH" pfc_start.sh {{ pfc_interface }} {{ pfc_instance_name }} 9 9 {{ pfc_gue_port_min }} {{ pfc_gue_port_max }}
+  ignore_errors: yes
