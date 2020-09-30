@@ -1,4 +1,5 @@
 BOX='generic/ubuntu2004'
+#EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
 EGWINT = ENV.fetch('EGWINT', 'ens33')
 
 
@@ -39,7 +40,7 @@ Vagrant.configure('2') do |config|
           postgresql_egw_password: '18companyOTHERbornSOON',
           ansible_python_interpreter: '/usr/bin/python3',
           postgresql_pref_int: 'eth1',
-          pfc_src_path: '/home/marek/workspace/pfc',
+          pfc_src_path: '../packet-forwarding-component',
           pfc_remote_path: '/tmp/.acnodal/bin',
           pfc_interface: 'eth1',
           pfc_gue_port_min: 5000,
