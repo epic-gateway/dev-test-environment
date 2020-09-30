@@ -34,6 +34,14 @@ Located in hosts.yml
     postgresql_egw_user: egw
     postgresql_egw_password: {add a secure password here}
     database_ip: {the IP address of the EGW host, where postgresql runs}
+    pfc_src_path: "../packet-forwarding-component" - location of packet-forwarding-component repository (location of compiled pfc)
+    pfc_remote_path: "/tmp/.acnodal/bin" - path where pfc binaries are located (location of installed)
+    pfc_interface: "eth1" - interface where pfc will process packets
+    pfc_gue_port_min: 5000 - port range lower bound for GUE tunnel allocation
+    pfc_gue_port_max: 6000 - port range upper bound for GUE tunnel allocation
+    pfc_instance_name: "egw" - pfc instance name
+
+> Note: Vagrand adds 'pfc_remote_path' to the hosts PATH. It will overwrite original /etc/environment, ATM it contains only PATH, but could possibly cause a troube in the future.
 
 Dependencies
 ------------
@@ -41,6 +49,8 @@ Dependencies
 Requires ubuntu 18.04LTS
 
 Requires a gitlab account and token from acnodal gitlab account to download our envoy build
+
+Clone and build packet-forwarding-component and set its location in 'pfc_src_path'
 
 How to use
 ----------------
