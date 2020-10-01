@@ -5,10 +5,13 @@
 
 - name:  create router namespace
   command: kubectl create namespace router
-  ignore_errors: yes
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: create secret for acnodal private registry
   command: kubectl -n router create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: copy bird configmap
   copy:

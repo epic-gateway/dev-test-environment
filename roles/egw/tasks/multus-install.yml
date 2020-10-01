@@ -9,7 +9,8 @@
 
 - name: create multus namespace
   command: kubectl create namespace multus
-  ignore_errors: yes
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: create net-attach-def
   template:
@@ -37,6 +38,3 @@
       command: /sbin/iptables -I FORWARD -m set --match-set egw-in dst,dst -j ACCEPT
   when: multus_rule_installed.rc  == 1
   become: yes
-
-
-

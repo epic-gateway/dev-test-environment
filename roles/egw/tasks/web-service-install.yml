@@ -39,13 +39,18 @@
 
 - name:  Create acnodal namespace
   command: kubectl create namespace acnodal
-  ignore_errors: yes
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: create secret for acnodal private registry for acnodal namespace
   command: kubectl -n acnodal create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: Store postgres connection credentials in a secret
   command: kubectl -n acnodal create secret generic egw-db --from-literal=username={{ postgresql_egw_user }} --from-literal=password='{{ postgresql_egw_password }}'
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: Upload database setup job manifest
   template:
