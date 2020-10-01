@@ -10,6 +10,11 @@
   args:
     creates: /etc/kubernetes/pki/ca.key
 
+- name: allow users in the root group to use admin.conf
+  file:
+    path: /etc/kubernetes/admin.conf
+    mode: g+r
+  become: yes
 
 # We do this taint/untaint dance because "taint --overwrite" is
 # idempotent so this pair of commands will work on new clusters and
