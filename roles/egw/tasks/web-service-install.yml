@@ -37,11 +37,6 @@
   become: yes
   become_user: postgres
 
-- name:  Create acnodal namespace
-  command: kubectl create namespace acnodal
-  register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
-
 - name: create secret for acnodal private registry for acnodal namespace
   command: kubectl -n acnodal create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   register: result

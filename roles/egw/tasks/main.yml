@@ -6,11 +6,6 @@
 - include_tasks: docker-install.yml
 - include_tasks: kube-clients-install.yml
 - include_tasks: k8s-install.yml
-- include_tasks: multus-install.yml
-- include_tasks: router-install.yml
-- include_tasks: egw-data-model.yml
-- include_tasks: envoy4egw-install.yml
-- include_tasks: web-service-install.yml
 
 - name: Fetch the EGW admin kubeconfig # so we can use kubectl from the host
   fetch:
@@ -18,3 +13,15 @@
     dest: egw-admin.conf
     flat: yes
   become: yes
+
+- include_tasks: multus-install.yml
+- include_tasks: router-install.yml
+
+- name:  Create acnodal namespace
+  command: kubectl create namespace acnodal
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+
+- include_tasks: egw-data-model.yml
+- include_tasks: envoy4egw-install.yml
+- include_tasks: web-service-install.yml
