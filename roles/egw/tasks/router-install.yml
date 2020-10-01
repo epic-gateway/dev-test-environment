@@ -17,8 +17,7 @@
     src: files/bird-cm.yml
     dest: /root/bird-cm.yml
   become: yes
-
-- name: create envoy configmap
+- name: apply bird configmap
   command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/bird-cm.yml
   become: yes
 
