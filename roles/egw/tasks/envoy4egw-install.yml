@@ -4,32 +4,22 @@
   no_log: true
 
 - name:  create envoy namespace
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create namespace envoy
-  become: yes
+  command: kubectl create namespace envoy
   ignore_errors: yes
 
 - name: create secret for acnodal private registry in envoy namespace
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n envoy create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
-  become: yes
+  command: kubectl -n envoy create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
 
 - name: copy envoy configmap
   copy:
     src: files/envoy-cm.yml
-    dest: /root/envoy-cm.yml
-  become: yes
-
+    dest: envoy-cm.yml
 - name: create envoy configmap
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/envoy-cm.yml
-  become: yes
-
+  command: kubectl apply -f envoy-cm.yml
 
 - name: create envoy4egw configuration
   template:
     src: envoy4egw.j2
-    dest: /root/envoy4egw.yml
-  become: yes
-
-
+    dest: envoy4egw.yml
 - name: create envoy4egw deployment
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/envoy4egw.yml
-  become: yes
+  command: kubectl apply -f envoy4egw.yml

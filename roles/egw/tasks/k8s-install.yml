@@ -22,36 +22,24 @@
 - name: taint controller
   command: kubectl taint nodes --all --overwrite node-role.kubernetes.io/master:NoSchedule
 - name: untaint controller
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf taint nodes --all node-role.kubernetes.io/master-
-  become: yes
+  command: kubectl taint nodes --all node-role.kubernetes.io/master-
 
 - name: create local flannel.yml
   template:
     src: kube-flannel.j2
-    dest: /root/kube-flannel.yml
-  become: yes
-
+    dest: kube-flannel.yml
 - name: add flannel - K8s CNI
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/kube-flannel.yml
-  become: yes
+  command: kubectl apply -f kube-flannel.yml
 
 - name: copy OpenEBS file
   copy:
     src: files/openebs-operator.yaml
-    dest: /root/openebs-operator.yml
-  become: yes
-
+    dest: openebs-operator.yml
 - name: copy OpenEBS default jiva storage class
   copy:
     src: files/update-jiva-sc.yml
-    dest: /root/update-jiva-sc.yml
-  become: yes
-
+    dest: update-jiva-sc.yml
 - name: Add OpenEBS - Persistant Storage System
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/openebs-operator.yml
-  become: yes
-
+  command: kubectl apply -f openebs-operator.yml
 - name: update Jiva default storage class
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/update-jiva-sc.yml
-  become: yes
-
+  command: kubectl apply -f update-jiva-sc.yml

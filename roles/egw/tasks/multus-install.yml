@@ -3,27 +3,20 @@
 - name:  transfer multus yaml
   copy:
     src: files/multus-daemonset.yml
-    dest: /root/multus-daemonset.yml
-  become: yes
-
+    dest: multus-daemonset.yml
 - name:  Apply multus daemonset
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/multus-daemonset.yml
-  become: yes
+  command: kubectl apply -f multus-daemonset.yml
+
+- name: create multus namespace
+  command: kubectl create namespace multus
+  ignore_errors: yes
 
 - name: create net-attach-def
   template:
     src: net-attach-multus0.j2
-    dest: /root/net-attach-multus0.yml
-  become: yes
-
-- name: create multus namespace
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create namespace multus
-  become: yes
-  ignore_errors: yes
-
+    dest: net-attach-multus0.yml
 - name: create net-attach-def multus0
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/net-attach-multus0.yml
-  become: yes
+  command: kubectl apply -f net-attach-multus0.yml
 
 - name: add ipset for incomming filtering
   command: /sbin/ipset -exist create egw-in hash:ip,port
