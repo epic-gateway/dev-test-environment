@@ -1,6 +1,18 @@
 BOX='generic/ubuntu2004'
 EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
 VAULT_PASSWORD_FILE = '.ansible-vault-password'
+SHELL_PROVISION_SCRIPT = <<-SHELL
+  # add the vagrant user to the docker group (and some others) before we run ansible so that it can run docker commands in the ansible playbook
+  grep --quiet docker /etc/group || groupadd --system docker && usermod -a -G docker,systemd-journal,root vagrant
+
+  cat <<ENV > /etc/environment
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+KUBECONFIG="/etc/kubernetes/admin.conf"
+ENV
+
+  # remove the vagrant default route so ansible figures out the correct default interface
+  ip route | grep --quiet "^default via 192.168.121.1" && ip route delete default via 192.168.121.1 || true
+SHELL
 
 Vagrant.configure('2') do |config|
   config.vm.box = BOX
@@ -17,8 +29,7 @@ Vagrant.configure('2') do |config|
                    mode: 'passthrough',
                    mac: '20:ca:b0:70:00:02',
                    trust_guest_rx_filters: true
-    egw.vm.provision 'shell',
-                     inline: 'ip route | grep --quiet "^default via .* dev eth0" && ip route delete 0.0.0.0/0 dev eth0 || true'
+    egw.vm.provision 'shell', inline: SHELL_PROVISION_SCRIPT
     egw.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'master.yml'
       ansible.compatibility_mode = '2.0'
