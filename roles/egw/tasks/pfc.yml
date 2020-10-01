@@ -15,6 +15,7 @@
     - "{{ pfc_src_path }}/test/port_*.sh"
     - "{{ pfc_src_path }}/test/pfc_*.sh"
     - "{{ pfc_src_path }}/test/docker/gue_ping_svc_auto"
+    - "{{ pfc_src_path }}/src/go/pfc_cli_go"
   ignore_errors: yes
 
 - name: start pfc
