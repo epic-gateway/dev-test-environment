@@ -1,6 +1,5 @@
 BOX='generic/ubuntu2004'
-#EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
-EGWINT = ENV.fetch('EGWINT', 'ens33')
+EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
 
 
 Vagrant.configure('2') do |config|
@@ -57,16 +56,16 @@ Vagrant.configure('2') do |config|
   end
 
 
-#  config.trigger.before [:up, :resume, :reload] do |trigger|
-#    trigger.info = "Setting EGWINT #{EGWINT} down"
-#    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
-#  end
+  config.trigger.before [:up, :resume, :reload] do |trigger|
+    trigger.info = "Setting EGWINT #{EGWINT} down"
+    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
+  end
 
 
 
-#  config.trigger.after [:destroy, :halt, :suspend] do |trigger|
-#    trigger.info = "setting EGWINT #{EGWINT} down"
-#    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
-#  end
+  config.trigger.after [:destroy, :halt, :suspend] do |trigger|
+    trigger.info = "setting EGWINT #{EGWINT} down"
+    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
+  end
 
 end
