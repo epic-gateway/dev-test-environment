@@ -51,6 +51,8 @@
   template:
     src: egw-ws-db-setup.yml.j2
     dest: egw-ws-db-setup.yml
+  vars:
+    postgres_ip: "{{ database_ip.stdout }}"
 - name:  Set up database (migrations and seeds)
   command: kubectl apply -f egw-ws-db-setup.yml
 
@@ -58,5 +60,7 @@
   template:
     src: templates/egw-ws-demo.yml.j2
     dest: egw-ws-demo.yml
+  vars:
+    postgres_ip: "{{ database_ip.stdout }}"
 - name:  Launch web service
   command: kubectl apply -f egw-ws-demo.yml
