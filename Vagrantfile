@@ -19,6 +19,8 @@ Vagrant.configure('2') do |config|
                    trust_guest_rx_filters: true
     egw.vm.provision 'shell',
                      inline: 'ip route | grep --quiet "^default via .* dev eth0" && ip route delete 0.0.0.0/0 dev eth0 || true'
+    egw.vm.provision 'shell',
+                     inline: 'echo "PATH=\"/tmp/.acnodal/bin:${PATH}\"" > /etc/environment'
     egw.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'master.yml'
       ansible.compatibility_mode = '2.0'
@@ -32,7 +34,13 @@ Vagrant.configure('2') do |config|
           gateway: '192.168.128.1',
           pod_cidr: '10.128.0.0/16',
           ansible_python_interpreter: '/usr/bin/python3',
-          postgresql_pref_int: 'eth1'
+          postgresql_pref_int: 'eth1',
+          pfc_src_path: '../packet-forwarding-component',
+          pfc_remote_path: '/tmp/.acnodal/bin',
+          pfc_interface: 'eth1',
+          pfc_gue_port_min: 5000,
+          pfc_gue_port_max: 6000,
+          pfc_instance_name: 'egw'
         }
       }
       ansible.verbose = true
