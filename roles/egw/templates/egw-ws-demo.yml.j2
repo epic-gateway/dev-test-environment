@@ -7,6 +7,46 @@ metadata:
   name: egw-web-service
   namespace: acnodal
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: egw
+  name: egw-web-service
+rules:
+- apiGroups:
+  - egw.acnodal.io
+  resources:
+  - accounts
+  - servicegroups
+  - loadbalancers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - egw.acnodal.io
+  resources:
+  - loadbalancers
+  verbs:
+  - create
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: egw
+  name: egw-web-service
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: egw-web-service
+subjects:
+- kind: ServiceAccount
+  name: egw-web-service
+  namespace: acnodal
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,7 +68,7 @@ spec:
     spec:
       containers:
       - name: web-service
-        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo202008041046
+        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo202010060939
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -38,7 +78,7 @@ spec:
           readOnlyRootFilesystem: true
         env:
         - name: DATABASE_URL
-          value: postgresql://{{ database_ip.stdout }}:5432/egw
+          value: postgresql://{{ postgres_ip }}:5432/egw
         - name: PGUSER
           valueFrom:
             secretKeyRef:

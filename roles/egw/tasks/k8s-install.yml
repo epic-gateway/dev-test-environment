@@ -1,64 +1,45 @@
 ---
-
-- name: idenify if k8s is installed
-  stat:
-    path: /etc/kubernetes/admin.conf
-  register: k8s_installed
-
-
-- name: clear previous k8s installation if present
-  block:
-    - name:  drain node
-      shell: kubectl --kubeconfig=/etc/kubernetes/admin.conf drain {{ansible_nodename}} --delete-local-data --force --ignore-daemonsets
-    - name: delete node
-      command: kubectl --kubeconfig=/etc/kubernetes/admin.conf delete node {{ansible_nodename }}
-    - name:  reset kubadm
-      command: kubeadm reset -f
-  when: k8s_installed.stat.exists
-  become: yes
-
-
 - name: create k8s config file
   template:
     src: kubeinit.j2
     dest: /root/egw.conf
   become: yes
-
 - name: install kubernetes
   command: kubeadm init --config /root/egw.conf
   become: yes
+  args:
+    creates: /etc/kubernetes/pki/ca.key
 
-- name: untaint controller
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf taint nodes --all node-role.kubernetes.io/master-
+- name: allow users in the root group to use admin.conf
+  file:
+    path: /etc/kubernetes/admin.conf
+    mode: g+r
   become: yes
+
+# We do this taint/untaint dance because "taint --overwrite" is
+# idempotent so this pair of commands will work on new clusters and
+# also work when we're updating an existing cluster
+- name: taint controller
+  command: kubectl taint nodes --all --overwrite node-role.kubernetes.io/master:NoSchedule
+- name: untaint controller
+  command: kubectl taint nodes --all node-role.kubernetes.io/master-
 
 - name: create local flannel.yml
   template:
     src: kube-flannel.j2
-    dest: /root/kube-flannel.yml
-  become: yes
-
+    dest: kube-flannel.yml
 - name: add flannel - K8s CNI
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/kube-flannel.yml
-  become: yes
+  command: kubectl apply -f kube-flannel.yml
 
 - name: copy OpenEBS file
   copy:
     src: files/openebs-operator.yaml
-    dest: /root/openebs-operator.yml
-  become: yes
-
+    dest: openebs-operator.yml
 - name: copy OpenEBS default jiva storage class
   copy:
     src: files/update-jiva-sc.yml
-    dest: /root/update-jiva-sc.yml
-  become: yes
-
+    dest: update-jiva-sc.yml
 - name: Add OpenEBS - Persistant Storage System
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/openebs-operator.yml
-  become: yes
-
+  command: kubectl apply -f openebs-operator.yml
 - name: update Jiva default storage class
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/update-jiva-sc.yml
-  become: yes
-
+  command: kubectl apply -f update-jiva-sc.yml

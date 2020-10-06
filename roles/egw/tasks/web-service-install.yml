@@ -37,35 +37,30 @@
   become: yes
   become_user: postgres
 
-- name:  Create acnodal namespace
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf create namespace acnodal
-  become: yes
-  ignore_errors: yes
-
 - name: create secret for acnodal private registry for acnodal namespace
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n acnodal create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
-  become: yes
+  command: kubectl -n acnodal create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: Store postgres connection credentials in a secret
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf -n acnodal create secret generic egw-db --from-literal=username={{ postgresql_egw_user }} --from-literal=password='{{ postgresql_egw_password }}'
-  become: yes
+  command: kubectl -n acnodal create secret generic egw-db --from-literal=username={{ postgresql_egw_user }} --from-literal=password='{{ postgresql_egw_password }}'
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: Upload database setup job manifest
   template:
     src: egw-ws-db-setup.yml.j2
-    dest: /root/egw-ws-db-setup.yml
-  become: yes
-
+    dest: egw-ws-db-setup.yml
+  vars:
+    postgres_ip: "{{ database_ip.stdout }}"
 - name:  Set up database (migrations and seeds)
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/egw-ws-db-setup.yml
-  become: yes
+  command: kubectl apply -f egw-ws-db-setup.yml
 
 - name: Upload web service manifest
   template:
     src: templates/egw-ws-demo.yml.j2
-    dest: /root/egw-ws-demo.yml
-  become: yes
-
+    dest: egw-ws-demo.yml
+  vars:
+    postgres_ip: "{{ database_ip.stdout }}"
 - name:  Launch web service
-  command: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /root/egw-ws-demo.yml
-  become: yes
+  command: kubectl apply -f egw-ws-demo.yml
