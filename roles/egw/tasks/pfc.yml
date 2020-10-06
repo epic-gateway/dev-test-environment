@@ -1,0 +1,23 @@
+---
+
+- name: copy pfc files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ pfc_remote_path }}/"
+    mode: a+x
+  with_fileglob:
+    - "{{ pfc_src_path }}/src/*.o"
+    - "{{ pfc_src_path }}/src/*.sh"
+    - "{{ pfc_src_path }}/src/cli_cfg"
+    - "{{ pfc_src_path }}/src/cli_service"
+    - "{{ pfc_src_path }}/src/cli_tunnel"
+    - "{{ pfc_src_path }}/src/cli_gc"
+    - "{{ pfc_src_path }}/test/port_*.sh"
+    - "{{ pfc_src_path }}/test/pfc_*.sh"
+    - "{{ pfc_src_path }}/test/docker/gue_ping_svc_auto"
+    - "{{ pfc_src_path }}/src/go/pfc_cli_go"
+  ignore_errors: yes
+
+- name: start pfc
+  shell: sudo env "PATH=$PATH" pfc_start.sh {{ pfc_interface }} {{ pfc_instance_name }} 9 9 {{ pfc_gue_port_min }} {{ pfc_gue_port_max }}
+  ignore_errors: yes
