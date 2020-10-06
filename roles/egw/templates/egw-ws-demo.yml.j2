@@ -24,6 +24,12 @@ rules:
   - get
   - list
   - watch
+- apiGroups:
+  - egw.acnodal.io
+  resources:
+  - loadbalancers
+  verbs:
+  - create
   - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -50,49 +56,6 @@ metadata:
   name: web-service
   namespace: acnodal
 spec:
-  revisionHistoryLimit: 3
-  selector:
-    matchLabels:
-      app: egw
-      component: web-service
-  template:
-    metadata:
-      labels:
-        app: egw
-        component: web-service
-    spec:
-      imagePullSecrets:
-      - name: gitlab
-      containers:
-      - args:
-        image: registry.gitlab.com/acnodal/egw/controller:latest
-        imagePullPolicy: Always
-        name: web-service
-        ports:
-        - containerPort: 8080
-          name: http
-          hostPort: 8080
-        resources:
-          limits:
-            cpu: 100m
-            memory: 100Mi
-        securityContext:
-          allowPrivilegeEscalation: true
-          readOnlyRootFilesystem: true
-      nodeSelector:
-        beta.kubernetes.io/os: linux
-      serviceAccountName: egw-web-service
-      terminationGracePeriodSeconds: 0
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: egw
-    component: web-service
-  name: web-service
-  namespace: acnodal
-spec:
   selector:
     matchLabels:
       app: egw
@@ -105,7 +68,7 @@ spec:
     spec:
       containers:
       - name: web-service
-        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo202010051404
+        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo202010060939
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
