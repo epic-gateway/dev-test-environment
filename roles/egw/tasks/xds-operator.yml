@@ -1,0 +1,7 @@
+---
+- name: Upload xds operator manifest
+  copy:
+    src: files/xds-operator.yml
+    dest: ./
+- name: Launch xds operator
+  command: kubectl apply -f xds-operator.yml
