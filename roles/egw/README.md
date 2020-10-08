@@ -25,7 +25,6 @@ Located in hosts.yml
       pod_cidr: "10.246.0.0/16"  - kubernetes POD CIDR range, needs to be configured because this block is used by endpoints and in the prototype cannot conflict with cluster
 
   vars:
-    database_ip: {the IP address of the EGW host, where postgresql runs}
     pfc_src_path: "../packet-forwarding-component" - location of packet-forwarding-component repository (location of compiled pfc)
     pfc_remote_path: "/tmp/.acnodal/bin" - path where pfc binaries are located (location of installed)
     pfc_interface: "eth1" - interface where pfc will process packets

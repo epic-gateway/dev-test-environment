@@ -43,7 +43,6 @@ Vagrant.configure('2') do |config|
           gateway: '192.168.128.1',
           pod_cidr: '10.128.0.0/16',
           ansible_python_interpreter: '/usr/bin/python3',
-          postgresql_pref_int: 'eth1',
           pfc_src_path: '../packet-forwarding-component',
           pfc_remote_path: '/tmp/.acnodal/bin',
           pfc_interface: 'eth1',
