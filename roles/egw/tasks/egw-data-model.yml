@@ -1,8 +1,4 @@
 ---
-- name: Pull in the secrets
-  include_vars: files/vault.yml
-  no_log: true
-
 - name: Create EGW namespace
   #                                                                        this is v0.1.0-pre6
   shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" https://gitlab.com/api/v4/projects/21452659/jobs/775348586/artifacts/config/crd/egw-namespace.yaml | kubectl apply -f -"

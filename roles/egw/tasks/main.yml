@@ -1,6 +1,10 @@
 ---
 # tasks file for egw
 
+- name: Pull in the secrets
+  include_vars: files/vault.yml
+  no_log: true
+
 - include_tasks: osprepk8s.yml
 - include_tasks: pfc.yml
 - include_tasks: docker-install.yml
