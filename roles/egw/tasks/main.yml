@@ -2,15 +2,11 @@
 # tasks file for egw
 
 - include_tasks: osprepk8s.yml
+- include_tasks: pfc.yml
 - include_tasks: postgresql-install.yml
 - include_tasks: docker-install.yml
 - include_tasks: kube-clients-install.yml
 - include_tasks: k8s-install.yml
-- include_tasks: multus-install.yml
-- include_tasks: router-install.yml
-- include_tasks: envoy4egw-install.yml
-- include_tasks: web-service-install.yml
-- include_tasks: pfc.yml
 
 - name: Fetch the EGW admin kubeconfig # so we can use kubectl from the host
   fetch:
