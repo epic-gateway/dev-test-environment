@@ -19,11 +19,11 @@
 - name: create net-attach-def multus0
   command: kubectl apply -f net-attach-multus0.yml
 
-- name: add ipset for incomming filtering
+- name: add ipset for incoming filtering
   command: /sbin/ipset -exist create egw-in hash:ip,port
   become: yes
 
-- name: have multus firewall rules been installedd
+- name: have multus firewall rules been installed
   command:  /sbin/iptables -C FORWARD -i {{ bridge_name }} -j ACCEPT
   register: multus_rule_installed
   become: yes

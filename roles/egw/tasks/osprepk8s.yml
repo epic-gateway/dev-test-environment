@@ -40,7 +40,7 @@
     enabled: yes
   become: yes
 
-- name: add bash alises file to root
+- name: add bash aliases file to root
   copy:
     src: files/bash_aliases
     dest: /root/.bash_aliases

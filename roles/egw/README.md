@@ -33,7 +33,7 @@ Located in hosts.yml
     pfc_gue_port_max: 6000 - port range upper bound for GUE tunnel allocation
     pfc_instance_name: "egw" - pfc instance name
 
-> Note: Vagrand adds 'pfc_remote_path' to the hosts PATH. It will overwrite original /etc/environment, ATM it contains only PATH, but could possibly cause a troube in the future.
+> Note: Vagrant adds 'pfc_remote_path' to the hosts PATH. It will overwrite original /etc/environment, ATM it contains only PATH, but could possibly cause a troube in the future.
 
 Dependencies
 ------------
