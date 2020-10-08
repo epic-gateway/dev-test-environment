@@ -6,7 +6,7 @@ SHELL_PROVISION_SCRIPT = <<-SHELL
   grep --quiet docker /etc/group || groupadd --system docker && usermod -a -G docker,systemd-journal,root vagrant
 
   cat <<ENV > /etc/environment
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+PATH="/tmp/.acnodal/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 KUBECONFIG="/etc/kubernetes/admin.conf"
 ENV
 
@@ -29,10 +29,7 @@ Vagrant.configure('2') do |config|
                    mode: 'passthrough',
                    mac: '20:ca:b0:70:00:02',
                    trust_guest_rx_filters: true
-    egw.vm.provision 'shell',
-                     inline: 'ip route | grep --quiet "^default via .* dev eth0" && ip route delete 0.0.0.0/0 dev eth0 || true'
-    egw.vm.provision 'shell',
-                     inline: 'echo "PATH=\"/tmp/.acnodal/bin:${PATH}\"" > /etc/environment'
+    egw.vm.provision :shell, inline: SHELL_PROVISION_SCRIPT
     egw.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'master.yml'
       ansible.compatibility_mode = '2.0'
