@@ -40,10 +40,13 @@
     enabled: yes
   become: yes
 
-- name: add bash aliases file to root
+- name: set up system-wide environment variables
   copy:
-    src: files/bash_aliases
-    dest: /root/.bash_aliases
+    dest: /etc/environment
+    mode: ugo+r
+    content: |
+      PATH="/tmp/.acnodal/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      KUBECONFIG="/etc/kubernetes/admin.conf"
   become: yes
 
 - name: add me to some useful groups

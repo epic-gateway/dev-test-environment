@@ -16,6 +16,17 @@
     mode: g+r
   become: yes
 
+- name: configure kubectl for all users
+  become: yes
+  copy:
+    dest: /etc/profile.d/kubecfg.sh
+    mode: ugo+r
+    content: |
+      export KUBECONFIG=/etc/kubernetes/admin.conf
+      source <(kubectl completion bash)
+      alias k=kubectl
+      complete -F __start_kubectl k
+
 # We do this taint/untaint dance because "taint --overwrite" is
 # idempotent so this pair of commands will work on new clusters and
 # also work when we're updating an existing cluster
