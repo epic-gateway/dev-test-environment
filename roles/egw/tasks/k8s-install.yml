@@ -50,7 +50,7 @@
   copy:
     src: files/update-jiva-sc.yml
     dest: update-jiva-sc.yml
-  command: kubectl apply -f openebs-operator.yml
 - name: Add OpenEBS - Persistent Storage System
+  command: kubectl apply -f openebs-operator.yml
 - name: update Jiva default storage class
   command: kubectl apply -f update-jiva-sc.yml
