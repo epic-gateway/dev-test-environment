@@ -6,7 +6,7 @@
 
 - name: Upload web service manifest
   template:
-    src: templates/egw-ws-demo.yml.j2
-    dest: egw-ws-demo.yml
+    src: files/egw-web-service.yml
+    dest: egw-web-service.yml
 - name:  Launch web service
-  command: kubectl apply -f egw-ws-demo.yml
+  command: kubectl apply -f egw-web-service.yml
