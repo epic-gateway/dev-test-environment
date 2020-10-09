@@ -45,7 +45,7 @@ Clone and build packet-forwarding-component and set its location in 'pfc_src_pat
 How to use
 ----------------
 
-ansible-playbook -i hosts.yml master.yml
+There's a Makefile in the project root, use the "egw-playbook" goal to run this playbook.
 
 License
 -------

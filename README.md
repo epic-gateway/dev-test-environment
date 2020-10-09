@@ -18,3 +18,10 @@ the vault password in a file called .ansible-vault-password so you
 don't have to type it every time you run
 ansible. .ansible-vault-password should be readable only by you. Ask
 Toby for the password.
+
+## Makefile
+
+The Makefile is mostly useful for running ad-hoc Ansible since the
+command has a bunch of flags.
+
+Run "make" to get a list of the goals.
