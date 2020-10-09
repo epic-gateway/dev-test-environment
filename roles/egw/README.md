@@ -26,11 +26,10 @@ Located in hosts.yml
 
   vars:
     pfc_src_path: "../packet-forwarding-component" - location of packet-forwarding-component repository (location of compiled pfc)
-    pfc_remote_path: "/tmp/.acnodal/bin" - path where pfc binaries are located (location of installed)
+    pfc_remote_path: "/opt/acnodal/bin" - path where pfc binaries are installed
     pfc_interface: "eth1" - interface where pfc will process packets
     pfc_gue_port_min: 5000 - port range lower bound for GUE tunnel allocation
     pfc_gue_port_max: 6000 - port range upper bound for GUE tunnel allocation
-    pfc_instance_name: "egw" - pfc instance name
 
 > Note: Vagrant adds 'pfc_remote_path' to the hosts PATH. It will overwrite original /etc/environment, ATM it contains only PATH, but could possibly cause a troube in the future.
 

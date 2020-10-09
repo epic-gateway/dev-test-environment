@@ -45,7 +45,7 @@
     dest: /etc/environment
     mode: ugo+r
     content: |
-      PATH="/tmp/.acnodal/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      PATH="{{ pfc_remote_path }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       KUBECONFIG="/etc/kubernetes/admin.conf"
   become: yes
 
@@ -54,4 +54,3 @@
   become: yes
 - name: Reset ssh connection to allow user changes to affect 'current login user'
   meta: reset_connection
-  become: yes

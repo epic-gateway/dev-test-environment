@@ -36,11 +36,10 @@ Vagrant.configure('2') do |config|
           pod_cidr: '10.128.0.0/16',
           ansible_python_interpreter: '/usr/bin/python3',
           pfc_src_path: '../packet-forwarding-component',
-          pfc_remote_path: '/tmp/.acnodal/bin',
+          pfc_remote_path: '/opt/acnodal/bin',
           pfc_interface: 'eth1',
           pfc_gue_port_min: 5000,
           pfc_gue_port_max: 6000,
-          pfc_instance_name: 'egw'
         }
       }
       ansible.verbose = true
