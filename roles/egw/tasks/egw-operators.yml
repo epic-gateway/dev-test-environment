@@ -5,3 +5,10 @@
     dest: ./
 - name: Launch xds operator
   command: kubectl apply -f xds-operator.yml
+
+- name: Upload egw operator manifest
+  copy:
+    src: files/egw-operator.yml
+    dest: ./
+- name: Launch egw operator
+  command: kubectl apply -f egw-operator.yml

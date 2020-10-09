@@ -31,5 +31,5 @@
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - include_tasks: egw-data-model.yml
-- include_tasks: xds-operator.yml
+- include_tasks: egw-operators.yml
 - include_tasks: web-service-install.yml
