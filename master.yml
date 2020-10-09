@@ -1,3 +1,12 @@
 - hosts: egw
+
+  vars_files:
+    # this is because Ansible looks for vars files relative to the
+    # inventory file, which is typically in the project root. Ansible,
+    # however, puts its auto-generated inventory file in a subdirectory
+    # so if I don't explicitly tell Ansible about the group vars it
+    # won't find them.
+    - group_vars/egw.yml
+
   roles:
    - egw

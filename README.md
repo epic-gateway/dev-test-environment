@@ -4,9 +4,11 @@ EGW infrastructure project
 
 ## Repository Structure
 
-| Directory              | Description                               |
-| ---------------------- | ----------------------------------------- |
-| [roles/egw](roles/egw) | Ansible playbook                          |
+| Directory              | Description                                     |
+| ---------------------- | -----------------------------------------       |
+| [roles/egw](roles/egw) | Ansible playbook                                |
+| group_vars/egw.yaml    | Default variable values (override in hosts.yml) |
+|                        |                                                 |
 
 ## Setup
 

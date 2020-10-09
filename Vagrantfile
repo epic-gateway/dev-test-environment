@@ -34,12 +34,6 @@ Vagrant.configure('2') do |config|
           rangeEnd: '192.168.128.216',
           gateway: '192.168.128.1',
           pod_cidr: '10.128.0.0/16',
-          ansible_python_interpreter: '/usr/bin/python3',
-          pfc_src_path: '../packet-forwarding-component',
-          pfc_remote_path: '/opt/acnodal/bin',
-          pfc_interface: 'eth1',
-          pfc_gue_port_min: 5000,
-          pfc_gue_port_max: 6000,
         }
       }
       ansible.verbose = true

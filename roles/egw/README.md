@@ -11,7 +11,7 @@ Requires variables in hosts.yml to execute
 Role Variables
 --------------
 
-Located in hosts.yml
+Defaults are located in group_vars/egw.yml. You can add per-host overrides to hosts.yml.
 
       bridge_name: multus0 - Used to identify the net-attach-def and create the bridge int
       isGateway: true - identifies bridge as a router - adds gateway address bridge bridge int
