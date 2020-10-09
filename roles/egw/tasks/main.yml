@@ -33,6 +33,3 @@
 - include_tasks: egw-data-model.yml
 - include_tasks: xds-operator.yml
 - include_tasks: web-service-install.yml
-
-# FIXME: remove this when we start managing envoy pods dynamically
-- include_tasks: envoy4egw-install.yml
