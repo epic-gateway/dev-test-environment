@@ -1,11 +1,6 @@
 ---
-- name: identify if docker is already installed
-  stat:
-    path: /etc/docker/daemon.json
-  register: docker_installed
-
-
 - name: install docker if not present
+  become: yes
   block:
     - name: setup docker repository
       apt:
@@ -43,5 +38,7 @@
       apt:
         name: docker-ce
 
-  when: docker_installed.stat.exists == False
-  become: yes
+    - name: add me to the docker group
+      shell: "usermod -a -G docker {{ target_user.stdout }}"
+    - name: Reset ssh connection to allow user changes to affect 'current login user'
+      meta: reset_connection

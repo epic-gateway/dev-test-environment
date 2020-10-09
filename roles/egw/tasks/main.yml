@@ -1,6 +1,10 @@
 ---
 # tasks file for egw
 
+- name: Figure out the name of the user running on the target
+  command: whoami
+  register: target_user
+
 - name: Pull in the secrets
   include_vars: files/vault.yml
   no_log: true
