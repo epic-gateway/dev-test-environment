@@ -5,130 +5,23 @@ metadata:
   namespace: router
 data:
   bird.conf: |-
-    # Basic configuration for EGW Routing Process
-    # Configure logging
-    log stderr all;
-
-    # Set router ID. 
-    # router id 192.168.151.154;
-    # Set in container by docker-entrypoint.sh
-    # router id from included file
-
-    include "/usr/local/include/routerid.conf";;
-
-
-    # Turn on global debugging of all protocols (all messages or just selected classes)
-    # debug protocols all;
-    # debug protocols { events, states };
+    # Configuration Skeleton for BIRD egw 
+    # includes come from PVC
+    
+    # set in env var retrieved and set in envvar.conf
+    include "/usr/local/include/bird/envvar.conf";
+    
+    
+    #  Router ID set to host addr
+    router id k8sipaddr;
 
     # Turn on internal watchdog
     watchdog warning 5 s;
     watchdog timeout 30 s;
-
-    protocol device {
-    }
-
-    protocol direct {
-      disabled;		# Disable by default
-      ipv4;			# Connect to default IPv4 table
-      ipv6;			# ... and to default IPv6 table
-    }
-
-    protocol kernel {
-      ipv4 { export all; };
-        learn;			# Learn alien routes from the kernel
-    }
-
-
-    protocol kernel {
-      ipv6 { export all; };
-          learn;
-    }
-
-    protocol static {
-      ipv4;			# Again, IPv4 channel with default options
-
-    #	route 0.0.0.0/0 via 198.51.100.10;
-    #	route 192.0.2.0/24 blackhole;
-    #	route 10.0.0.0/8 unreachable;
-    #	route 10.2.0.0/24 via "enp1s0";
-    #	route 10.1.1.0/24 via 198.51.100.3 { rip_metric = 3; };
-    #	route 10.1.2.0/24 via 198.51.100.3 { ospf_metric1 = 100; };
-    #	route 10.1.3.0/24 via 198.51.100.4 { ospf_metric2 = 100; };
-    }
-
-    # protocol rip {
-    #	ipv4 {
-    #		# Export direct, static routes and ones from RIP itself
-    #		import all;
-    #		export where source ~ [ RTS_DEVICE, RTS_STATIC, RTS_RIP ];
-    #	};
-    #	interface "eth*" {
-    #	  	update time 10;			# Default period is 30
-    #		timeout time 60;		# Default timeout is 180
-    #		authentication cryptographic;	# No authentication by default
-    #		password "hello" { algorithm hmac sha256; }; # Default is MD5
-    #	};
-    # }
-
-
-    # protocol ospf v3 {
-    #  	ipv6 {
-    #		import all;
-    #		export where source = RTS_STATIC;
-    #	};
-    #	area 0 {
-    #		interface "eth*" {
-    #			type broadcast;		# Detected by default
-    #			cost 10;		# Interface metric
-    #			hello 5;		# Default hello perid 10 is too long
-    #		};
-    #		interface "tun*" {
-    #			type ptp;		# PtP mode, avoids DR selection
-    #			cost 100;		# Interface metric
-    #			hello 5;		# Default hello perid 10 is too long
-    #		};
-    #		interface "dummy0" {
-    #			stub;			# Stub interface, just propagate it
-    #		};
-    #	};
-    #}
-
-    # Define simple filter as an example for BGP import filter
-    # See https://gitlab.labs.nic.cz/labs/bird/wikis/BGP_filtering for more examples
-    # filter rt_import
-    # {
-    #	if bgp_path.first != 64496 then accept;
-    #	if bgp_path.len > 64 then accept;
-    #	if bgp_next_hop != from then accept;
-    #	reject;
-    # }
-
-    #filter bgp_accept {
-    #	accept;
-    #}
-
-    # protocol bgp uplink1 {
-    #	description "My BGP uplink";
-    #	local 192.168.151.154 as 4200000003;
-    #	neighbor 192.168.151.1 as 65550;
-    #       multihop 2;
-    #	hold time 90;		# Default is 240
-    #	password "secret";	# Password used for MD5 authentication
-    #
-    #	ipv4 {			# regular IPv4 unicast (1/1)
-    #		import filter rt_import;
-    #		export where source ~ [ RTS_STATIC, RTS_BGP ];
-    #		import filter bgp_accept;
-    #	};
-
-    #	ipv6 {			# regular IPv6 unicast (2/1)
-    #		import filter rt_import;
-    #		export filter {	# The same as 'where' expression above
-    #			if source ~ [ RTS_STATIC, RTS_BGP ]
-    #			then accept;
-    #			else reject;
-    #		};
-    #		import filter bgp_accept;
-    #	};
-
+    include "/usr/local/include/bird/logging.conf";
+    include "/usr/local/include/bird/proto_host.conf";
+    include "/usr/local/include/bird/bfd.conf";
+    include "/usr/local/include/bird/routes_static.conf";
+    include "/usr/local/include/bird/bgp_policies.conf";
+    include "/usr/local/include/bird/bgp_peers.conf";
+    
