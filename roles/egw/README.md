@@ -11,7 +11,7 @@ Requires variables in hosts.yml to execute
 Role Variables
 --------------
 
-Located in hosts.yml
+Defaults are located in group_vars/egw.yml. You can add per-host overrides to hosts.yml.
 
       bridge_name: multus0 - Used to identify the net-attach-def and create the bridge int
       isGateway: true - identifies bridge as a router - adds gateway address bridge bridge int
@@ -25,15 +25,13 @@ Located in hosts.yml
       pod_cidr: "10.246.0.0/16"  - kubernetes POD CIDR range, needs to be configured because this block is used by endpoints and in the prototype cannot conflict with cluster
 
   vars:
-    database_ip: {the IP address of the EGW host, where postgresql runs}
     pfc_src_path: "../packet-forwarding-component" - location of packet-forwarding-component repository (location of compiled pfc)
-    pfc_remote_path: "/tmp/.acnodal/bin" - path where pfc binaries are located (location of installed)
+    pfc_remote_path: "/opt/acnodal/bin" - path where pfc binaries are installed
     pfc_interface: "eth1" - interface where pfc will process packets
     pfc_gue_port_min: 5000 - port range lower bound for GUE tunnel allocation
     pfc_gue_port_max: 6000 - port range upper bound for GUE tunnel allocation
-    pfc_instance_name: "egw" - pfc instance name
 
-> Note: Vagrand adds 'pfc_remote_path' to the hosts PATH. It will overwrite original /etc/environment, ATM it contains only PATH, but could possibly cause a troube in the future.
+> Note: Vagrant adds 'pfc_remote_path' to the hosts PATH. It will overwrite original /etc/environment, ATM it contains only PATH, but could possibly cause a troube in the future.
 
 Dependencies
 ------------
@@ -47,7 +45,7 @@ Clone and build packet-forwarding-component and set its location in 'pfc_src_pat
 How to use
 ----------------
 
-ansible-playbook -i hosts.yml master.yml
+There's a Makefile in the project root, use the "egw-playbook" goal to run this playbook.
 
 License
 -------

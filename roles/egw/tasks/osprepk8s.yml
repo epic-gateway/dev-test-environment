@@ -40,8 +40,17 @@
     enabled: yes
   become: yes
 
-- name: add bash alises file to root
+- name: set up system-wide environment variables
   copy:
-    src: files/bash_aliases
-    dest: /root/.bash_aliases
+    dest: /etc/environment
+    mode: ugo+r
+    content: |
+      PATH="{{ pfc_remote_path }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      KUBECONFIG="/etc/kubernetes/admin.conf"
   become: yes
+
+- name: add me to some useful groups
+  shell: "usermod -a -G systemd-journal,root {{ target_user.stdout }}"
+  become: yes
+- name: Reset ssh connection to allow user changes to affect 'current login user'
+  meta: reset_connection

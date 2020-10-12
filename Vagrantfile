@@ -2,14 +2,6 @@ BOX='generic/ubuntu2004'
 EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
 VAULT_PASSWORD_FILE = '.ansible-vault-password'
 SHELL_PROVISION_SCRIPT = <<-SHELL
-  # add the vagrant user to the docker group (and some others) before we run ansible so that it can run docker commands in the ansible playbook
-  grep --quiet docker /etc/group || groupadd --system docker && usermod -a -G docker,systemd-journal,root vagrant
-
-  cat <<ENV > /etc/environment
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-KUBECONFIG="/etc/kubernetes/admin.conf"
-ENV
-
   # remove the vagrant default route so ansible figures out the correct default interface
   ip route | grep --quiet "^default via 192.168.121.1" && ip route delete default via 192.168.121.1 || true
 SHELL
@@ -29,10 +21,7 @@ Vagrant.configure('2') do |config|
                    mode: 'passthrough',
                    mac: '20:ca:b0:70:00:02',
                    trust_guest_rx_filters: true
-    egw.vm.provision 'shell',
-                     inline: 'ip route | grep --quiet "^default via .* dev eth0" && ip route delete 0.0.0.0/0 dev eth0 || true'
-    egw.vm.provision 'shell',
-                     inline: 'echo "PATH=\"/tmp/.acnodal/bin:${PATH}\"" > /etc/environment'
+    egw.vm.provision :shell, inline: SHELL_PROVISION_SCRIPT
     egw.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'master.yml'
       ansible.compatibility_mode = '2.0'
@@ -45,14 +34,6 @@ Vagrant.configure('2') do |config|
           rangeEnd: '192.168.128.216',
           gateway: '192.168.128.1',
           pod_cidr: '10.128.0.0/16',
-          ansible_python_interpreter: '/usr/bin/python3',
-          postgresql_pref_int: 'eth1',
-          pfc_src_path: '../packet-forwarding-component',
-          pfc_remote_path: '/tmp/.acnodal/bin',
-          pfc_interface: 'eth1',
-          pfc_gue_port_min: 5000,
-          pfc_gue_port_max: 6000,
-          pfc_instance_name: 'egw'
         }
       }
       ansible.verbose = true

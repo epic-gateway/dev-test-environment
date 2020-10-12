@@ -1,6 +1,6 @@
 ---
 
-- name: check dependancies installed
+- name: check dependencies installed
   apt:
     update_cache: yes
     name:

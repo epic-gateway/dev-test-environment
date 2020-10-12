@@ -4,7 +4,7 @@ kind: ServiceAccount
 metadata:
   labels:
     app: egw
-  name: egw-web-service
+  name: xds-operator
   namespace: acnodal
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -12,7 +12,7 @@ kind: ClusterRole
 metadata:
   labels:
     app: egw
-  name: egw-web-service
+  name: xds-operator
 rules:
 - apiGroups:
   - egw.acnodal.io
@@ -24,27 +24,20 @@ rules:
   - get
   - list
   - watch
-- apiGroups:
-  - egw.acnodal.io
-  resources:
-  - loadbalancers
-  verbs:
-  - create
-  - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
     app: egw
-  name: egw-web-service
+  name: xds-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: egw-web-service
+  name: xds-operator
 subjects:
 - kind: ServiceAccount
-  name: egw-web-service
+  name: xds-operator
   namespace: acnodal
 ---
 apiVersion: apps/v1
@@ -52,62 +45,51 @@ kind: Deployment
 metadata:
   labels:
     app: egw
-    component: web-service
-  name: web-service
+    component: xds-operator
+  name: xds-operator
   namespace: acnodal
 spec:
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app: egw
-      component: web-service
+      component: xds-operator
   template:
     metadata:
       labels:
         app: egw
-        component: web-service
+        component: xds-operator
     spec:
+      imagePullSecrets:
+      - name: gitlab
       containers:
-      - name: web-service
-        image: registry.gitlab.com/acnodal/egw-web-service/web-service:demo202010060939
+      - args:
+        image: registry.gitlab.com/acnodal/xds-operator/xds-operator:latest
         imagePullPolicy: Always
+        name: xds-operator
         ports:
-        - containerPort: 8080
-        - containerPort: 18000
+        - name: http
+          containerPort: 8080
+          hostPort: 8080
+        - name: xds
+          containerPort: 18000
+          hostPort: 18000
         securityContext:
           allowPrivilegeEscalation: true
           readOnlyRootFilesystem: true
-        env:
-        - name: DATABASE_URL
-          value: postgresql://{{ postgres_ip }}:5432/egw
-        - name: PGUSER
-          valueFrom:
-            secretKeyRef:
-              name: egw-db
-              key: username
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: egw-db
-              key: password
-      imagePullSecrets:
-      - name: gitlab
-      serviceAccountName: egw-web-service
+      serviceAccountName: xds-operator
       terminationGracePeriodSeconds: 0
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: web-service
+  name: xds-operator
   namespace: acnodal
 spec:
   type: NodePort
   ports:
-  - port: 8080
-    nodePort: 30080
-    name: ws
-  - port: 18000
-    nodePort: 30081
-    name: xds
+    - port: 18000
+      nodePort: 30018
   selector:
     app: egw
-    component: web-service
+    component: xds-operator

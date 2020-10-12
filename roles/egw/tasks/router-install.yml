@@ -1,8 +1,4 @@
 ---
-- name: Pull in the secrets
-  include_vars: files/vault.yml
-  no_log: true
-
 - name:  create router namespace
   command: kubectl create namespace router
   register: result
