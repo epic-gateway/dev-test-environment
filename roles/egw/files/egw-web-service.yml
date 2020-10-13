@@ -19,6 +19,7 @@ rules:
   resources:
   - accounts
   - servicegroups
+  - serviceprefixes
   - loadbalancers
   verbs:
   - get
