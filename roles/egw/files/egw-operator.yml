@@ -19,6 +19,7 @@ rules:
   resources:
   - accounts
   - servicegroups
+  - serviceprefixes
   - loadbalancers
   verbs:
   - get
@@ -30,6 +31,22 @@ rules:
   - loadbalancers
   verbs:
   - update
+- apiGroups:
+  - k8s.cni.cncf.io
+  resources:
+  - network-attachment-definitions
+  verbs:
+  - get
+  - create
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - list
+  - get
+  - create
+  - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
