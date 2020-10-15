@@ -25,6 +25,11 @@
       register: result
       failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
+    - name: Create sample service prefix
+      shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/samples/egw_v1_serviceprefix.yaml | kubectl apply -f -"
+      args:
+        warn: false
+
     - name: Create sample account
       shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/samples/egw_v1_account.yaml | kubectl apply -f -"
       args:
@@ -35,10 +40,6 @@
       args:
         warn: false
 
-    - name: Create sample service prefix
-      shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/samples/egw_v1_serviceprefix.yaml | kubectl apply -f -"
-      args:
-        warn: false
-
   vars:
-    job: https://gitlab.com/api/v4/projects/21452659/jobs/788398815/artifacts # this is egw-resource-model v0.1.1-pre2
+     # this is egw-resource-model v0.1.1-pre3
+    job: https://gitlab.com/api/v4/projects/21452659/jobs/793629828/artifacts
