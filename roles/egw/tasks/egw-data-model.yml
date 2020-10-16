@@ -41,5 +41,5 @@
         warn: false
 
   vars:
-     # this is egw-resource-model v0.1.1-pre3
-    job: https://gitlab.com/api/v4/projects/21452659/jobs/793629828/artifacts
+     # this is egw-resource-model v0.1.1-pre4
+    job: https://gitlab.com/api/v4/projects/21452659/jobs/794021192/artifacts
