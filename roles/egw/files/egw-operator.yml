@@ -90,8 +90,20 @@ spec:
         image: registry.gitlab.com/acnodal/egw-operator/egw-operator:latest
         imagePullPolicy: Always
         name: egw-operator
+        ports:
+        - name: http
+          containerPort: 8081
+          hostPort: 8081
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
         securityContext:
           allowPrivilegeEscalation: true
           readOnlyRootFilesystem: true
+          capabilities:
+            add:
+            - NET_ADMIN
+      hostNetwork: true
       serviceAccountName: egw-operator
       terminationGracePeriodSeconds: 0
