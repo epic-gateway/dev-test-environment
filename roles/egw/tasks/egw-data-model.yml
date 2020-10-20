@@ -42,4 +42,4 @@
 
   vars:
      # this is egw-resource-model v0.1.1-pre4
-    job: https://gitlab.com/api/v4/projects/21452659/jobs/794021192/artifacts
+    job: https://gitlab.com/api/v4/projects/21452659/jobs/801889319/artifacts
