@@ -25,3 +25,9 @@
       - "{{ pfc_src_path }}/test/docker/gue_ping_svc_auto"
       - "{{ pfc_src_path }}/src/go/pfc_cli_go"
 
+  - name: mount BPF filesystem
+    mount:
+      state: mounted
+      fstype: bpf
+      src: bpf
+      path: /sys/fs/bpf
