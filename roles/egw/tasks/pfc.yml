@@ -25,5 +25,3 @@
       - "{{ pfc_src_path }}/test/docker/gue_ping_svc_auto"
       - "{{ pfc_src_path }}/src/go/pfc_cli_go"
 
-  - name: start pfc
-    shell: "PATH={{ pfc_remote_path }}:$PATH pfc_start.sh {{ pfc_interface }} {{ inventory_hostname }} 9 9 {{ pfc_gue_port_min }} {{ pfc_gue_port_max }}"

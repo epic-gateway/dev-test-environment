@@ -12,23 +12,3 @@
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-
-- name: add ipset for incoming filtering
-  command: /sbin/ipset -exist create egw-in hash:ip,port
-  become: yes
-
-- name: have multus firewall rules been installed
-  command:  /sbin/iptables -C FORWARD -i {{ bridge_name }} -j ACCEPT
-  register: multus_rule_installed
-  become: yes
-  ignore_errors: true
-
-
-- name: install multus firewall rules
-  block:
-    - name: add multus interface origin accept rule
-      command:  /sbin/iptables -I FORWARD -i {{ bridge_name }} -m comment --comment "multus bridge {{ bridge_name }}" -j ACCEPT
-    - name: add matching iptables rule for ipset
-      command: /sbin/iptables -I FORWARD -m set --match-set egw-in dst,dst -j ACCEPT
-  when: multus_rule_installed.rc  == 1
-  become: yes

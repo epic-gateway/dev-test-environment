@@ -30,6 +30,7 @@
     - acl
     - open-iscsi
     - jq
+    - bridge-utils
     install_recommends: no
   become: yes
   
