@@ -1,45 +1,56 @@
 ---
-- name: Load EGW custom resource definitions and samples
-  block:
-    - name: Create EGW namespace
-      shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/crd/egw-namespace.yaml | kubectl apply -f -"
-      args:
-        warn: false
-      register: result
-      failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+- name: download resource model artifacts from gitlab
+  get_url:
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
+    # this is job v0.1.2-pre1
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/825462242/artifacts
+    dest: ./
+- name: unzip artifacts
+  unarchive:
+    src: artifacts.zip
+    remote_src: yes
+    dest: ./
 
-    - name: Apply EGW custom resource definitions
-      shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/crd/bases/egw.acnodal.io.yaml | kubectl apply -f -"
-      args:
-        warn: false
+- name: Create EGW namespace
+  command: kubectl apply -f config/crd/egw-namespace.yaml
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-    - name: Create sample namespace
-      shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/samples/namespace.yaml | kubectl apply -f -"
-      args:
-        warn: false
-      register: result
-      failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+- name: Create acnodal namespace, crds, and EGW operator
+  # we should be able to run "kubectl apply -k config/default" but the
+  # version of kustomize that's build into kubectl is so old that it
+  # doesn't work. For example, kubectl doesn't substitute the
+  # namespace properly so it creates a "system" namespace, which is
+  # wrong.
+  #
+  # FIXME: use "kubectl -k" when "kubectl -k" works, and don't install
+  # kustomize
+  shell: kustomize build config/default | kubectl apply -f -
+  # this play can fail when we're bringing up the system because
+  # various components (e.g., cert-manager) are in the process of
+  # starting up. Back off for a few seconds to give things a chance to
+  # settle down and try again.
+  retries: 3
+  delay: 30
+  register: result
+  until: result is not failed
 
-    - name: create secret for acnodal private registry
-      command: kubectl -n egw-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
-      register: result
-      failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+- name: Create sample namespace
+  command: kubectl apply -f config/samples/namespace.yaml
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-    - name: Create sample service prefix
-      shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/samples/egw_v1_serviceprefix.yaml | kubectl apply -f -"
-      args:
-        warn: false
+- name: create secret for acnodal private registry
+  command: kubectl -n egw-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-    - name: Create sample account
-      shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/samples/egw_v1_account.yaml | kubectl apply -f -"
-      args:
-        warn: false
+- name: Create sample service prefix
+  command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml
 
-    - name: Create sample service group
-      shell: "curl -s --header \"PRIVATE-TOKEN: {{ gitlab_toby_ansible_ro }}\" {{ job }}/config/samples/egw_v1_servicegroup.yaml | kubectl apply -f -"
-      args:
-        warn: false
+- name: Create sample account
+  command: kubectl apply -f config/samples/egw_v1_account.yaml
 
-  vars:
-     # this is egw-resource-model v0.1.1-pre8
-    job: https://gitlab.com/api/v4/projects/21452659/jobs/804133390/artifacts
+- name: Create sample service group
+  command: kubectl apply -f config/samples/egw_v1_servicegroup.yaml

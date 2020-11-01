@@ -24,11 +24,7 @@
 
 - include_tasks: multus-install.yml
 - include_tasks: router-install.yml
-
-- name:  Create acnodal namespace
-  command: kubectl create namespace acnodal
-  register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+- include_tasks: cert-manager-install.yml
 
 - include_tasks: egw-data-model.yml
 - include_tasks: egw-operators.yml
