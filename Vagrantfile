@@ -14,6 +14,8 @@ Vagrant.configure('2') do |config|
     lv.memory = 4096
   end
 
+  config.vm.synced_folder './', '/vagrant', type: 'nfs'
+
   config.vm.define 'egw' do |egw|
     egw.vm.hostname = 'egw'
     egw.vm.network :public_network,
@@ -50,7 +52,6 @@ Vagrant.configure('2') do |config|
     trigger.info = "Setting EGWINT #{EGWINT} down"
     trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
   end
-
 
 
   config.trigger.after [:destroy, :halt, :suspend] do |trigger|
