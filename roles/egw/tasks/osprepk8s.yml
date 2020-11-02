@@ -1,25 +1,20 @@
 ---
-
 - name: copy sysctl file
   copy:
     src: files/k8s.conf
     dest: /etc/sysctl.d/k8s.conf
-  become: yes
   
 - name: update sysctl
   command: /sbin/sysctl --system
-  become: yes
 
 - name: disable swap
   command: /sbin/swapoff -a
-  become: yes
 
 - name: edit fstab
   lineinfile:
     path: /etc/fstab
     regexp: 'swap'
     state: absent
-  become: yes
 
 - name: install system tools
   apt:
@@ -32,14 +27,12 @@
     - jq
     - bridge-utils
     install_recommends: no
-  become: yes
   
 - name: enable & start iscsi client
   systemd:
     name: iscsid
     state: started
     enabled: yes
-  become: yes
 
 - name: set up system-wide environment variables
   copy:
@@ -48,10 +41,15 @@
     content: |
       PATH="{{ pfc_remote_path }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       KUBECONFIG="/etc/kubernetes/admin.conf"
-  become: yes
 
 - name: add me to some useful groups
   shell: "usermod -a -G systemd-journal,root {{ target_user.stdout }}"
-  become: yes
 - name: Reset ssh connection to allow user changes to affect 'current login user'
   meta: reset_connection
+
+- name: mount BPF filesystem
+  mount:
+    state: mounted
+    fstype: bpf
+    src: bpf
+    path: /sys/fs/bpf
