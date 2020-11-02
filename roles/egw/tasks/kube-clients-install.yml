@@ -43,9 +43,15 @@
     mode: '0755'
   become: yes
 
-
-
-
-
-
-
+- name: upload kustomize install script
+  copy:
+    src: files/install_kustomize.sh
+    dest: /root
+    mode: '0755'
+  become: yes
+- name: install kustomize
+  command:
+    cmd: /root/install_kustomize.sh 3.8.6
+    chdir: /usr/local/bin
+    creates: /usr/local/bin/kustomize
+  become: yes
