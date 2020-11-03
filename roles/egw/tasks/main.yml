@@ -15,6 +15,8 @@
       become: yes
 - include_tasks: docker-install.yml
 - include_tasks: kube-clients-install.yml
+- include_tasks: helm-install.yml
+  args: {apply: {become: yes}}
 - include_tasks: k8s-install.yml
 
 - name: Fetch the EGW admin kubeconfig # so we can use kubectl from the host
@@ -27,6 +29,7 @@
 - include_tasks: multus-install.yml
 - include_tasks: router-install.yml
 - include_tasks: cert-manager-install.yml
+- include_tasks: vault-install.yml
 
 - include_tasks: egw-data-model.yml
 - include_tasks: egw-operators.yml

@@ -1,0 +1,8 @@
+---
+- name: add hashicorp helm repo
+  command: helm repo add hashicorp https://helm.releases.hashicorp.com
+
+- name: install development mode vault
+  command: helm upgrade --install vault hashicorp/vault --set "server.dev.enabled=true" --version 0.8.0
+  # the helm website says "The Helm chart is new and under significant
+  # development" so I'm being cautious and pinning the version
