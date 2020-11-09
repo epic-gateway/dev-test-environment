@@ -46,11 +46,5 @@
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-- name: Create sample service prefix
-  command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml
-
-- name: Create sample account
-  command: kubectl apply -f config/samples/egw_v1_account.yaml
-
-- name: Create sample service group
-  command: kubectl apply -f config/samples/egw_v1_servicegroup.yaml
+- name: Create sample config
+  command: kubectl apply -f config/samples/egw_v1_nodeconfig.yaml -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml -f config/samples/egw_v1_servicegroup.yaml
