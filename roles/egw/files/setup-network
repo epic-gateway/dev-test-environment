@@ -2,7 +2,6 @@
 
 import docker
 import json
-import netlink
 import subprocess
 from kubernetes import client, config, watch
 
@@ -36,8 +35,11 @@ def handle_event(event):
                     print("Netnsid: ", nsid)
 
                     # get veth interface
-                    veth = netlink.NetworkDevice(nsid, None, netlink.Network()).get_interface()
-                    ifname = veth['IFNAME']
+                    d = subprocess.run(["/usr/sbin/ip", "-j", "link", "show"], capture_output=True)
+                    if d.returncode == 0:
+                        for dev in json.loads(d.stdout):
+                            if 'master' in dev and dev['master'] == 'multus0' and 'link_netnsid' in dev and dev['link_netnsid'] == nsid:
+                                ifname = dev['ifname']
                     print("veth name: ", ifname)
 
                     # setup PFC on that veth

@@ -1,8 +1,4 @@
 ---
-  - name: install python netlink package
-    pip:
-      name: netlink
-
   - name: install network setup daemon
     copy:
       src: setup-network
