@@ -6,7 +6,7 @@
   - name: install network setup daemon
     copy:
       src: setup-network
-      dest: /opt/acnodal/bin/
+      dest: "{{ pfc_remote_path }}"
       mode: +x
 
   - name: create systemd service directory
@@ -24,7 +24,7 @@
         Environment=KUBECONFIG=/etc/kubernetes/admin.conf \
                     PYTHONUNBUFFERED=1
         ExecStartPre=/usr/bin/kubectl wait --for=condition=Available --timeout=5m --all -A deployments
-        ExecStart=/opt/acnodal/bin/setup-network
+        ExecStart="{{ pfc_remote_path }}"/setup-network
         User=root
         Group=root
         WorkingDirectory=/root
