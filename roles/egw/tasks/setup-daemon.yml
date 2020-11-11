@@ -1,0 +1,42 @@
+---
+  - name: install python netlink package
+    pip:
+      name: netlink
+
+  - name: install network setup daemon
+    copy:
+      src: setup-network
+      dest: /opt/acnodal/bin/
+      mode: +x
+
+  - name: create systemd service directory
+    file:
+      path: /usr/local/lib/systemd/system
+      state: directory
+  - name: install systemd service file for the network setup daemon
+    copy:
+      content: |
+        [Unit]
+        Description=Envoy pod veth config daemon
+        After=network.target
+        
+        [Service]
+        Environment=KUBECONFIG=/etc/kubernetes/admin.conf \
+                    PYTHONUNBUFFERED=1
+        ExecStartPre=/usr/bin/kubectl wait --for=condition=Available --timeout=5m --all -A deployments
+        ExecStart=/opt/acnodal/bin/setup-network
+        User=root
+        Group=root
+        WorkingDirectory=/root
+        Restart=always
+        RestartSec=10
+        
+        [Install]
+        WantedBy=multi-user.target
+      dest: /usr/local/lib/systemd/system/setup-network.service
+
+  - name: start network setup daemon
+    systemd:
+      name: setup-network.service
+      state: started
+      daemon_reload: yes

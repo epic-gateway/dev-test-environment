@@ -1,0 +1,61 @@
+#!/usr/bin/python3
+
+import docker
+import json
+import netlink
+import subprocess
+from kubernetes import client, config, watch
+
+
+def handle_event(event):
+
+    # the only type of event that we care about is when an Envoy pod
+    # is launched which is indicated by an "ADDED" event
+    if 'ADDED' == event['type']:
+
+        # start with the container id
+        print(event['object'].status)
+        containerid = event['object'].status.container_statuses[0].container_id.split('://')[1]
+        print("Container ID: ", containerid)
+
+        # use the container id to find the docker pid
+        podpid = dclient.containers.get(containerid).attrs['Config']['Labels']['io.kubernetes.sandbox.id']
+        print("Pod PID: ", podpid)
+
+        # use the primary pod container to find the "pause" container
+        pausepid = int(dclient.containers.get(podpid).attrs['State']['Pid'])
+        print("Pause container PID: ", pausepid)
+
+        # find the namespace that contains the "pause" container
+        cp = subprocess.run(['/usr/bin/lsns', '-Jt', 'net'], capture_output=True)
+        if cp.returncode == 0:
+            nss = json.loads(cp.stdout)['namespaces']
+            for ns in nss:
+                if ns['pid'] == pausepid:
+                    nsid = int(ns['netnsid'])
+                    print("Netnsid: ", nsid)
+
+                    # get veth interface
+                    veth = netlink.NetworkDevice(nsid, None, netlink.Network()).get_interface()
+                    ifname = veth['IFNAME']
+                    print("veth name: ", ifname)
+
+                    # setup PFC on that veth
+                    subprocess.run("/usr/sbin/tc qdisc list dev {0} clsact | grep clsact || /usr/sbin/tc qdisc add dev {0} clsact".format(ifname), shell=True, check=True)
+                    subprocess.run("/usr/sbin/tc filter show dev {0} ingress | grep pfc_tag_rx_tc || /usr/sbin/tc filter add dev {0} ingress bpf direct-action object-file /opt/acnodal/bin/pfc_tag_rx_tc.o sec .text".format(ifname), shell=True, check=True)
+                    print(ifname, "configured")
+
+                    return
+        else:
+            print("error running lsns", cp.stderr)
+
+
+if __name__ == "__main__":
+    config.load_kube_config()
+    dclient = docker.from_env()
+
+    v1 = client.CoreV1Api()
+    w = watch.Watch()
+    for event in w.stream(v1.list_pod_for_all_namespaces, _request_timeout=60, label_selector='app=egw,role=proxy'):
+        print("Event: %s %s" % (event['type'], event['object'].metadata.name))
+        handle_event(event)

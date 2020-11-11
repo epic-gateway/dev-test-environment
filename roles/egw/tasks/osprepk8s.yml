@@ -26,6 +26,7 @@
     - open-iscsi
     - jq
     - bridge-utils
+    - python3-pip
     install_recommends: no
 
 - name: enable & start iscsi client

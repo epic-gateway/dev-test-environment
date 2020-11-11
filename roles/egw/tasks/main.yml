@@ -35,3 +35,5 @@
 - include_tasks: egw-data-model.yml
 - include_tasks: egw-operators.yml
 - include_tasks: web-service-install.yml
+- include_tasks: setup-daemon.yml
+  args: {apply: {become: yes}}

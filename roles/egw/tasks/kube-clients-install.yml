@@ -30,6 +30,7 @@
     - kubelet
     - kubeadm
     - kubectl
+    - python3-kubernetes
   become: yes
 
 - name: mark for version hold

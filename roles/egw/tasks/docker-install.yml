@@ -36,7 +36,9 @@
 
     - name: Install Docker CE
       apt:
-        name: docker-ce
+        name:
+          - docker-ce
+          - python3-docker
 
     - name: add me to the docker group
       shell: "usermod -a -G docker {{ target_user.stdout }}"
