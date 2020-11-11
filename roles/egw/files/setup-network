@@ -56,6 +56,6 @@ if __name__ == "__main__":
 
     v1 = client.CoreV1Api()
     w = watch.Watch()
-    for event in w.stream(v1.list_pod_for_all_namespaces, _request_timeout=60, label_selector='app=egw,role=proxy'):
+    for event in w.stream(v1.list_pod_for_all_namespaces, label_selector='app=egw,role=proxy'):
         print("Event: %s %s" % (event['type'], event['object'].metadata.name))
         handle_event(event)
