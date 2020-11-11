@@ -1,33 +1,27 @@
 ---
-- name: install the packet forwarding components
-  become: yes
-  block:
-  - name: create installation directory
-    file:
-      path: "{{ pfc_remote_path }}"
-      state: directory
-      mode: ugo+rx
+- name: create installation directory
+  file:
+    path: "{{ pfc_remote_path }}"
+    state: directory
+    mode: ugo+rx
 
-  - name: copy files
-    copy:
-      src: "{{ item }}"
-      dest: "{{ pfc_remote_path }}/"
-      mode: a+x
-    with_fileglob:
-      - "{{ pfc_src_path }}/src/*.o"
-      - "{{ pfc_src_path }}/src/*.sh"
-      - "{{ pfc_src_path }}/src/cli_cfg"
-      - "{{ pfc_src_path }}/src/cli_service"
-      - "{{ pfc_src_path }}/src/cli_tunnel"
-      - "{{ pfc_src_path }}/src/cli_gc"
-      - "{{ pfc_src_path }}/test/port_*.sh"
-      - "{{ pfc_src_path }}/test/pfc_*.sh"
-      - "{{ pfc_src_path }}/test/docker/gue_ping_svc_auto"
-      - "{{ pfc_src_path }}/src/go/pfc_cli_go"
+- name: download PFC artifacts from gitlab
+  get_url:
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fpacket-forwarding-component/jobs/841864770/artifacts/pfc.tar.bz2
+    dest: /root/pfc.tar.bz2
+- name: untar artifacts
+  unarchive:
+    src: /root/pfc.tar.bz2
+    dest: "{{ pfc_remote_path }}"
+    extra_opts:
+    - --strip-components=1
+    remote_src: yes
 
-  - name: mount BPF filesystem
-    mount:
-      state: mounted
-      fstype: bpf
-      src: bpf
-      path: /sys/fs/bpf
+- name: mount BPF filesystem
+  mount:
+    state: mounted
+    fstype: bpf
+    src: bpf
+    path: /sys/fs/bpf

@@ -25,7 +25,6 @@ Defaults are located in group_vars/egw.yml. You can add per-host overrides to ho
       pod_cidr: "10.246.0.0/16"  - kubernetes POD CIDR range, needs to be configured because this block is used by endpoints and in the prototype cannot conflict with cluster
 
   vars:
-    pfc_src_path: "../packet-forwarding-component" - location of packet-forwarding-component repository (location of compiled pfc)
     pfc_remote_path: "/opt/acnodal/bin" - path where pfc binaries are installed
     pfc_interface: "eth1" - interface where pfc will process packets
     pfc_gue_port_min: 5000 - port range lower bound for GUE tunnel allocation
@@ -39,8 +38,6 @@ Dependencies
 Requires ubuntu 20.04LTS
 
 Requires a gitlab account and token from acnodal gitlab account to download our envoy build
-
-Clone and build packet-forwarding-component and set its location in 'pfc_src_path'
 
 How to use
 ----------------

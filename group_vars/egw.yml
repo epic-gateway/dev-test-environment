@@ -1,6 +1,5 @@
 ---
 # PFC config
-pfc_src_path: ../packet-forwarding-component
 pfc_remote_path: /opt/acnodal/bin
 pfc_interface: eth1
 pfc_gue_port_min: 5000

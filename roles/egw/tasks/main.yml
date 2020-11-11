@@ -14,6 +14,7 @@
     apply:
       become: yes
 - include_tasks: pfc.yml
+  args: {apply: {become: yes}}
 - include_tasks: docker-install.yml
 - include_tasks: kube-clients-install.yml
 - include_tasks: helm-install.yml
