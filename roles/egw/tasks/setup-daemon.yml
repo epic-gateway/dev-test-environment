@@ -34,5 +34,5 @@
   - name: start network setup daemon
     systemd:
       name: setup-network.service
-      state: started
+      state: restarted
       daemon_reload: yes
