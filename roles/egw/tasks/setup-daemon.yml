@@ -31,8 +31,9 @@
         WantedBy=multi-user.target
       dest: /usr/local/lib/systemd/system/setup-network.service
 
-  - name: start network setup daemon
+  - name: enable and start network setup daemon
     systemd:
       name: setup-network.service
+      enabled: yes
       state: restarted
       daemon_reload: yes

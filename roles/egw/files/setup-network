@@ -8,48 +8,56 @@ from kubernetes import client, config, watch
 
 def handle_event(event):
 
-    # the only type of event that we care about is when an Envoy pod
-    # is launched which is indicated by an "ADDED" event
-    if 'ADDED' == event['type']:
+    if event['type'] not in ['ADDED', 'MODIFIED']:
+        print("Event is not an ADDED/MODIFIED type, ignoring")
+        return
 
-        # start with the container id
-        print(event['object'].status)
-        containerid = event['object'].status.container_statuses[0].container_id.split('://')[1]
-        print("Container ID: ", containerid)
+    print(event['object'].status)
 
-        # use the container id to find the docker pid
-        podpid = dclient.containers.get(containerid).attrs['Config']['Labels']['io.kubernetes.sandbox.id']
-        print("Pod PID: ", podpid)
+    if None == event['object'].status.container_statuses:
+        print("Event has no container status, cannot proceed")
+        return
 
-        # use the primary pod container to find the "pause" container
-        pausepid = int(dclient.containers.get(podpid).attrs['State']['Pid'])
-        print("Pause container PID: ", pausepid)
+    if None == event['object'].status.container_statuses[0].container_id:
+        print("Container doesn't have an id yet, cannot proceed")
+        return
 
-        # find the namespace that contains the "pause" container
-        cp = subprocess.run(['/usr/bin/lsns', '-Jt', 'net'], capture_output=True)
-        if cp.returncode == 0:
-            nss = json.loads(cp.stdout)['namespaces']
-            for ns in nss:
-                if ns['pid'] == pausepid:
-                    nsid = int(ns['netnsid'])
-                    print("Netnsid: ", nsid)
+    # start by finding the container id
+    containerid = event['object'].status.container_statuses[0].container_id.split('://')[1]
+    print("Container ID: ", containerid)
 
-                    # get veth interface
-                    d = subprocess.run(["/usr/sbin/ip", "-j", "link", "show"], capture_output=True)
-                    if d.returncode == 0:
-                        for dev in json.loads(d.stdout):
-                            if 'master' in dev and dev['master'] == 'multus0' and 'link_netnsid' in dev and dev['link_netnsid'] == nsid:
-                                ifname = dev['ifname']
-                    print("veth name: ", ifname)
+    # use the container id to find the docker pid
+    podpid = dclient.containers.get(containerid).attrs['Config']['Labels']['io.kubernetes.sandbox.id']
+    print("Pod PID: ", podpid)
 
-                    # setup PFC on that veth
-                    subprocess.run("/usr/sbin/tc qdisc list dev {0} clsact | grep clsact || /usr/sbin/tc qdisc add dev {0} clsact".format(ifname), shell=True, check=True)
-                    subprocess.run("/usr/sbin/tc filter show dev {0} ingress | grep pfc_tag_rx_tc || /usr/sbin/tc filter add dev {0} ingress bpf direct-action object-file /opt/acnodal/bin/pfc_tag_rx_tc.o sec .text".format(ifname), shell=True, check=True)
-                    print(ifname, "configured")
+    # use the primary pod container to find the "pause" container
+    pausepid = int(dclient.containers.get(podpid).attrs['State']['Pid'])
+    print("Pause container PID: ", pausepid)
 
-                    return
-        else:
-            print("error running lsns", cp.stderr)
+    # find all of the net namespaces
+    cp = subprocess.run(['/usr/bin/lsns', '-Jt', 'net'], capture_output=True)
+    if cp.returncode != 0:
+        print("error running lsns", cp.stderr)
+        return
+    nss = json.loads(cp.stdout)['namespaces']
+
+    # find the namespace that contains the "pause" container
+    for ns in filter(lambda ns: ns['pid'] == pausepid, nss):
+        nsid = int(ns['netnsid'])
+        print("Netnsid: ", nsid)
+
+        # get veth interface
+        d = subprocess.run(["/usr/sbin/ip", "-j", "link", "show"], capture_output=True)
+        if d.returncode == 0:
+            for dev in json.loads(d.stdout):
+                if 'master' in dev and dev['master'] == 'multus0' and 'link_netnsid' in dev and dev['link_netnsid'] == nsid:
+                    ifname = dev['ifname']
+        print("veth name: ", ifname)
+
+        # setup PFC on that veth
+        subprocess.run("/usr/sbin/tc qdisc list dev {0} clsact | grep clsact || /usr/sbin/tc qdisc add dev {0} clsact".format(ifname), shell=True, check=True)
+        subprocess.run("/usr/sbin/tc filter show dev {0} ingress | grep pfc_tag_rx_tc || /usr/sbin/tc filter add dev {0} ingress bpf direct-action object-file /opt/acnodal/bin/pfc_tag_rx_tc.o sec .text".format(ifname), shell=True, check=True)
+        print(ifname, "configured")
 
 
 if __name__ == "__main__":
