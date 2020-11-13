@@ -3,8 +3,8 @@
   get_url:
     headers:
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    # this is job v0.1.4-pre1
-    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/843973918/artifacts
+    # this is a job from the gue-keys branch (toby's dev branch)
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/848319572/artifacts
     dest: ./
 - name: unzip artifacts
   unarchive:
@@ -47,4 +47,4 @@
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: Create sample config
-  command: kubectl apply -f config/samples/egw_v1_nodeconfig.yaml -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml -f config/samples/egw_v1_servicegroup.yaml
+  command: kubectl apply -f config/samples/egw_v1_egw.yaml -f config/samples/egw_v1_nodeconfig.yaml -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml -f config/samples/egw_v1_servicegroup.yaml
