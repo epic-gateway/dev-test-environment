@@ -36,6 +36,11 @@
   register: result
   until: result is not failed
 
+- name: Wait for our stuff to be ready so the samples will load correctly
+  # the samples below require that the webhooks be operational but
+  # that takes a few seconds so we need to explicitly wait
+  command: kubectl wait --for=condition=Ready --timeout=5m --all -n acnodal pods
+
 - name: Create sample namespace
   command: kubectl apply -f config/samples/namespace.yaml
   register: result
