@@ -2,32 +2,23 @@
 
 import docker
 import json
+import netifaces
 import subprocess
 from kubernetes import client, config, watch
 
 
-def handle_event(event):
+# FIXME: get this from the serviceprefix
+MULTUS_BRIDGE_NAME = 'multus0'
+# FIXME: get this from the nodeconfig
+INGRESS_INTF_NAME = 'eth0'
+# FIXME: get this from ???
+TUNNEL_ID = 0x420042
+TUNNEL_PORT = 4242
 
-    if event['type'] not in ['ADDED', 'MODIFIED']:
-        print("Event is not an ADDED/MODIFIED type, ignoring")
-        return
 
-    print(event['object'].status)
-
-    if None == event['object'].status.container_statuses:
-        print("Event has no container status, cannot proceed")
-        return
-
-    if None == event['object'].status.container_statuses[0].container_id:
-        print("Container doesn't have an id yet, cannot proceed")
-        return
-
-    # start by finding the container id
-    containerid = event['object'].status.container_statuses[0].container_id.split('://')[1]
-    print("Container ID: ", containerid)
-
+def configure_veth(container_id):
     # use the container id to find the docker pid
-    podpid = dclient.containers.get(containerid).attrs['Config']['Labels']['io.kubernetes.sandbox.id']
+    podpid = dclient.containers.get(container_id).attrs['Config']['Labels']['io.kubernetes.sandbox.id']
     print("Pod PID: ", podpid)
 
     # use the primary pod container to find the "pause" container
@@ -50,7 +41,7 @@ def handle_event(event):
         d = subprocess.run(["/usr/sbin/ip", "-j", "link", "show"], capture_output=True)
         if d.returncode == 0:
             for dev in json.loads(d.stdout):
-                if 'master' in dev and dev['master'] == 'multus0' and 'link_netnsid' in dev and dev['link_netnsid'] == nsid:
+                if 'master' in dev and dev['master'] == MULTUS_BRIDGE_NAME and 'link_netnsid' in dev and dev['link_netnsid'] == nsid:
                     ifname = dev['ifname']
         print("veth name: ", ifname)
 
@@ -58,6 +49,43 @@ def handle_event(event):
         subprocess.run("/usr/sbin/tc qdisc list dev {0} clsact | grep clsact || /usr/sbin/tc qdisc add dev {0} clsact".format(ifname), shell=True, check=True)
         subprocess.run("/usr/sbin/tc filter show dev {0} ingress | grep pfc_tag_rx_tc || /usr/sbin/tc filter add dev {0} ingress bpf direct-action object-file /opt/acnodal/bin/pfc_tag_rx_tc.o sec .text".format(ifname), shell=True, check=True)
         print(ifname, "configured")
+
+
+def configure_tunnel():
+    # find the IP attached to the ingress NIC
+    ingress_addr = netifaces.ifaddresses(INGRESS_INTF_NAME)[netifaces.AF_INET][0]['addr']
+    print("Ingress Address: ", ingress_addr)
+
+    # cli_tunnel set <TUNNEL_ID> <LOCAL-TUN-IP> <LOCAL-TUN-PORT> 0 0
+    subprocess.run("/opt/acnodal/bin/cli_tunnel get {tunid} | grep {addr} || /opt/acnodal/bin/cli_tunnel set {tunid} {addr} {port} 0 0".format(tunid=TUNNEL_ID, addr=ingress_addr, port=TUNNEL_PORT), shell=True, check=True)
+    print("tunnel", TUNNEL_ID, "configured")
+
+
+def handle_event(event):
+
+    if event['type'] not in ['ADDED', 'MODIFIED']:
+        print("Event is not an ADDED/MODIFIED type, ignoring")
+        return
+
+    print(event['object'].status)
+
+    if None == event['object'].status.container_statuses:
+        print("Event has no container status, cannot proceed")
+        return
+
+    if None == event['object'].status.container_statuses[0].container_id:
+        print("Container doesn't have an id yet, cannot proceed")
+        return
+
+    # FIXME: return if this event isn't happening on this host
+
+    # start by finding the container id
+    containerid = event['object'].status.container_statuses[0].container_id.split('://')[1]
+    print("Container ID: ", containerid)
+
+    configure_veth(containerid)
+
+    configure_tunnel()
 
 
 if __name__ == "__main__":
