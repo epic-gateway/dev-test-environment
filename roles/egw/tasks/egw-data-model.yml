@@ -3,8 +3,7 @@
   get_url:
     headers:
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    # this is a job from the gue-keys branch (toby's dev branch)
-    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/848319572/artifacts
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/863627037/artifacts # v0.1.6-pre2
     dest: ./
 - name: unzip artifacts
   unarchive:
@@ -26,7 +25,7 @@
   #
   # FIXME: use "kubectl -k" when "kubectl -k" works, and don't install
   # kustomize
-  shell: kustomize build config/default | kubectl apply -f -
+  shell: kustomize build config/default | IMG=registry.gitlab.com/acnodal/egw-resource-model:latest envsubst | kubectl apply -f -
   # this play can fail when we're bringing up the system because
   # various components (e.g., cert-manager) are in the process of
   # starting up. Back off for a few seconds to give things a chance to
