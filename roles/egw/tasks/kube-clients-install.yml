@@ -30,7 +30,11 @@
     - kubelet
     - kubeadm
     - kubectl
-    - python3-kubernetes
+  become: yes
+
+- name: install python client libraries
+  # I'd rather use the debian/ubuntu package but it's way too old
+  command: pip3 install kubernetes~=12.0
   become: yes
 
 - name: mark for version hold

@@ -7,16 +7,15 @@ import subprocess
 from kubernetes import client, config, watch
 
 
+GROUP="egw.acnodal.io"
+V1="v1"
+LB_PLURAL="loadbalancers"
+
 # FIXME: get this from the serviceprefix
 MULTUS_BRIDGE_NAME = 'multus0'
-# FIXME: get this from the nodeconfig
-INGRESS_INTF_NAME = 'eth0'
-# FIXME: get this from ???
-TUNNEL_ID = 0x420042
-TUNNEL_PORT = 4242
 
 
-def configure_veth(container_id):
+def find_veth(container_id):
     # use the container id to find the docker pid
     podpid = dclient.containers.get(container_id).attrs['Config']['Labels']['io.kubernetes.sandbox.id']
     print("Pod PID: ", podpid)
@@ -43,22 +42,19 @@ def configure_veth(container_id):
             for dev in json.loads(d.stdout):
                 if 'master' in dev and dev['master'] == MULTUS_BRIDGE_NAME and 'link_netnsid' in dev and dev['link_netnsid'] == nsid:
                     ifname = dev['ifname']
-        print("veth name: ", ifname)
+                    ifindex = dev['ifindex']
+        print("veth: ", ifname, " ifindex: ", ifindex)
+        return ifname, ifindex
 
-        # setup PFC on that veth
-        subprocess.run("/usr/sbin/tc qdisc list dev {0} clsact | grep clsact || /usr/sbin/tc qdisc add dev {0} clsact".format(ifname), shell=True, check=True)
-        subprocess.run("/usr/sbin/tc filter show dev {0} ingress | grep pfc_tag_rx_tc || /usr/sbin/tc filter add dev {0} ingress bpf direct-action object-file /opt/acnodal/bin/pfc_tag_rx_tc.o sec .text".format(ifname), shell=True, check=True)
-        print(ifname, "configured")
+    return False, -1
 
 
-def configure_tunnel():
-    # find the IP attached to the ingress NIC
-    ingress_addr = netifaces.ifaddresses(INGRESS_INTF_NAME)[netifaces.AF_INET][0]['addr']
-    print("Ingress Address: ", ingress_addr)
+def container_name_to_service_name(container_name):
+    '''The container name is the service name prefixed by "envoy-" so we
+    can strip the "envoy-" to get back to the service name.
 
-    # cli_tunnel set <TUNNEL_ID> <LOCAL-TUN-IP> <LOCAL-TUN-PORT> 0 0
-    subprocess.run("/opt/acnodal/bin/cli_tunnel get {tunid} | grep {addr} || /opt/acnodal/bin/cli_tunnel set {tunid} {addr} {port} 0 0".format(tunid=TUNNEL_ID, addr=ingress_addr, port=TUNNEL_PORT), shell=True, check=True)
-    print("tunnel", TUNNEL_ID, "configured")
+    '''
+    return container_name.split("envoy-")[1]
 
 
 def handle_event(event):
@@ -79,13 +75,22 @@ def handle_event(event):
 
     # FIXME: return if this event isn't happening on this host
 
+    api = client.CustomObjectsApi()
+
     # start by finding the container id
     containerid = event['object'].status.container_statuses[0].container_id.split('://')[1]
     print("Container ID: ", containerid)
 
-    configure_veth(containerid)
+    ifname, ifindex = find_veth(containerid)
+    if ifname:
+        # figure out this container's service name and namespace
+        container_name = event['object'].status.container_statuses[0].name
+        namespace = event['object'].metadata.namespace
+        service_name = container_name_to_service_name(container_name)
 
-    configure_tunnel()
+        # write the ifname and ifindex into the service status
+        patch = {"status":{"proxy-ifname":ifname, "proxy-ifindex":ifindex}}
+        api.patch_namespaced_custom_object_status(group=GROUP,version=V1,plural=LB_PLURAL,namespace=namespace,name=service_name,body=patch)
 
 
 if __name__ == "__main__":
@@ -95,5 +100,5 @@ if __name__ == "__main__":
     v1 = client.CoreV1Api()
     w = watch.Watch()
     for event in w.stream(v1.list_pod_for_all_namespaces, label_selector='app=egw,role=proxy'):
-        print("Event: %s %s" % (event['type'], event['object'].metadata.name))
+        print("Event: %s %s %s" % (event['type'], event['object'].metadata.name, event['object'].metadata.namespace))
         handle_event(event)
