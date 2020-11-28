@@ -30,6 +30,7 @@
 
 - include_tasks: multus-install.yml
 - include_tasks: router-install.yml
+  args: {apply: {become: yes}}
 - include_tasks: cert-manager-install.yml
 - include_tasks: vault-install.yml
 

@@ -23,18 +23,13 @@
     - ipset
     - linux-tools-common
     - acl
-    - open-iscsi
     - jq
     - bridge-utils
     - python3-pip
-    - zip
+    - unzip
     install_recommends: no
 
-- name: enable & start iscsi client
-  systemd:
-    name: iscsid
-    state: started
-    enabled: yes
+
 
 - name: set up system-wide environment variables
   copy:

@@ -49,24 +49,12 @@ spec:
       - name: gitlab
       volumes:
       - name: birdconfig
-        persistentVolumeClaim:
-          claimName: birdconfigvol
+        hostPath:
+          path: /opt/acnodal/bird
+          type: "Directory"
       - name: bird-cm
         configMap:
           name: bird-cm
       hostNetwork: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
----      
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: birdconfigvol
-  namespace: router
-spec:
-  storageClassName: openebs-jiva-default
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5G

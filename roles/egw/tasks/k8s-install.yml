@@ -41,16 +41,3 @@
     dest: kube-flannel.yml
 - name: add flannel - K8s CNI
   command: kubectl apply -f kube-flannel.yml
-
-- name: copy OpenEBS file
-  copy:
-    src: files/openebs-operator.yaml
-    dest: openebs-operator.yml
-- name: copy OpenEBS default jiva storage class
-  copy:
-    src: files/update-jiva-sc.yml
-    dest: update-jiva-sc.yml
-- name: Add OpenEBS - Persistent Storage System
-  command: kubectl apply -f openebs-operator.yml
-- name: update Jiva default storage class
-  command: kubectl apply -f update-jiva-sc.yml

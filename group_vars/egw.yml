@@ -1,17 +1,10 @@
 ---
 # PFC config
 pfc_remote_path: /opt/acnodal/bin
-pfc_interface: eth1
-pfc_gue_port_min: 5000
-pfc_gue_port_max: 6000
+pfc_interface: enp1s0
 
-# multus bridge net-attach-def
-bridge_name: multus0
-isGateway: true
-subnet: "192.168.128.0/24"
-rangeStart: "192.168.128.200"
-rangeEnd: "192.168.128.216"
-gateway: "192.168.128.1"
+# Bird config 
+bird_remote_path: /opt/acnodal/bird
 
 # k8s configuration
-pod_cidr: "10.128.0.0/16"
+pod_cidr: "10.215.0.0/16"
