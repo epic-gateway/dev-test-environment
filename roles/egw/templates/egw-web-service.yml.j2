@@ -70,7 +70,7 @@ spec:
     spec:
       containers:
       - name: web-service
-        image: registry.gitlab.com/acnodal/egw-web-service/web-service:latest
+        image: {{ lookup('env', 'EPIC_WS_IMG') | default('registry.gitlab.com/acnodal/egw-web-service/web-service:latest', True) }}
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

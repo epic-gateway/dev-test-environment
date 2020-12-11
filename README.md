@@ -25,3 +25,16 @@ The Makefile is mostly useful for running ad-hoc Ansible since the
 command has a bunch of flags.
 
 Run "make" to get a list of the goals.
+
+## Environment Vars
+
+You can override the controller-manager and web-service images with
+the ```EPIC_CM_IMG``` and ```EPIC_WS_IMG``` environment
+variables. For example, if I wanted to use a personal dev image
+instead of "latest" I could:
+
+```
+$ export EPIC_CM_IMG=registry.gitlab.com/acnodal/egw-resource-model:tobyc-dev
+$ make rebuild
+```
+
