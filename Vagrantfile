@@ -1,5 +1,6 @@
 BOX='generic/ubuntu2004'
 EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
+EXTRA_DOCKER_CONFIG = ENV['EXTRA_DOCKER_CONFIG'] && "#{ENV['EXTRA_DOCKER_CONFIG']}," || ""
 VAULT_PASSWORD_FILE = '.ansible-vault-password'
 SHELL_PROVISION_SCRIPT = <<-SHELL
   # remove the vagrant default route so ansible figures out the correct default interface
@@ -37,6 +38,9 @@ Vagrant.configure('2') do |config|
           gateway: '192.168.128.1',
           pod_cidr: '10.128.0.0/16',
         }
+      }
+      ansible.extra_vars = {
+        extra_docker_config: EXTRA_DOCKER_CONFIG,
       }
       ansible.verbose = true
       ansible.vault_password_file = VAULT_PASSWORD_FILE

@@ -38,3 +38,14 @@ $ export EPIC_CM_IMG=registry.gitlab.com/acnodal/egw-resource-model:tobyc-dev
 $ make rebuild
 ```
 
+You can add extra Docker daemon configuration using the
+```EXTRA_DOCKER_CONFIG``` environment variable. For example, if I
+wanted to use an insecure local registry (instead of gitlab) for
+development I could:
+
+```
+$ export EXTRA_DOCKER_CONFIG="insecure-registries": ["refectory.caboteria.org:5000"]
+$ export EPIC_CM_IMG=refectory.caboteria.org:5000/egw-resource-model:tobyc-dev
+$ export EPIC_CM_IMG=refectory.caboteria.org:5000/egw-web-service/web-service:tobyc-dev
+$ make rebuild
+```

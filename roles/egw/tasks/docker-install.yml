@@ -31,8 +31,16 @@
 
     - name: setup docker daemon
       copy:
-        src: files/daemon.json
         dest: /etc/docker/daemon.json
+        content: |
+          { "exec-opts": ["native.cgroupdriver=systemd"],
+            {{ extra_docker_config }}
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "100m"
+            },
+            "storage-driver": "overlay2"
+          }
 
     - name: Install Docker CE
       apt:
