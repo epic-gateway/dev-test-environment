@@ -8,3 +8,5 @@ bird_remote_path: /opt/acnodal/bird
 
 # k8s configuration
 pod_cidr: "10.215.0.0/16"
+
+extra_docker_config: ""
