@@ -41,3 +41,6 @@
     dest: kube-flannel.yml
 - name: add flannel - K8s CNI
   command: kubectl apply -f kube-flannel.yml
+
+- name: Wait for nodes to be ready
+  command: kubectl wait --for=condition=Ready --timeout=5m --all nodes
