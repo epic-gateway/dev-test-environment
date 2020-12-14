@@ -20,10 +20,13 @@ rules:
   - accounts
   - servicegroups
   - loadbalancers
+  - endpoints
   verbs:
   - get
   - list
   - watch
+  - update
+  - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -64,7 +67,7 @@ spec:
       - name: gitlab
       containers:
       - args:
-        image: registry.gitlab.com/acnodal/xds-operator/xds-operator:latest
+        image: {{ lookup('env', 'EPIC_XD_IMG') | default('registry.gitlab.com/acnodal/xds-operator:latest', True) }}
         imagePullPolicy: Always
         name: xds-operator
         ports:
