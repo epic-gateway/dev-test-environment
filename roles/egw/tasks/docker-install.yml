@@ -49,6 +49,10 @@
           - python3-docker
 
     - name: add me to the docker group
-      shell: "usermod -a -G docker {{ target_user.stdout }}"
+      user:
+        name: '{{ ansible_user }}'
+        groups:
+        - docker
+        append: yes
     - name: Reset ssh connection to allow user changes to affect 'current login user'
       meta: reset_connection

@@ -40,7 +40,12 @@
       KUBECONFIG="/etc/kubernetes/admin.conf"
 
 - name: add me to some useful groups
-  shell: "usermod -a -G systemd-journal,root {{ target_user.stdout }}"
+  user:
+    name: '{{ ansible_user }}'
+    groups:
+    - systemd-journal
+    - root
+    append: yes
 - name: Reset ssh connection to allow user changes to affect 'current login user'
   meta: reset_connection
 
