@@ -3,7 +3,7 @@
   get_url:
     headers:
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/904287907/artifacts # v0.1.11-pre0
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/913270925/artifacts # v0.1.11-pre2
     dest: ./
 - name: unzip artifacts
   unarchive:
