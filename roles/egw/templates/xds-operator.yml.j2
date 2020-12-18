@@ -27,6 +27,14 @@ rules:
   - watch
   - update
   - patch
+- apiGroups:
+  - egw.acnodal.io
+  resources:
+  - servicegroups/status
+  verbs:
+  - get
+  - patch
+  - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
