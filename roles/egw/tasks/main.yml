@@ -36,7 +36,6 @@
 - include_tasks: router-install.yml
   args: {apply: {become: yes}}
 - include_tasks: cert-manager-install.yml
-- include_tasks: vault-install.yml
 
 - name:  create acnodal namespace
   command: kubectl create namespace acnodal
