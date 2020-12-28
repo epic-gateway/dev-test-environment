@@ -3,7 +3,7 @@
   get_url:
     headers:
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/926197665/artifacts # v0.1.12-pre4
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/934481345/artifacts # v0.1.13-pre3
     dest: ./
 - name: unzip artifacts
   unarchive:
@@ -50,5 +50,9 @@
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
+- name: Create sample EGW config singleton
+  command: kubectl apply -f config/samples/egw_v1_egw.yaml
+- name: Create sample nodeconfig, with interface override
+  shell: cat config/samples/egw_v1_nodeconfig.yaml | sed "s/eth0/{{ lookup('env', 'EPIC_PFC_INTF') | default('eth0', True) }}/" | kubectl apply -f -
 - name: Create sample config
-  command: kubectl apply -f config/samples/egw_v1_egw.yaml -f config/samples/egw_v1_nodeconfig.yaml -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml -f config/samples/egw_v1_servicegroup.yaml
+  command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml -f config/samples/egw_v1_servicegroup.yaml

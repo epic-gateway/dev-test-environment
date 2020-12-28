@@ -28,6 +28,10 @@ Run "make" to get a list of the goals.
 
 ## Environment Vars
 
+You can override the PFC interface device with the ```EPIC_PFC_INTF```
+environment variable. This will almost always be ```eth1``` for
+Vagrant-created EPIC instances.
+
 You can override the controller-manager and web-service images with
 the ```EPIC_XD_IMG```, ```EPIC_CM_IMG``` and ```EPIC_WS_IMG``` environment
 variables. For example, if I wanted to use a personal dev image
