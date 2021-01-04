@@ -5,7 +5,7 @@ metadata:
   labels:
     app: egw
   name: egw-web-service
-  namespace: acnodal
+  namespace: egw
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -20,7 +20,7 @@ rules:
   - servicegroups
   - serviceprefixes
   - loadbalancers
-  - endpoints
+  - remoteendpoints
   verbs:
   - get
   - list
@@ -29,7 +29,7 @@ rules:
   - egw.acnodal.io
   resources:
   - loadbalancers
-  - endpoints
+  - remoteendpoints
   verbs:
   - create
   - update
@@ -49,7 +49,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: egw-web-service
-  namespace: acnodal
+  namespace: egw
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -58,7 +58,7 @@ metadata:
     app: egw
     component: web-service
   name: web-service
-  namespace: acnodal
+  namespace: egw
 spec:
   selector:
     matchLabels:
@@ -88,7 +88,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: web-service
-  namespace: acnodal
+  namespace: egw
 spec:
   type: NodePort
   ports:

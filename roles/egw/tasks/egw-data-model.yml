@@ -3,7 +3,7 @@
   get_url:
     headers:
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/934481345/artifacts # v0.1.13-pre3
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/943672639/artifacts # v0.2.0-pre7
     dest: ./
 - name: unzip artifacts
   unarchive:
@@ -11,12 +11,7 @@
     remote_src: yes
     dest: ./
 
-- name: Create EGW namespace
-  command: kubectl apply -f config/crd/egw-namespace.yaml
-  register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
-
-- name: Create acnodal namespace, crds, and EGW operator
+- name: Create egw namespace, crds, and operator
   # we should be able to run "kubectl apply -k config/default" but the
   # version of kustomize that's build into kubectl is so old that it
   # doesn't work. For example, kubectl doesn't substitute the
@@ -38,7 +33,7 @@
 - name: Wait for our stuff to be ready so the samples will load correctly
   # the samples below require that the webhooks be operational but
   # that takes a few seconds so we need to explicitly wait
-  command: kubectl wait --for=condition=Ready --timeout=5m --all -n acnodal pods
+  command: kubectl wait --for=condition=Ready --timeout=5m --all -n egw pods
 
 - name: Create sample namespace
   command: kubectl apply -f config/samples/namespace.yaml
