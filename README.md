@@ -32,8 +32,8 @@ You can override the PFC interface device with the ```EPIC_PFC_INTF```
 environment variable. This will almost always be ```eth1``` for
 Vagrant-created EPIC instances.
 
-You can override the controller-manager and web-service images with
-the ```EPIC_XD_IMG```, ```EPIC_CM_IMG``` and ```EPIC_WS_IMG``` environment
+You can override the envoy-for-egw, xds-control-plane, controller-manager and web-service images with
+the ```EPIC_EP_IMG```, ```EPIC_XD_IMG```, ```EPIC_CM_IMG``` and ```EPIC_WS_IMG``` environment
 variables. For example, if I wanted to use a personal dev image
 instead of "latest" I could:
 
@@ -49,6 +49,7 @@ development I could:
 
 ```
 $ export EXTRA_DOCKER_CONFIG="insecure-registries": ["refectory.caboteria.org:5000"]
+$ export EPIC_EP_IMG=refectory.caboteria.org:5000/envoy-for-egw:tobyc-dev
 $ export EPIC_CM_IMG=refectory.caboteria.org:5000/egw-resource-model:tobyc-dev
 $ export EPIC_WS_IMG=refectory.caboteria.org:5000/egw-web-service:tobyc-dev
 $ export EPIC_XD_IMG=refectory.caboteria.org:5000/xds-operator:tobyc-dev

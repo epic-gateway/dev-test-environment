@@ -50,9 +50,9 @@
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-- name: Create sample EGW config singleton
-  command: kubectl apply -f config/samples/egw_v1_egw.yaml
-- name: Create sample nodeconfig, with interface override
-  shell: cat config/samples/egw_v1_nodeconfig.yaml | sed "s/eth0/{{ lookup('env', 'EPIC_PFC_INTF') | default('eth0', True) }}/" | kubectl apply -f -
-- name: Create sample config
-  command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml -f config/samples/egw_v1_servicegroup.yaml
+- name: Create sample config singleton, with interface override
+  shell: cat config/samples/egw_v1_egw.yaml | sed "s/eth0/{{ lookup('env', 'EPIC_PFC_INTF') | default('eth0', True) }}/" | kubectl apply -f -
+- name: Create sample serviceprefix and account
+  command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml
+- name: Create sample service group (with envoy docker image override)
+  shell: cat config/samples/egw_v1_servicegroup.yaml | sed "s~registry.gitlab.com/acnodal/envoy-for-egw:latest~{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/envoy-for-egw:latest', True) }}~" | kubectl apply -f -
