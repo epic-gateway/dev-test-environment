@@ -40,7 +40,11 @@
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-- name: create secret for acnodal private registry
+- name: create secret for acnodal private registry in egw namespace
+  command: kubectl -n egw create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+- name: create secret for acnodal private registry in egw-sample namespace
   command: kubectl -n egw-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
