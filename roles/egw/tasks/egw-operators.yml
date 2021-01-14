@@ -1,7 +1,0 @@
----
-- name: Upload xds operator manifest
-  template:
-    src: templates/xds-operator.yml.j2
-    dest: xds-operator.yml
-- name: Launch xds operator
-  command: kubectl apply -f xds-operator.yml

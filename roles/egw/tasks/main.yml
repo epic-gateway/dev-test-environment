@@ -38,7 +38,6 @@
 - include_tasks: cert-manager-install.yml
 
 - include_tasks: egw-data-model.yml
-- include_tasks: egw-operators.yml
 - include_tasks: web-service-install.yml
 - include_tasks: purelb.yml
 - include_tasks: contour-ingress.yml
