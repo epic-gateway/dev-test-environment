@@ -1,0 +1,8 @@
+---
+- name: Upload manifest
+  template:
+    src: files/marin3r-manifest.yml
+    dest: marin3r-manifest.yml
+
+- name: Apply manifest
+  command: kubectl apply -f marin3r-manifest.yml

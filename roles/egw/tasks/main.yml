@@ -36,6 +36,7 @@
 - include_tasks: router-install.yml
   args: {apply: {become: yes}}
 - include_tasks: cert-manager-install.yml
+- include_tasks: marin3r-install.yml
 
 - include_tasks: egw-data-model.yml
 - include_tasks: web-service-install.yml
