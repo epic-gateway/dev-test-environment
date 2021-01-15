@@ -9,7 +9,7 @@
   get_url:
     headers:
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: https://gitlab.com/api/v4/projects/acnodal%2Fpacket-forwarding-component/jobs/914086619/artifacts/pkg/pfc.tar.bz2 # v0.6.7
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fpacket-forwarding-component/jobs/artifacts/main/raw/pkg/pfc.tar.bz2?job=make
     dest: /root
 - name: untar artifacts
   unarchive:
