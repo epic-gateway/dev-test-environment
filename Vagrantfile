@@ -40,6 +40,7 @@ Vagrant.configure('2') do |config|
         }
       }
       ansible.extra_vars = {
+        ansible_user: 'vagrant',
         extra_docker_config: EXTRA_DOCKER_CONFIG,
       }
       ansible.verbose = true
