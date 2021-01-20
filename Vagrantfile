@@ -11,7 +11,7 @@ Vagrant.configure('2') do |config|
   config.vm.box = BOX
 
   config.vm.provider :libvirt do |lv|
-    lv.cpus = 2
+    lv.cpus = 3
     lv.memory = 4096
   end
 
