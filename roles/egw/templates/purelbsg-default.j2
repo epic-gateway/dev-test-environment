@@ -1,0 +1,10 @@
+apiVersion: purelb.io/v1
+kind: ServiceGroup
+metadata:
+  name: default
+  namespace: purelb
+spec:
+  local:
+    subnet: {{ subnet }}
+    pool: {{ pool }}
+    aggregation: '/32'

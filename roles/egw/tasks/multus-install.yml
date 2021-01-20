@@ -1,6 +1,6 @@
 ---
 
-- name:  transfer multus yaml
+- name:  (multus-install.yml) transfer multus yaml
   copy:
     src: files/multus-daemonset.yml
     dest: multus-daemonset.yml

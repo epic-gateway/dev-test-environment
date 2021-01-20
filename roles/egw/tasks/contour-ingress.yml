@@ -1,0 +1,55 @@
+---
+
+- name: (contour-ingress.yaml) transfer contour.yml
+  copy:
+    src: files/contour.yml
+    dest: contour.yml
+
+- name: apply contour.yml
+  command: kubectl apply -f contour.yml
+
+
+# httpproxy is configured to use self signed cert, uses issuer previously installed in 
+# namespace by egw-data-model.yml
+
+
+- name: create httpsproxy-ws.yml
+  template:
+    src: httpsproxy-ws.j2
+    dest: httpsproxy-ws.yml 
+
+- name: apply httpsproxy-ws.yml
+  command: kubectl apply -f httpsproxy-ws.yml
+
+- name: transfer authserver.yml
+  copy:
+    src: files/authserver.yml
+    dest: authserver.yml
+
+- name: apply authserver.yml
+  command: kubectl apply -f authserver.yml
+
+#  The following auth is a template file used to create accounts
+#  it is created using htpasswd -B -b auth user password
+#  it includes two user accounts, the file must be called auth
+#  user1 password1, user2 password2
+#  The resulting secret is added to the egw-sample namespace
+#  The ingress controller checks all namespaces for secrets in the realm: egw
+
+
+- name: transfer default auth file for use in egw-sample
+  copy:
+    src: files/auth
+    dest: auth
+
+# ignore errors is used because create will not overwrite existing secrets
+# we are going to have to figure out how to update this
+
+- name: create auth secrets in namespace egw-sample
+  command: kubectl create secret generic -n egw-sample password --from-file=auth
+  ignore_errors: yes
+
+- name: annotate secret 
+  command: kubectl annotate secret -n egw-sample password projectcontour.io/auth-type=basic projectcontour.io/auth-realm=epicauth
+
+

@@ -1,0 +1,16 @@
+---
+
+- name: (purelb,yaml) create the namespace
+  command: kubectl apply -f https://gitlab.com/purelb/purelb/-/raw/main/deployments/purelb-complete.yaml
+  retries: 3
+  delay: 2
+  register: result
+  until: result.rc == 0
+
+- name: create default service group
+  template:
+    src: purelbsg-default.j2
+    dest: purelbsg-default.yml
+
+- name: create default servicegroup
+  command: kubectl apply -f purelbsg-default.yml

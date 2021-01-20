@@ -7,6 +7,14 @@ pfc_interface: enp1s0
 bird_remote_path: /opt/acnodal/bird
 
 # k8s configuration
-pod_cidr: "10.215.0.0/16"
+pod_cidr: "10.212.0.0/16"
 
 extra_docker_config: ""
+
+ansible_user: adamd
+
+# purelb configuration
+
+subnet: "192.168.66.0/24"
+pool: "192.168.66.1-192.168.66.10"
+

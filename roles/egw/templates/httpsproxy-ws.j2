@@ -1,0 +1,33 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: epic-ws
+  namespace: egw
+spec:
+  dnsNames:
+  - {{ ansible_fqdn + '-ctl' }}
+  secretName: ws-service-cert
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: acnodal-ws
+  namespace: egw
+spec:
+  virtualhost:
+    fqdn: {{ ansible_fqdn + '-ctl' }}
+    tls:
+      secretName: ws-service-cert
+    authorization:
+      extensionRef:
+        name: epicauth
+        namespace: epicauth
+  routes:
+  - conditions:
+    - prefix: /api/egw/accounts
+    services:
+    - name: web-service
+      port: 8080
