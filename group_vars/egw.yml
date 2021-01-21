@@ -3,7 +3,7 @@
 pfc_remote_path: /opt/acnodal/bin
 pfc_interface: enp1s0
 
-# Bird config 
+# Bird config
 bird_remote_path: /opt/acnodal/bird
 
 # k8s configuration

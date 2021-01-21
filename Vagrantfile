@@ -28,17 +28,6 @@ Vagrant.configure('2') do |config|
     egw.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'master.yml'
       ansible.compatibility_mode = '2.0'
-      ansible.host_vars = {
-        egw: {
-          bridge_name: 'multus0',
-          isGateway: true,
-          subnet: '192.168.128.0/24',
-          rangeStart: '192.168.128.200',
-          rangeEnd: '192.168.128.216',
-          gateway: '192.168.128.1',
-          pod_cidr: '10.128.0.0/16',
-        }
-      }
       ansible.extra_vars = {
         ansible_user: 'vagrant',
         extra_docker_config: EXTRA_DOCKER_CONFIG,
