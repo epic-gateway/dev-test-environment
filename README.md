@@ -19,6 +19,16 @@ don't have to type it every time you run
 ansible. .ansible-vault-password should be readable only by you. Ask
 Toby for the password.
 
+### /etc/hosts
+
+We use hostname-based virtual hosting for our web service proxy so you need to access it using a hostname, not an IP address.
+By default, the IP address is 192.168.66.1 and the hostname is egw-ctl.
+It can be helpful to add an entry to `/etc/hosts` so you can use "egw-ctl" with command-line tools like curl.
+
+```
+192.168.66.1    egw-ctl
+```
+
 ## Makefile
 
 The Makefile is mostly useful for running ad-hoc Ansible since the
