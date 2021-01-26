@@ -3,8 +3,15 @@ EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
 EXTRA_DOCKER_CONFIG = ENV['EXTRA_DOCKER_CONFIG'] && "#{ENV['EXTRA_DOCKER_CONFIG']}," || ""
 VAULT_PASSWORD_FILE = '.ansible-vault-password'
 SHELL_PROVISION_SCRIPT = <<-SHELL
-  # remove the vagrant default route so ansible figures out the correct default interface
-  ip route | grep --quiet "^default via 192.168.121.1" && ip route delete default via 192.168.121.1 || true
+  apt-get purge -qq unattended-upgrades
+  apt-get install -qq ifmetric
+  # Make the Vagrant-created interface cost more so the public_network interface is the default (now, and after reboot)
+  ifmetric eth0 200
+  sed s/RouteMetric=100/RouteMetric=200/ /run/systemd/network/10-netplan-eth0.network > /etc/systemd/network/10-netplan-eth0.network
+  # make logging in a little quieter
+  echo -n > /etc/motd
+  # add me to some useful groups
+  usermod -G systemd-journal,root -a vagrant
 SHELL
 
 Vagrant.configure('2') do |config|
