@@ -42,14 +42,10 @@
     src: files/auth
     dest: auth
 
-# ignore errors is used because create will not overwrite existing secrets
-# we are going to have to figure out how to update this
-
 - name: create auth secrets in namespace egw-sample
   command: kubectl create secret generic -n egw-sample password --from-file=auth
-  ignore_errors: yes
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-- name: annotate secret 
-  command: kubectl annotate secret -n egw-sample password projectcontour.io/auth-type=basic projectcontour.io/auth-realm=epicauth
-
-
+- name: annotate secret
+  command: kubectl annotate secret -n egw-sample --overwrite=true password projectcontour.io/auth-type=basic projectcontour.io/auth-realm=epicauth
