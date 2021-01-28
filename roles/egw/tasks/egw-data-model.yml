@@ -20,7 +20,7 @@
   #
   # FIXME: use "kubectl -k" when "kubectl -k" works, and don't install
   # kustomize
-  shell: "kustomize build config/default | IMG={{ lookup('env', 'EPIC_CM_IMG') | default('registry.gitlab.com/acnodal/egw-resource-model:latest', True) }} envsubst | kubectl apply -f -"
+  shell: "kustomize build config/default | IMG={{ lookup('env', 'EPIC_CM_IMG') | default('registry.gitlab.com/acnodal/egw-resource-model:ci-main', True) }} envsubst | kubectl apply -f -"
   # this play can fail when we're bringing up the system because
   # various components (e.g., cert-manager) are in the process of
   # starting up. Back off for a few seconds to give things a chance to
