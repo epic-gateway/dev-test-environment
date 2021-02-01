@@ -1,10 +1,4 @@
 ---
-- name: create installation directory
-  file:
-    path: "{{ pfc_remote_path }}"
-    state: directory
-    mode: ugo+rx
-
 - name: download PFC artifacts from gitlab
   get_url:
     headers:

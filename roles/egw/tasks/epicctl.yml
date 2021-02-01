@@ -1,0 +1,8 @@
+---
+- name: download epicctl CLI from gitlab
+  get_url:
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fepicctl/jobs/artifacts/main/raw/epicctl?job=build
+    dest: "{{ pfc_remote_path }}"
+    mode: +x
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
