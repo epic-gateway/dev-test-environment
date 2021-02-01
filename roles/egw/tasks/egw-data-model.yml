@@ -32,10 +32,8 @@
 
 
 
-- name: Create sample namespace
-  command: kubectl apply -f config/samples/namespace.yaml
-  register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+- name: Create sample org/namespace
+  command: /opt/acnodal/bin/epicctl create org --uuidoverride egw-sample
 
 - name: create secret for acnodal private registry in egw namespace
   command: kubectl -n egw create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
