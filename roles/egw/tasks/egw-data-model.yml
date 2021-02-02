@@ -55,12 +55,3 @@
   command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml
 - name: Create sample service group (with envoy docker image override)
   shell: cat config/samples/egw_v1_servicegroup.yaml | sed "s~registry.gitlab.com/acnodal/envoy-for-egw:latest~{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/envoy-for-egw:latest', True) }}~" | kubectl apply -f -
-
-# FIXME: this should be done by a controller watching for Account objects.
-- name: Upload sample marin3r discovery service manifest
-  template:
-    src: files/marin3r-discoveryservice.yml
-    dest: ./
-
-- name: Launch sample marin3r discovery service
-  command: kubectl apply -f marin3r-discoveryservice.yml
