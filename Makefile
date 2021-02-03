@@ -1,9 +1,8 @@
-SHELL:=/bin/bash
-
 ##@ Default Goal
 .PHONY: help
 help: ## Display this help
-	@echo -e "Usage:\n  make <goal> [VAR=value ...]"
+	@echo "Usage:"
+	@echo "  make <goal> [VAR=value ...]"
 	@awk 'BEGIN {FS = ":.*##"}; \
 		/^[a-zA-Z0-9_-]+:.*?##/ { printf "  %-15s %s\n", $$1, $$2 } \
 		/^##@/ { printf "\n%s\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
