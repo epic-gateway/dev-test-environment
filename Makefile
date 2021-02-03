@@ -18,9 +18,11 @@ egw-playbook: ## Run the EGW playbook on a target host (specified by TARGET, e.g
 
 .PHONY: up
 up: ## Bring up the vagrant guest
-	vagrant up
+	vagrant up --no-destroy-on-error
+
+.PHONY: destroy
+destroy: ## Destroy the guest
+	vagrant destroy -f
 
 .PHONY: rebuild
-rebuild: ## Destroy and rebuild the vagrant guest
-	vagrant destroy -f
-	vagrant up
+rebuild: destroy up ## Destroy and rebuild the vagrant guest
