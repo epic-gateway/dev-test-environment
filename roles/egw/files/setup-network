@@ -43,9 +43,10 @@ def find_veth(container_id):
                 if 'master' in dev and dev['master'] == MULTUS_BRIDGE_NAME and 'link_netnsid' in dev and dev['link_netnsid'] == nsid:
                     ifname = dev['ifname']
                     ifindex = dev['ifindex']
-        print("veth: ", ifname, " ifindex: ", ifindex)
-        return ifname, ifindex
+                    print("veth: ", ifname, " ifindex: ", ifindex)
+                    return ifname, ifindex
 
+    print("veth not found for container", container_id)
     return False, -1
 
 
