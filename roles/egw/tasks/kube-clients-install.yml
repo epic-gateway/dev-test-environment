@@ -56,7 +56,7 @@
   become: yes
 - name: install kustomize
   command:
-    cmd: /root/install_kustomize.sh 3.8.6
+    cmd: /root/install_kustomize.sh 3.8.10
     chdir: /usr/local/bin
     creates: /usr/local/bin/kustomize
   become: yes
