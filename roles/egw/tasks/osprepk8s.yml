@@ -48,10 +48,3 @@
     append: yes
 - name: Reset ssh connection to allow user changes to affect 'current login user'
   meta: reset_connection
-
-- name: mount BPF filesystem
-  mount:
-    state: mounted
-    fstype: bpf
-    src: bpf
-    path: /sys/fs/bpf
