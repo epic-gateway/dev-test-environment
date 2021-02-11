@@ -1,7 +1,22 @@
 ---
-- name: Upload web service manifest
-  template:
-    src: templates/egw-web-service.yml.j2
-    dest: egw-web-service.yml
+- name: download manifest from gitlab
+  get_url:
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
+    url: https://gitlab.com/api/v4/projects/acnodal%2Fegw-web-service/jobs/1024217400/artifacts
+    dest: ./
+
+- name: unzip artifacts
+  unarchive:
+    src: artifacts.zip
+    remote_src: yes
+    dest: ./
+
+- name: override docker image if EPIC_WS_IMG is set
+  when: lookup('env', 'EPIC_WS_IMG') != ""
+  shell:
+    cmd: sed "s registry.gitlab.com/acnodal/egw-web-service:unknown {{ lookup('env', 'EPIC_WS_IMG') }} " < config/egw-web-service.yaml > deploy/egw-web-service.yaml
+    warn: no
+
 - name:  Launch web service
-  command: kubectl apply -f egw-web-service.yml
+  shell: kubectl apply -f deploy/egw-web-service.yaml
