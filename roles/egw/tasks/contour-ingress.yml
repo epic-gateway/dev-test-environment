@@ -44,6 +44,7 @@
 
 - name: create auth secrets in namespace egw-sample
   command: kubectl create secret generic -n egw-sample password --from-file=auth
+  no_log: true
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 

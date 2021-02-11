@@ -13,6 +13,7 @@
 
 - name: create secret for acnodal private registry
   command: kubectl -n router create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  no_log: true
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
