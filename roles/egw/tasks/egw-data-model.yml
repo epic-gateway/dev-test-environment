@@ -52,7 +52,7 @@
   command: kubectl wait --for=condition=Ready --timeout=5m --all -n egw pods
 
 - name: Create sample config singleton, with interface override
-  shell: cat config/samples/egw_v1_egw.yaml | sed "s/eth0/{{ lookup('env', 'EPIC_PFC_INTF') | default('eth0', True) }}/" | kubectl apply -f -
+  shell: cat config/samples/egw_v1_egw.yaml | sed "s/enp1s0/{{ pfc_interface }}/" | kubectl apply -f -
 - name: Create sample serviceprefix and account
   command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml
 - name: Create sample service group (with envoy docker image override)

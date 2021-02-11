@@ -1,7 +1,7 @@
 ---
 # PFC config
 pfc_remote_path: /opt/acnodal/bin
-pfc_interface: enp1s0
+pfc_interface: "{{ lookup('env', 'EPIC_PFC_INTF') | default('enp1s0', True) }}"
 
 # Bird config
 bird_remote_path: /opt/acnodal/bird
@@ -23,8 +23,8 @@ pool: "192.168.66.1-192.168.66.10"
 # ci-versioned-ci-manifest-ec7ccf75
 web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-web-service/jobs/1024217400/artifacts
 
-# v0.4.0-pre3
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/1022540142/artifacts
+# v0.4.1-pre0
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/1025085211/artifacts
 
 # v0.7.4
 pfc_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fpacket-forwarding-component/jobs/1022478050/artifacts/pkg/pfc.tar.bz2
