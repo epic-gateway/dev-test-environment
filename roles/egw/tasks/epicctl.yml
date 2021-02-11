@@ -1,7 +1,7 @@
 ---
 - name: download epicctl CLI from gitlab
   get_url:
-    url: https://gitlab.com/api/v4/projects/acnodal%2Fepicctl/jobs/artifacts/main/raw/epicctl?job=build
+    url: "{{ epicctl_artifact }}"
     dest: "{{ pfc_remote_path }}"
     mode: +x
     headers:
