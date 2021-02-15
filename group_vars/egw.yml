@@ -20,8 +20,8 @@ pool: "192.168.66.1-192.168.66.10"
 
 # EGW artifacts that we download from Gitlab
 
-# ci-versioned-ci-manifest-ec7ccf75
-web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-web-service/jobs/1024217400/artifacts
+# ci-main-af231a6c
+web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-web-service/jobs/1030904490/artifacts
 
 # v0.4.1-pre0
 resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/1025085211/artifacts
