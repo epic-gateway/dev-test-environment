@@ -11,16 +11,21 @@
     remote_src: yes
     dest: ./
 
+- name: override docker image if EPIC_CM_IMG is set
+  when: lookup('env', 'EPIC_CM_IMG') != ""
+  shell:
+    # we should be able to run "kubectl apply -k config/default" but the
+    # version of kustomize that's build into kubectl is so old that it
+    # doesn't work. For example, kubectl doesn't substitute the
+    # namespace properly so it creates a "system" namespace, which is
+    # wrong.
+    #
+    # FIXME: use "kubectl -k" when "kubectl -k" works, and don't install
+    # kustomize
+    cmd: "kustomize build config/default | IMG={{ lookup('env', 'EPIC_CM_IMG') }} envsubst > deploy/egw-resource-model.yaml"
+
 - name: Create egw namespace, crds, and operator
-  # we should be able to run "kubectl apply -k config/default" but the
-  # version of kustomize that's build into kubectl is so old that it
-  # doesn't work. For example, kubectl doesn't substitute the
-  # namespace properly so it creates a "system" namespace, which is
-  # wrong.
-  #
-  # FIXME: use "kubectl -k" when "kubectl -k" works, and don't install
-  # kustomize
-  shell: "kustomize build config/default | IMG={{ lookup('env', 'EPIC_CM_IMG') | default('registry.gitlab.com/acnodal/egw-resource-model:ci-main', True) }} envsubst | kubectl apply -f -"
+  command: kubectl apply -f deploy/egw-resource-model.yaml
   # this play can fail when we're bringing up the system because
   # various components (e.g., cert-manager) are in the process of
   # starting up. Back off for a few seconds to give things a chance to
@@ -29,8 +34,6 @@
   delay: 30
   register: result
   until: result is not failed
-
-
 
 - name: Create sample org/namespace
   command: /opt/acnodal/bin/epicctl create org --uuidoverride egw-sample
