@@ -205,15 +205,6 @@ spec:
         spec:
           description: DiscoveryServiceSpec defines the desired state of DiscoveryService
           properties:
-            ServiceConfig:
-              description: ServiceConfig configures the way the DiscoveryService endpoints are exposed
-              properties:
-                name:
-                  type: string
-                type:
-                  description: ServiceType is an enum with the available discovery service Service types
-                  type: string
-              type: object
             debug:
               description: Debug enables debugging log level for the discovery service controllers. It is safe to use since secret data is never shown in the logs.
               type: boolean
@@ -275,7 +266,16 @@ spec:
                   description: 'Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                   type: object
               type: object
-            xdsPort:
+            serviceConfig:
+              description: ServiceConfig configures the way the DiscoveryService endpoints are exposed
+              properties:
+                name:
+                  type: string
+                type:
+                  description: ServiceType is an enum with the available discovery service Service types
+                  type: string
+              type: object
+            xdsServerPort:
               description: XdsServerPort is the port where the xDS server listens. Defaults to 18000.
               format: int32
               type: integer
@@ -1466,14 +1466,14 @@ spec:
         env:
         - name: WATCH_NAMESPACE
           value: ""
-        image: quay.io/3scale/marin3r:v0.7.0-alpha6
+        image: quay.io/3scale/marin3r:v0.7.0
         name: manager
         resources:
           limits:
             cpu: 300m
             memory: 300Mi
           requests:
-            cpu: 100m
+            cpu: 50m
             memory: 100Mi
       serviceAccountName: marin3r-controller-manager
       terminationGracePeriodSeconds: 10
@@ -1503,12 +1503,19 @@ spec:
         - --tls-key-name=tls.key
         command:
         - /manager
-        image: quay.io/3scale/marin3r:v0.7.0-alpha6
+        image: quay.io/3scale/marin3r:v0.7.0
         name: webhook
         ports:
         - containerPort: 9443
           name: webhook-server
           protocol: TCP
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 30Mi
         volumeMounts:
         - mountPath: /tmp/k8s-webhook-server/serving-certs
           name: cert
