@@ -26,8 +26,8 @@ web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-web-servi
 # v0.4.1-pre2
 resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/1033970778/artifacts
 
-# v0.7.5
-pfc_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fpacket-forwarding-component/jobs/1034412018/artifacts/pkg/pfc.tar.bz2
+# v0.7.6
+pfc_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fpacket-forwarding-component/jobs/1037654098/artifacts/pkg/pfc.tar.bz2
 
 # "latest"
 epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepicctl/jobs/artifacts/main/raw/epicctl?job=build
