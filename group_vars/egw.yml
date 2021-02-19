@@ -20,11 +20,11 @@ pool: "192.168.66.1-192.168.66.10"
 
 # EGW artifacts that we download from Gitlab
 
-# ci-main-af231a6c
-web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-web-service/jobs/1030904490/artifacts
+# ci-main-cdf4c6bf
+web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-web-service/jobs/1038188636/artifacts
 
-# v0.4.1-pre2
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/1033970778/artifacts
+# v0.5.1-pre3
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/1044592786/artifacts
 
 # v0.7.6
 pfc_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fpacket-forwarding-component/jobs/1037654098/artifacts/pkg/pfc.tar.bz2
