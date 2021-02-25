@@ -49,8 +49,8 @@
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-- name: Create sample config singleton, with interface override
-  shell: cat config/samples/egw_v1_egw.yaml | sed "s/enp1s0/{{ pfc_interface }}/" | kubectl apply -f -
+- name: Create sample config singleton, with overrides
+  shell: cat config/samples/egw_v1_egw.yaml | sed "s/enp1s0/{{ pfc_interface }}/" | sed "s~registry.gitlab.com/acnodal/xds-operator:latest~{{ endpoints_image }}~" | kubectl apply -f -
   # this play can fail when we're bringing up the system because the
   # controller-manager webhooks are in the process of starting up so
   # you can't connect to them. Back off for a few seconds to give
@@ -62,5 +62,6 @@
 
 - name: Create sample serviceprefix and account
   command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml
+
 - name: Create sample service group (with envoy docker image override)
-  shell: cat config/samples/egw_v1_servicegroup.yaml | sed "s~registry.gitlab.com/acnodal/envoy-for-egw:ci-envoy-0-16-3-ad-1ee93658~{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/envoy-for-egw:ci-envoy-0-16-3-ad-1ee93658', True) }}~" | kubectl apply -f -
+  shell: cat config/samples/egw_v1_servicegroup.yaml | sed "s~registry.gitlab.com/acnodal/envoy-for-egw:latest~{{ envoy_image }}~" | kubectl apply -f -

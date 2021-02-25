@@ -62,5 +62,6 @@ $ export EXTRA_DOCKER_CONFIG="insecure-registries": ["refectory.caboteria.org:50
 $ export EPIC_EP_IMG=refectory.caboteria.org:5000/envoy-for-egw:tobyc-dev
 $ export EPIC_CM_IMG=refectory.caboteria.org:5000/egw-resource-model:tobyc-dev
 $ export EPIC_WS_IMG=refectory.caboteria.org:5000/egw-web-service:tobyc-dev
+$ export EPIC_XD_IMG=refectory.caboteria.org:5000/xds-operator:tobyc-dev
 $ make rebuild
 ```

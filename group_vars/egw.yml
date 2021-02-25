@@ -18,16 +18,20 @@ ansible_user: adamd
 subnet: "192.168.66.0/24"
 pool: "192.168.66.1-192.168.66.10"
 
-# EGW artifacts that we download from Gitlab
+# artifacts that we download from Gitlab
 
 # ci-main-b02050fb
 web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-web-service/jobs/1059521273/artifacts
 
-# v0.5.2-pre1
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/1053375706/artifacts
+# v0.5.3-xds7
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fegw-resource-model/jobs/1088095996/artifacts
 
 # v0.7.7
 pfc_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fpacket-forwarding-component/jobs/1051082664/artifacts/pkg/pfc.tar.bz2
 
 # "latest"
 epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepicctl/jobs/artifacts/main/raw/epicctl?job=build
+
+endpoints_image: "{{ lookup('env', 'EPIC_XD_IMG') | default('registry.gitlab.com/acnodal/xds-operator:tls-bb88063f', True) }}"
+
+envoy_image: "{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/envoy-for-egw:ci-eds-fbdbefaf', True) }}"
