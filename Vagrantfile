@@ -19,7 +19,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.provider :libvirt do |lv|
     lv.cpus = 3
-    lv.memory = 4096
+    lv.memory = 8192
   end
 
   config.vm.synced_folder './', '/vagrant', type: 'nfs'
