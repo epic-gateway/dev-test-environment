@@ -63,4 +63,4 @@
 - name: Create sample serviceprefix and account
   command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml
 - name: Create sample service group (with envoy docker image override)
-  shell: cat config/samples/egw_v1_servicegroup.yaml | sed "s~registry.gitlab.com/acnodal/envoy-for-egw:latest~{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/envoy-for-egw:latest', True) }}~" | kubectl apply -f -
+  shell: cat config/samples/egw_v1_servicegroup.yaml | sed "s~registry.gitlab.com/acnodal/envoy-for-egw:ci-envoy-0-16-3-ad-1ee93658~{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/envoy-for-egw:ci-envoy-0-16-3-ad-1ee93658', True) }}~" | kubectl apply -f -
