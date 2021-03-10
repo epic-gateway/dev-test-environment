@@ -27,6 +27,10 @@
       alias k=kubectl
       complete -F __start_kubectl k
 
+# There's not much sense running two DNS pods on a single-node system
+- name: scale dns down to one pod
+  command: kubectl scale deployment -n kube-system --replicas=1 coredns
+
 # We do this taint/untaint dance because "taint --overwrite" is
 # idempotent so this pair of commands will work on new clusters and
 # also work when we're updating an existing cluster
