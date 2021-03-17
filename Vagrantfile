@@ -39,7 +39,6 @@ Vagrant.configure('2') do |config|
         ansible_user: 'vagrant',
         extra_docker_config: EXTRA_DOCKER_CONFIG,
       }
-      ansible.verbose = true
       ansible.vault_password_file = VAULT_PASSWORD_FILE
     end
     egw.trigger.after :destroy do |trigger|
