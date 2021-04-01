@@ -20,8 +20,8 @@ pool: "192.168.66.1-192.168.66.10"
 
 # artifacts that we download from Gitlab
 
-# v0.6.0-pre8
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/jobs/278179211/artifacts
+# v0.7.0-pre1
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/jobs/1147713727/artifacts
 
 # egw-to-epic-a4046c72
 web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/jobs/1131528482/artifacts
@@ -32,6 +32,12 @@ true_ingress_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Ftrue-
 # v0.1.0
 epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/jobs/1129697374/artifacts/epicctl
 
-eds_server_image: "{{ lookup('env', 'EPIC_ED_IMG') | default('registry.gitlab.com/acnodal/epic/eds-server:egw-to-epic-f3418d20', True) }}"
+eds_server_image: "{{ lookup('env', 'EPIC_ED_IMG') | default('registry.gitlab.com/acnodal/epic/eds-server:v2-to-v3-30cc8340', True) }}"
 
-envoy_image: "{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/epic/envoy:egw-to-epic-d5eb8959', True) }}"
+envoy_image: "{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/epic/envoy:v2-to-v3-0729bc95', True) }}"
+
+# FIXME: this image is a little different from the others in that we
+# don't expect to run a fork indefinitely. Hopefully we'll get our
+# fixes merged upstream and be able to go back to not overriding the
+# defaults.
+marin3r_image: "{{ lookup('env', 'EPIC_XD_IMG') | default('caboteria/marin3r:v0.7.0-5-gb0d2dfd', True) }}"

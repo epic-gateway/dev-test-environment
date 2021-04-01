@@ -49,6 +49,14 @@
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
+- name: maybe override the marin3r image (only if the override variable is set)
+  when: marin3r_image is defined
+  lineinfile:
+    path: config/samples/epic_v1_epic.yaml
+    insertafter: '^spec:'
+    regexp: '^  xds-image:'
+    line: "  xds-image: {{ marin3r_image }}"
+
 - name: Create sample config singleton, with overrides
   shell: cat config/samples/epic_v1_epic.yaml | sed "s/enp1s0/{{ true_ingress_interface }}/" | sed "s~registry.gitlab.com/acnodal/xds-operator:latest~{{ eds_server_image }}~" | kubectl apply -f -
   # this play can fail when we're bringing up the system because the
