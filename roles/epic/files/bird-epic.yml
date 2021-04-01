@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bird-egw
+  name: bird-epic
   namespace: router
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: bird-egw
+      app: bird-epic
   template:
     metadata:
       labels:
-        app: bird-egw
+        app: bird-epic
     spec:
       containers:
-      - name: bird-egw
+      - name: bird-epic
         env:
         - name: BIRD_NODE_NAME
           valueFrom:

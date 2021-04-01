@@ -9,8 +9,8 @@ help: ## Display this help
 
 ##@ Ansible Goals
 
-.PHONY: egw-playbook
-egw-playbook: ## Run the EGW playbook on a target host (specified by TARGET, e.g., "make provision TARGET=egw.acnodal.io")
+.PHONY: epic-playbook
+epic-playbook: ## Run the EPIC playbook on a target host (specified by TARGET, e.g., "make provision TARGET=epic.acnodal.io")
 	@test -n "${TARGET}" || (echo "TARGET not set. It must contain the name or address of the host to be provisioned." ; exit 1)
 	ansible-playbook --verbose --ask-become-pass --vault-password-file=.ansible-vault-password --inventory=hosts.yml --limit=${TARGET} master.yml
 

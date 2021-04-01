@@ -15,8 +15,8 @@
 - name: override docker image if EPIC_WS_IMG is set
   when: lookup('env', 'EPIC_WS_IMG') != ""
   shell:
-    cmd: sed "s registry.gitlab.com/acnodal/egw-web-service:unknown {{ lookup('env', 'EPIC_WS_IMG') }} " < config/egw-web-service.yaml > deploy/egw-web-service.yaml
+    cmd: sed "s registry.gitlab.com/acnodal/epic/web-service:unknown {{ lookup('env', 'EPIC_WS_IMG') }} " < config/web-service.yaml > deploy/web-service.yaml
     warn: no
 
 - name:  Launch web service
-  shell: kubectl apply -f deploy/egw-web-service.yaml
+  shell: kubectl apply -f deploy/web-service.yaml

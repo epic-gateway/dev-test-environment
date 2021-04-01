@@ -36,7 +36,7 @@
     dest: /etc/environment
     mode: ugo+r
     content: |
-      PATH="{{ pfc_remote_path }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      PATH="{{ true_ingress_remote_path }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       KUBECONFIG="/etc/kubernetes/admin.conf"
 
 - name: add me to some useful groups

@@ -1,14 +1,14 @@
 ---
-- name: download PFC artifacts from gitlab
+- name: download True Ingress artifacts from gitlab
   get_url:
     headers:
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: "{{ pfc_artifact }}"
+    url: "{{ true_ingress_artifact }}"
     dest: /root
 - name: untar artifacts
   unarchive:
-    src: /root/pfc.tar.bz2
-    dest: "{{ pfc_remote_path }}"
+    src: /root/true-ingress.tar.bz2
+    dest: "{{ true_ingress_remote_path }}"
     extra_opts:
     - --strip-components=1
     remote_src: yes

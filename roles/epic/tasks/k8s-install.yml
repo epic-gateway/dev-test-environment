@@ -2,10 +2,10 @@
 - name: create k8s config file
   template:
     src: kubeinit.j2
-    dest: /root/egw.conf
+    dest: /root/epic.conf
   become: yes
 - name: install kubernetes
-  command: kubeadm init --config /root/egw.conf
+  command: kubeadm init --config /root/epic.conf
   become: yes
   args:
     creates: /etc/kubernetes/pki/ca.key

@@ -5,7 +5,7 @@ metadata:
   namespace: router
 data:
   bird.conf: |-
-    # Configuration Skeleton for BIRD egw 
+    # Configuration Skeleton for BIRD epic 
     # includes come from PVC
     
     # set in env var retrieved and set in envvar.conf

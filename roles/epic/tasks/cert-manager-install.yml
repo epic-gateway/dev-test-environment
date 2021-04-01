@@ -1,5 +1,5 @@
 ---
-- name: install cert-manager which the egw operator webhook needs
+- name: install cert-manager which the epic operator webhook needs
   # https://cert-manager.io/docs/installation/kubernetes/#installing-with-regular-manifests
   command: kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.3/cert-manager.yaml
 

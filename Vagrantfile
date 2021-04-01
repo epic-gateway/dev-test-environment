@@ -1,5 +1,5 @@
 BOX='generic/ubuntu2004'
-EGWINT = ENV.fetch('EGWINT', 'enp113s0f0')
+EPICINT = ENV.fetch('EPICINT', 'enp113s0f0')
 EXTRA_DOCKER_CONFIG = ENV['EXTRA_DOCKER_CONFIG'] && "#{ENV['EXTRA_DOCKER_CONFIG']}," || ""
 VAULT_PASSWORD_FILE = '.ansible-vault-password'
 SHELL_PROVISION_SCRIPT = <<-SHELL
@@ -24,15 +24,15 @@ Vagrant.configure('2') do |config|
 
   config.vm.synced_folder './', '/vagrant', type: 'nfs'
 
-  config.vm.define 'egw' do |egw|
-    egw.vm.hostname = 'egw'
-    egw.vm.network :public_network,
-                   dev: EGWINT,
-                   mode: 'passthrough',
-                   mac: '20:ca:b0:70:00:02',
-                   trust_guest_rx_filters: true
-    egw.vm.provision :shell, inline: SHELL_PROVISION_SCRIPT
-    egw.vm.provision 'ansible' do |ansible|
+  config.vm.define 'epic' do |epic|
+    epic.vm.hostname = 'epic'
+    epic.vm.network :public_network,
+                    dev:EPICINT,
+                    mode: 'passthrough',
+                    mac: '20:ca:b0:70:00:02',
+                    trust_guest_rx_filters: true
+    epic.vm.provision :shell, inline: SHELL_PROVISION_SCRIPT
+    epic.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'master.yml'
       ansible.compatibility_mode = '2.0'
       ansible.extra_vars = {
@@ -41,22 +41,22 @@ Vagrant.configure('2') do |config|
       }
       ansible.vault_password_file = VAULT_PASSWORD_FILE
     end
-    egw.trigger.after :destroy do |trigger|
-      trigger.run = {inline: 'rm -f egw-admin.conf master.retry'}
+    epic.trigger.after :destroy do |trigger|
+      trigger.run = {inline: 'rm -f epic-admin.conf master.retry'}
     end
 
   end
 
 
   config.trigger.before [:up, :resume, :reload] do |trigger|
-    trigger.info = "Setting EGWINT #{EGWINT} down"
-    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
+    trigger.info = "Setting EPICINT #{EPICINT} down"
+    trigger.run = { inline: "sudo ip link set dev #{EPICINT} down" }
   end
 
 
   config.trigger.after [:destroy, :halt, :suspend] do |trigger|
-    trigger.info = "setting EGWINT #{EGWINT} down"
-    trigger.run = { inline: "sudo ip link set dev #{EGWINT} down" }
+    trigger.info = "setting EPICINT #{EPICINT} down"
+    trigger.run = { inline: "sudo ip link set dev #{EPICINT} down" }
   end
 
 end

@@ -5,7 +5,6 @@
     state: directory
     mode: ugo+rx
 
-
 - name:  create router namespace
   command: kubectl create namespace router
   register: result
@@ -26,9 +25,8 @@
 
 - name: create bird configuration
   copy:
-    src: files/bird-egw.yml
-    dest: bird-egw.yml
-
+    src: files/bird-epic.yml
+    dest: bird-epic.yml
 
 - name: create router - bird deployment
-  command: kubectl apply -f bird-egw.yml
+  command: kubectl apply -f bird-epic.yml

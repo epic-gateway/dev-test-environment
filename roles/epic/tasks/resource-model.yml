@@ -22,10 +22,10 @@
     #
     # FIXME: use "kubectl -k" when "kubectl -k" works, and don't install
     # kustomize
-    cmd: "kustomize build config/default | IMG={{ lookup('env', 'EPIC_CM_IMG') }} envsubst > deploy/egw-resource-model.yaml"
+    cmd: "kustomize build config/default | IMG={{ lookup('env', 'EPIC_CM_IMG') }} envsubst > deploy/epic-resource-model.yaml"
 
-- name: Create egw namespace, crds, and operator
-  command: kubectl apply -f deploy/egw-resource-model.yaml
+- name: Create epic namespace, crds, and operator
+  command: kubectl apply -f deploy/epic-resource-model.yaml
   # this play can fail when we're bringing up the system because
   # various components (e.g., cert-manager) are in the process of
   # starting up. Back off for a few seconds to give things a chance to
@@ -36,21 +36,21 @@
   until: result is not failed
 
 - name: Create sample org/namespace
-  command: /opt/acnodal/bin/epicctl create org --uuidoverride egw-sample
+  command: /opt/acnodal/bin/epicctl create org --uuidoverride epic-sample
 
-- name: create secret for acnodal private registry in egw namespace
-  command: kubectl -n egw create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+- name: create secret for acnodal private registry in epic namespace
+  command: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   no_log: true
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
-- name: create secret for acnodal private registry in egw-sample namespace
-  command: kubectl -n egw-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+- name: create secret for acnodal private registry in epic-sample namespace
+  command: kubectl -n epic-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   no_log: true
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: Create sample config singleton, with overrides
-  shell: cat config/samples/egw_v1_egw.yaml | sed "s/enp1s0/{{ pfc_interface }}/" | sed "s~registry.gitlab.com/acnodal/xds-operator:latest~{{ endpoints_image }}~" | kubectl apply -f -
+  shell: cat config/samples/epic_v1_epic.yaml | sed "s/enp1s0/{{ true_ingress_interface }}/" | sed "s~registry.gitlab.com/acnodal/xds-operator:latest~{{ eds_server_image }}~" | kubectl apply -f -
   # this play can fail when we're bringing up the system because the
   # controller-manager webhooks are in the process of starting up so
   # you can't connect to them. Back off for a few seconds to give
@@ -61,7 +61,7 @@
   until: result is not failed
 
 - name: Create sample serviceprefix and account
-  command: kubectl apply -f config/samples/egw_v1_serviceprefix.yaml -f config/samples/egw_v1_account.yaml
+  command: kubectl apply -f config/samples/epic_v1_serviceprefix.yaml -f config/samples/epic_v1_account.yaml
 
 - name: Create sample service group (with envoy docker image override)
-  shell: cat config/samples/egw_v1_servicegroup.yaml | sed "s~registry.gitlab.com/acnodal/envoy-for-egw:latest~{{ envoy_image }}~" | kubectl apply -f -
+  shell: cat config/samples/epic_v1_lbservicegroup.yaml | sed "s~registry.gitlab.com/acnodal/epic/envoy:latest~{{ envoy_image }}~" | kubectl apply -f -
