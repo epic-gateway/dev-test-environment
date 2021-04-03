@@ -35,21 +35,13 @@
   register: result
   until: result is not failed
 
-- name: Create sample org/namespace
-  command: /opt/acnodal/bin/epicctl create org --uuidoverride epic-sample
-
 - name: create secret for acnodal private registry in epic namespace
   command: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   no_log: true
   register: result
   failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
-- name: create secret for acnodal private registry in epic-sample namespace
-  command: kubectl -n epic-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
-  no_log: true
-  register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
-- name: maybe override the marin3r image (only if the override variable is set)
+- name: maybe override the config singleton marin3r image (only if the override variable is set)
   when: marin3r_image is defined
   lineinfile:
     path: config/samples/epic_v1_epic.yaml
@@ -69,7 +61,19 @@
   until: result is not failed
 
 - name: Create sample serviceprefix and account
-  command: kubectl apply -f config/samples/epic_v1_serviceprefix.yaml -f config/samples/epic_v1_account.yaml
+  command: kubectl apply -f config/samples/epic_v1_serviceprefix.yaml
+
+- name: Create sample org/namespace
+  command: /opt/acnodal/bin/epicctl create org --uuidoverride epic-sample
+
+- name: Create sample account
+  command: kubectl apply -f config/samples/epic_v1_account.yaml
+
+- name: create secret for acnodal private registry in epic-sample namespace
+  command: kubectl -n epic-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  no_log: true
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
 
 - name: Create sample service group (with envoy docker image override)
   shell: cat config/samples/epic_v1_lbservicegroup.yaml | sed "s~registry.gitlab.com/acnodal/epic/envoy:latest~{{ envoy_image }}~" | kubectl apply -f -
