@@ -20,8 +20,8 @@ pool: "192.168.66.1-192.168.66.10"
 
 # artifacts that we download from Gitlab
 
-# v0.7.0-pre1
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/jobs/1147713727/artifacts
+# v0.7.0-pre3
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/jobs/1150708286/artifacts
 
 # egw-to-epic-a4046c72
 web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/jobs/1131528482/artifacts
