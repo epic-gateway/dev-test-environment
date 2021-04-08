@@ -46,7 +46,7 @@
   command: kubectl create secret generic -n epic-sample password --from-file=auth
   no_log: true
   register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+  failed_when: result.rc != 0 and "already exists" not in result.stderr
 
 - name: annotate secret
   command: kubectl annotate secret -n epic-sample --overwrite=true password projectcontour.io/auth-type=basic projectcontour.io/auth-realm=epicauth

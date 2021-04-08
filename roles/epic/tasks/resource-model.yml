@@ -39,7 +39,7 @@
   command: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   no_log: true
   register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+  failed_when: result.rc != 0 and "already exists" not in result.stderr
 
 - name: maybe override the config singleton marin3r image (only if the override variable is set)
   when: marin3r_image is defined
@@ -73,7 +73,7 @@
   command: kubectl -n epic-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   no_log: true
   register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+  failed_when: result.rc != 0 and "already exists" not in result.stderr
 
 - name: Create sample service group (with envoy docker image override)
   shell: cat config/samples/epic_v1_lbservicegroup.yaml | sed "s~registry.gitlab.com/acnodal/epic/envoy:latest~{{ envoy_image }}~" | kubectl apply -f -
