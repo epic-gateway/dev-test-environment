@@ -20,11 +20,11 @@ pool: "192.168.66.1-192.168.66.10"
 
 # artifacts that we download from Gitlab
 
-# v0.7.0-pre3
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/jobs/1150708286/artifacts
+# v0.7.1
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/jobs/1167266817/artifacts
 
-# egw-to-epic-a4046c72
-web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/jobs/1131528482/artifacts
+# v0.1.0
+web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/jobs/1166904882/artifacts
 
 # v0.8.0
 true_ingress_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Ftrue-ingress/jobs/1129682331/artifacts/pkg/true-ingress.tar.bz2
@@ -32,9 +32,11 @@ true_ingress_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Ftrue-
 # v0.1.0
 epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/jobs/1129697374/artifacts/epicctl
 
-eds_server_image: "{{ lookup('env', 'EPIC_ED_IMG') | default('registry.gitlab.com/acnodal/epic/eds-server:v2-to-v3-30cc8340', True) }}"
+# v0.1.0
+eds_server_image: "{{ lookup('env', 'EPIC_ED_IMG') | default('registry.gitlab.com/acnodal/epic/eds-server:v0.1.0', True) }}"
 
-envoy_image: "{{ lookup('env', 'EPIC_EP_IMG') | default('registry.gitlab.com/acnodal/epic/envoy:v2-to-v3-0729bc95', True) }}"
+# v0.1.1
+envoy_image: "{{ lookup('env', 'EPIC_EY_IMG') | default('registry.gitlab.com/acnodal/epic/envoy:v0.1.1', True) }}"
 
 # FIXME: this image is a little different from the others in that we
 # don't expect to run a fork indefinitely. Hopefully we'll get our
