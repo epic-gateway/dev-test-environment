@@ -5,7 +5,7 @@ This project provides scripts to install and use Vagrant to create representativ
 To use the enviroment clone the repo
 
 If vagrant is not installed use the setup_vagrant_host.sh script to install Vagrant with
-libvirt support
+libvirt support.  Note that is required additional bridge setup to provide the host network for the router VM.
 
 Execute Vagrant up in the singlenode directory to create three VMs and a bridge ($user-epic0) that connects these three VMs together.  The VM have static IP addresses on $user-epic0
 
