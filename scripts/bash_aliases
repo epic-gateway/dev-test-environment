@@ -1,0 +1,8 @@
+kubectl() {
+  /snap/bin/microk8s kubectl "$@"
+}
+export -f kubectl
+alias m=microk8s
+alias k='microk8s kubectl'
+source <(microk8s kubectl completion bash)
+complete -F __start_kubectl k
