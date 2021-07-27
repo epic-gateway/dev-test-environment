@@ -1,8 +1,9 @@
 #!/bin/bash
 
-if [ ! -f /usr/bin/vagrant ];
-    echo "Vagrant already installed - Exiting"
-    exit 0
+if [ -x /usr/bin/vagrant ]
+    then
+        echo "Vagrant already installed - Exiting"
+        exit 0
 fi
 
 # Install Latest Vagrant from Hashicorp
@@ -18,12 +19,13 @@ sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
 sudo apt-get update
 
 
-apt-get build-dep vagrant ruby-libvirt
-apt-get install qemu libvirt-daemon-system libvirt-clients ebtables dnsmasq-base \
+sudo apt-get -y build-dep vagrant ruby-libvirt
+sudo apt-get -y install qemu libvirt-daemon-system libvirt-clients ebtables dnsmasq-base \
 libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev \
 libguestfs-tools
 
-sudo vagrant plugin install vagrant-libvirt
+# sudo vagrant plugin install vagrant-libvirt
+CFLAGS="-I/opt/vagrant/embedded/include/ruby-3.0.0/ruby" vagrant plugin install vagrant-libvirt
 
 # add environment variable for vagrant provider
 
@@ -33,5 +35,6 @@ sudo  sed -Ei '$ a export VAGRANT_DEFAULT_PROVIDER=libvirt' /etc/environment
 
 sudo cp ./brmgr.sh /usr/local/bin
 sudo chmod 755 /usr/local/bin/brmgr.sh
+sudo cp ./50-bridge-priv /etc/sudoers.d/50-bridge-priv
 
 

@@ -45,7 +45,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.1"
     router.vm.network :public_network,
-      :dev => "brext0",
+      :dev => "brint0",
       :mode => "bridge",
       :type => "bridge",
       :trust_guest_rx_filters => "true",
@@ -104,9 +104,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s.vm.provision "shell",
       run: "always",
       inline: "ip route add default via 192.168.254.1"
-    mk8s.vm.provision "shell",
-      run: "always",
-      inline: "ip route del default dev eth0"
+    
 
     mk8s.vm.provision "shell", inline: $installmk8s
 
@@ -115,6 +113,9 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
 
     mk8s.vm.provision "file", source: "../scripts/bash_aliases", destination: ".bash_aliases" 
     
+    mk8s.vm.provision "shell",
+      run: "always",
+      inline: "ip route del default dev eth0"
     
   end
 
