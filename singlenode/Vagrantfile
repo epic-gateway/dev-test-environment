@@ -45,7 +45,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.1"
     router.vm.network :public_network,
-      :dev => "brext0",
+      :dev => "brint0",
       :mode => "bridge",
       :type => "bridge",
       :trust_guest_rx_filters => "true",
