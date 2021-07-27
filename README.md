@@ -16,7 +16,18 @@ Execute Vagrant up in the singlenode directory to create three VMs and a bridge 
 
 
 
-Multinode is not yet implmented
+Multinode
+This is basically the same as above but creates 3 nodes for epic and 3 nodes for mk8s
+
+epic1-192.168.254.11
+epic2-192.168.254.12
+epic3-192.168.254.13
+
+mk8s1-192.168.254.101
+mk8s2-192.168.254.102
+mk8s3-192.168.254.103
+
+Note:  mk8s setup installs microk8s but does not combine them into a cluster.  Use the stand microk8s commands if thats what you want.
 
 
 The VM are accessed from the host machine using vagrant ssh
