@@ -1,25 +1,34 @@
 
 $fixsysconf = <<-SCRIPT
-
 sed -i '/net.ipv6.conf.all.disable_ipv6/d' /etc/sysctl.conf
 sed -i 's/^#net.ipv4.ip_forward/net.ipv4.ip_forward/' /etc/sysctl.conf
 sed -i 's/^#net.ipv6.conf.all.forwarding/net.ipv6.conf.all.forwarding/' /etc/sysctl.conf
-
+sed -i 's/^#net.ipv4.conf.all.log_martians/net.ipv4.conf.all.log_martians/' /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf
+SCRIPT
 
+$deleth0dhcpdefault = <<-SCRIPT
+sed -i '/^[[:space:]]*dhcp4:[[:space:]]true/a \\     \\ dhcp4-overrides:' /etc/netplan/01-netcfg.yaml
+sed -i '/^[[:space:]]*dhcp4-overrides:/a \\       \\ use-routes: false'  /etc/netplan/01-netcfg.yaml 
+SCRIPT
+
+$fixhosts = <<-SCRIPT
+sed -i '/ubuntu2004/d' /etc/hosts
+sed -i 's/^127.0.2.1/127.0.1.1/' /etc/hosts
+SCRIPT
+
+$routerasdefault = <<-SCRIPT
+sed -i  '$ a \\     \\ gateway4: 192.168.254.1' /etc/netplan/50-vagrant.yaml
 SCRIPT
 
 $installmk8s = <<-SCRIPT
-
 snap install microk8s --classic
 usermod -a -G microk8s vagrant
 chown -f -R vagrant ~/.kube
 microk8s status --wait-ready
 microk8s enable dns
 microk8s enable rbac
-
 SCRIPT
-
 
 
 Vagrant.configure("2") do |config|
@@ -43,24 +52,22 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       :mode => "bridge",
       :type => "bridge",
       :trust_guest_rx_filters => "true",
-      ip: "192.168.254.1"
+      auto_config: false
     router.vm.network :public_network,
       :dev => "brint0",
       :mode => "bridge",
       :type => "bridge",
       :trust_guest_rx_filters => "true",
-      use_dhcp_assigned_default_route: true
+      auto_config: false
     
     router.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 2048
     end
     router.vm.provision "shell", inline: $fixsysconf
-    router.vm.provision "shell",
-      run: "always",
-      inline: "ip route del default dev eth0"
-    
-
+    router.vm.provision "shell", inline: $fixhosts
+    router.vm.provision "shell", inline: $deleth0dhcpdefault
+    router.vm.provision "shell", inline: "netplan apply"
   end
  
   config.vm.define 'epic1' do |epic1|
@@ -78,12 +85,14 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       lv.memory = 6148
     end
     epic1.vm.provision "shell", inline: $fixsysconf
-    epic1.vm.provision "shell",
-      run: "always",
-      inline: "ip route add default via 192.168.254.1"
-    epic1.vm.provision "shell",
-      run: "always",
-      inline: "ip route del default dev eth0"
+    epic1.vm.provision "shell", inline: $fixhosts
+    epic1.vm.provision "shell", inline: $deleth0dhcpdefault
+    epic1.vm.provision "shell", inline: $routerasdefault
+    epic1.vm.provision "shell", inline: "netplan apply"
+
+    epic1.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
+    epic1.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
+
   end
 
   config.vm.define 'epic2' do |epic2|
@@ -101,12 +110,14 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       lv.memory = 6148
     end
     epic2.vm.provision "shell", inline: $fixsysconf
-    epic2.vm.provision "shell",
-      run: "always",
-      inline: "ip route add default via 192.168.254.1"
-    epic2.vm.provision "shell",
-      run: "always",
-      inline: "ip route del default dev eth0"
+    epic2.vm.provision "shell", inline: $fixhosts
+    epic2.vm.provision "shell", inline: $deleth0dhcpdefault
+    epic2.vm.provision "shell", inline: $routerasdefault
+    epic2.vm.provision "shell", inline: "netplan apply"
+
+    epic2.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
+    epic2.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
+
   end
 
   config.vm.define 'epic3' do |epic3|
@@ -124,12 +135,14 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       lv.memory = 6148
     end
     epic3.vm.provision "shell", inline: $fixsysconf
-    epic3.vm.provision "shell",
-      run: "always",
-      inline: "ip route add default via 192.168.254.1"
-    epic3.vm.provision "shell",
-      run: "always",
-      inline: "ip route del default dev eth0"
+    epic3.vm.provision "shell", inline: $fixhosts
+    epic3.vm.provision "shell", inline: $deleth0dhcpdefault
+    epic3.vm.provision "shell", inline: $routerasdefault
+    epic3.vm.provision "shell", inline: "netplan apply"
+
+    epic3.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
+    epic3.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
+
   end
 
   config.vm.define 'mk8s1' do |mk8s1|
@@ -147,19 +160,21 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       lv.memory = 4096
     end
     mk8s1.vm.provision "shell", inline: $fixsysconf
-    mk8s1.vm.provision "shell",
-      run: "always",
-      inline: "ip route add default via 192.168.254.1"
-    mk8s1.vm.provision "shell",
-      run: "always",
-      inline: "ip route del default dev eth0"
+    mk8s1.vm.provision "shell", inline: $fixhosts
+    mk8s1.vm.provision "shell", inline: $deleth0dhcpdefault
+    mk8s1.vm.provision "shell", inline: $routerasdefault
+    mk8s1.vm.provision "shell", inline: "netplan apply"
+
+    mk8s1.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
+    mk8s1.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
+   
 
     mk8s1.vm.provision "shell", inline: $installmk8s
 
-    mk8s1.vm.provision "file", source: "../scripts/kubens", destination: "kubens"
+    mk8s1.vm.provision "file", source: "../files/kubens", destination: "kubens"
     mk8s1.vm.provision "shell", inline: "mv kubens /usr/local/bin"
 
-    mk8s1.vm.provision "file", source: "../scripts/bash_aliases", destination: ".bash_aliases" 
+    mk8s1.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
     
     
   end
@@ -179,19 +194,20 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       lv.memory = 4096
     end
     mk8s2.vm.provision "shell", inline: $fixsysconf
-    mk8s2.vm.provision "shell",
-      run: "always",
-      inline: "ip route add default via 192.168.254.1"
-    mk8s2.vm.provision "shell",
-      run: "always",
-      inline: "ip route del default dev eth0"
+    mk8s2.vm.provision "shell", inline: $fixhosts
+    mk8s2.vm.provision "shell", inline: $deleth0dhcpdefault
+    mk8s2.vm.provision "shell", inline: $routerasdefault
+    mk8s2.vm.provision "shell", inline: "netplan apply"
 
+    mk8s2.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
+    mk8s2.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
+    
     mk8s2.vm.provision "shell", inline: $installmk8s
 
-    mk8s2.vm.provision "file", source: "../scripts/kubens", destination: "kubens"
+    mk8s2.vm.provision "file", source: "../files/kubens", destination: "kubens"
     mk8s2.vm.provision "shell", inline: "mv kubens /usr/local/bin"
 
-    mk8s2.vm.provision "file", source: "../scripts/bash_aliases", destination: ".bash_aliases" 
+    mk8s2.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
   
   end
   
@@ -210,19 +226,21 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       lv.memory = 4096
     end
     mk8s3.vm.provision "shell", inline: $fixsysconf
-    mk8s3.vm.provision "shell",
-      run: "always",
-      inline: "ip route add default via 192.168.254.1"
-    mk8s3.vm.provision "shell",
-      run: "always",
-      inline: "ip route del default dev eth0"
+    mk8s3.vm.provision "shell", inline: $fixhosts
+    mk8s3.vm.provision "shell", inline: $deleth0dhcpdefault
+    mk8s3.vm.provision "shell", inline: $routerasdefault
+    mk8s3.vm.provision "shell", inline: "netplan apply"
+
+    mk8s3.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
+    mk8s3.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
+
 
     mk8s3.vm.provision "shell", inline: $installmk8s
 
-    mk8s3.vm.provision "file", source: "../scripts/kubens", destination: "kubens"
+    mk8s3.vm.provision "file", source: "../files/kubens", destination: "kubens"
     mk8s3.vm.provision "shell", inline: "mv kubens /usr/local/bin"
 
-    mk8s3.vm.provision "file", source: "../scripts/bash_aliases", destination: ".bash_aliases" 
+    mk8s3.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
     
   end
 

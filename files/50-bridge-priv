@@ -1,0 +1,12 @@
+# Allow Vagrant automation users to create linux bridges
+
+Cmnd_Alias BRMGR_ADD = /sbin/brctl addbr *
+Cmnd_Alias BRMGR_UP = /sbin/ip link set * up
+Cmnd_Alias BRMGR_DEL = /sbin/brctl delbr *
+Cmnd_Alias BRMGR_DOWN = /sbin/ip link set * down
+
+
+ALL ALL=(root) NOPASSWD: BRMGR_ADD
+ALL ALL=(root) NOPASSWD: BRMGR_UP
+ALL ALL=(root) NOPASSWD: BRMGR_DEL
+ALL ALL=(root) NOPASSWD: BRMGR_DOWN

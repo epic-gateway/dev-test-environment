@@ -1,0 +1,3 @@
+singlenode/.vagrant/*
+boxes/*
+multinode/.vagrant/*
