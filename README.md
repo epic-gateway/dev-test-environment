@@ -8,7 +8,9 @@ This project provides scripts to install and use Vagrant to create representativ
  They are already setup.  Just clone into your home directory on the host you want to use and start the version you want. 
 
 
-## To use the environment
+## To use in your Environment
+
+You should be able to run the single node version, the multinode version is 7 host, take a look at the resources required in the vagrantfile
 
 Before cloning the repo a bridge connecting the router to your network is required.  The netplan configuration will look like this.
 
