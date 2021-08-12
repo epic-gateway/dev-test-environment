@@ -35,6 +35,6 @@ sudo  sed -Ei '$ a export VAGRANT_DEFAULT_PROVIDER=libvirt' /etc/environment
 
 sudo cp ./brmgr.sh /usr/local/bin
 sudo chmod 755 /usr/local/bin/brmgr.sh
-sudo cp ./50-bridge-priv /etc/sudoers.d/50-bridge-priv
+sudo cp ./files/50-bridge-priv /etc/sudoers.d/50-bridge-priv
 
 
