@@ -81,7 +81,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       ip: "192.168.254.10"
 
     epic.vm.provider :libvirt do |lv|
-      lv.cpus = 2
+      lv.cpus = 4
       lv.memory = 6148
     end
     epic.vm.provision "shell", inline: $fixsysconf

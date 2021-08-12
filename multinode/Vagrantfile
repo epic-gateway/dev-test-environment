@@ -81,7 +81,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       ip: "192.168.254.11"
 
     epic1.vm.provider :libvirt do |lv|
-      lv.cpus = 2
+      lv.cpus = 4
       lv.memory = 6148
     end
     epic1.vm.provision "shell", inline: $fixsysconf
@@ -106,7 +106,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       ip: "192.168.254.12"
 
     epic2.vm.provider :libvirt do |lv|
-      lv.cpus = 2
+      lv.cpus = 4
       lv.memory = 6148
     end
     epic2.vm.provision "shell", inline: $fixsysconf
@@ -131,7 +131,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       ip: "192.168.254.13"
 
     epic3.vm.provider :libvirt do |lv|
-      lv.cpus = 2
+      lv.cpus = 4
       lv.memory = 6148
     end
     epic3.vm.provision "shell", inline: $fixsysconf
