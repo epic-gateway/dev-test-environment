@@ -63,6 +63,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     router.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 2048
+      lv.storage_pool_name = "lv-vmdisks"
     end
     router.vm.provision "shell", inline: $fixsysconf
     router.vm.provision "shell", inline: $fixhosts
@@ -81,8 +82,9 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       ip: "192.168.254.11"
 
     epic1.vm.provider :libvirt do |lv|
-      lv.cpus = 2
+      lv.cpus = 4
       lv.memory = 6148
+      lv.storage_pool_name = "lv-vmdisks"
     end
     epic1.vm.provision "shell", inline: $fixsysconf
     epic1.vm.provision "shell", inline: $fixhosts
@@ -106,8 +108,9 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       ip: "192.168.254.12"
 
     epic2.vm.provider :libvirt do |lv|
-      lv.cpus = 2
+      lv.cpus = 4
       lv.memory = 6148
+      lv.storage_pool_name = "lv-vmdisks"
     end
     epic2.vm.provision "shell", inline: $fixsysconf
     epic2.vm.provision "shell", inline: $fixhosts
@@ -131,8 +134,9 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       ip: "192.168.254.13"
 
     epic3.vm.provider :libvirt do |lv|
-      lv.cpus = 2
+      lv.cpus = 4
       lv.memory = 6148
+      lv.storage_pool_name = "lv-vmdisks"
     end
     epic3.vm.provision "shell", inline: $fixsysconf
     epic3.vm.provision "shell", inline: $fixhosts
@@ -158,6 +162,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s1.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 4096
+      lv.storage_pool_name = "lv-vmdisks"
     end
     mk8s1.vm.provision "shell", inline: $fixsysconf
     mk8s1.vm.provision "shell", inline: $fixhosts
@@ -192,6 +197,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s2.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 4096
+      lv.storage_pool_name = "lv-vmdisks"
     end
     mk8s2.vm.provision "shell", inline: $fixsysconf
     mk8s2.vm.provision "shell", inline: $fixhosts
@@ -224,6 +230,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s3.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 4096
+      lv.storage_pool_name = "lv-vmdisks"
     end
     mk8s3.vm.provision "shell", inline: $fixsysconf
     mk8s3.vm.provision "shell", inline: $fixhosts

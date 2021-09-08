@@ -63,6 +63,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     router.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 2048
+      lv.storage_pool_name = "lv-vmdisks"
     end
     router.vm.provision "shell", inline: $fixsysconf
     router.vm.provision "shell", inline: $fixhosts
@@ -81,8 +82,9 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       ip: "192.168.254.10"
 
     epic.vm.provider :libvirt do |lv|
-      lv.cpus = 2
+      lv.cpus = 4
       lv.memory = 6148
+      lv.storage_pool_name = "lv-vmdisks"
     end
     epic.vm.provision "shell", inline: $fixsysconf
     epic.vm.provision "shell", inline: $fixhosts
@@ -104,6 +106,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 4096
+      lv.storage_pool_name = "lv-vmdisks"
     end
     mk8s.vm.provision "shell", inline: $fixsysconf
     mk8s.vm.provision "shell", inline: $fixhosts
