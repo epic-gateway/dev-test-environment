@@ -22,7 +22,7 @@ sed -i  '$ a \\     \\ gateway4: 192.168.254.1' /etc/netplan/50-vagrant.yaml
 SCRIPT
 
 $installmk8s = <<-SCRIPT
-snap install microk8s --classic
+snap install microk8s --classic --channel=1.22/stable
 usermod -a -G microk8s vagrant
 chown -f -R vagrant ~/.kube
 microk8s status --wait-ready
