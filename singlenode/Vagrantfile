@@ -26,8 +26,7 @@ snap install microk8s --classic --channel=1.22/stable
 usermod -a -G microk8s vagrant
 chown -f -R vagrant ~/.kube
 microk8s status --wait-ready
-microk8s enable dns
-microk8s enable rbac
+microk8s enable dns rbac helm3
 SCRIPT
 
 
