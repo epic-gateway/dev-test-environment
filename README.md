@@ -47,7 +47,7 @@ Execute Vagrant up in the singlenode directory to create three VMs and a bridge 
 
 1. router VM. (192.168.254.1)  This is a prebuilt router with FRR running and a FRR configuraiton that will accept BGP peers based upon the defaults used in EPIC.  It is connected to the host network and routes/NAT between the host network and the VM network.  The host network provides an address via DHCP.
 2. EPIC VM. (192.168.254.10)  This is a VM that is prepared for the installation of EPIC.  Installation of EPIC is not automated.  It is connected to the bridge $user-epic0 and the default route is configured via the router VM
-3. mk8s VM. (192.168.10.100)  This VM has the same configuration as above.  In addition mk8s is installed in this VM and some based additional tools such as aliases and kubens are added.  The mk8s is ready for the installation of Purelb(Ego)
+3. mk8s VM. (192.168.254.100)  This VM has the same configuration as above.  In addition mk8s is installed in this VM and some based additional tools such as aliases and kubens are added.  The mk8s is ready for the installation of Purelb(Ego)
 
 
 
