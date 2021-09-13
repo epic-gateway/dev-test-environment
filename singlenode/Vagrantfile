@@ -23,7 +23,7 @@ SCRIPT
 
 $installmk8s = <<-SCRIPT
 snap install microk8s --classic --channel=1.22/stable
-usermod -a -G microk8s vagrant
+usermod -a -G systemd-journal,root,microk8s vagrant
 chown -f -R vagrant ~/.kube
 microk8s status --wait-ready
 microk8s enable dns rbac helm3
