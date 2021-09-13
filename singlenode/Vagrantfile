@@ -21,6 +21,18 @@ $routerasdefault = <<-SCRIPT
 sed -i  '$ a \\     \\ gateway4: 192.168.254.1' /etc/netplan/50-vagrant.yaml
 SCRIPT
 
+
+$epicmgr = <<-SCRIPT
+# create the epicmgr group so I can add the vagrant user to it
+groupadd --force --system epicmgr
+# add me to some useful groups
+usermod -G systemd-journal,root,epicmgr -a vagrant
+# set up some handy aliases for things we do often
+cat <<-ALIASES > /etc/profile.d/snap-aliases.sh
+alias snap-install-epic="snap install --classic --dangerous"
+ALIASES
+SCRIPT
+
 $installmk8s = <<-SCRIPT
 snap install microk8s --classic --channel=1.22/stable
 usermod -a -G systemd-journal,root,microk8s vagrant
@@ -90,6 +102,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     epic.vm.provision "shell", inline: $deleth0dhcpdefault
     epic.vm.provision "shell", inline: $routerasdefault
     epic.vm.provision "shell", inline: "netplan apply"
+    epic.vm.provision "shell", inline: $epicmgr
   end
 
   config.vm.define 'mk8s' do |mk8s|
