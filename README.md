@@ -30,6 +30,12 @@ network:
 
 ```
 
+You might also want to set up a route so you can reach the VMs via the router VM. This will allow you to do things like run kubectl commands on your host:
+
+```
+# ip route add 192.168.254.0/24 via 192.168.254.1
+```
+
 Clone the repo and run setup_vagrant_host.sh as root
 
 You will also need a copy of the frrouter box, you will need to get this from Adam, its a big file
