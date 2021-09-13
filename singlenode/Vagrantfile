@@ -21,8 +21,16 @@ $routerasdefault = <<-SCRIPT
 sed -i  '$ a \\     \\ gateway4: 192.168.254.1' /etc/netplan/50-vagrant.yaml
 SCRIPT
 
+# This var tells the snap package to configure containerd to use a
+# private (i.e., insecure) registry. For example, if the value of
+# EPIC_PRIVATE_REGISTRY is refectory.caboteria.org:5000 then
+# containerd will be able to pull images from that registry using
+# plaintext http.
+EPIC_PRIVATE_REGISTRY = ENV.fetch('EPIC_PRIVATE_REGISTRY', nil)
 
 $epicmgr = <<-SCRIPT
+# optionally set an env var that allows k8s to pull images from an insecure registry
+#{EPIC_PRIVATE_REGISTRY && "" || "#"} sed --quiet --in-place --expression='/^EPIC_PRIVATE_REGISTRY=/!p' --expression="\\$aEPIC_PRIVATE_REGISTRY=\\"#{EPIC_PRIVATE_REGISTRY}\\"" /etc/environment
 # create the epicmgr group so I can add the vagrant user to it
 groupadd --force --system epicmgr
 # add me to some useful groups
