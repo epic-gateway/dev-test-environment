@@ -94,7 +94,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     epic1.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
     epic1.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
     epic1.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    epic1.vm.provision "shell", inline: "resolved.conf", destination: "/etc/systemd/resolved.conf"
+    epic1.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
 
 
   end
@@ -123,7 +123,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     epic2.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
     epic2.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
     epic2.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    epic2.vm.provision "shell", inline: "resolved.conf", destination: "/etc/systemd/resolved.conf"
+    epic2.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
 
   end
 
@@ -151,7 +151,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     epic3.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
     epic3.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
     epic3.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    epic3.vm.provision "shell", inline: "resolved.conf", destination: "/etc/systemd/resolved.conf"
+    epic3.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
 
   end
 
@@ -188,7 +188,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s1.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
 
     mk8s1.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    mk8s1.vm.provision "shell", inline: "resolved.conf", destination: "/etc/systemd/resolved.conf"
+    mk8s1.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
     
   end
 
@@ -224,7 +224,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s2.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
 
     mk8s2.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    mk8s2.vm.provision "shell", inline: "resolved.conf", destination: "/etc/systemd/resolved.conf"
+    mk8s2.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
   
   end
   
@@ -261,7 +261,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s3.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
 
     mk8s3.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    mk8s3.vm.provision "shell", inline: "resolved.conf", destination: "/etc/systemd/resolved.conf"
+    mk8s3.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
     
     
   end
