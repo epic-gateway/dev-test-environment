@@ -93,7 +93,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
 
     epic1.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
     epic1.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
-    epic1.vm.provision "file", source: "../files/resolved", destination: "resolved.conf"
+    epic1.vm.provision "file", source: "../files/resolved", destination: "/etc/systemd/resolved.conf"
 
   end
 
