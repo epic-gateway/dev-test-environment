@@ -53,6 +53,8 @@ SCRIPT
 Vagrant.configure("2") do |config|
 
 BRIDGE = "#{ENV['USER']}" + "-epic0"
+EXTBRIDGE = "brext0"
+LVMPOOL = "default"
 
 
   config.vm.define 'router' do |router|
@@ -73,7 +75,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
       :trust_guest_rx_filters => "true",
       auto_config: false
     router.vm.network :public_network,
-      :dev => "brint0",
+      :dev => EXTBRIDGE,
       :mode => "bridge",
       :type => "bridge",
       :trust_guest_rx_filters => "true",
@@ -82,7 +84,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     router.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 2048
-      lv.storage_pool_name = "lv-vmdisks"
+      lv.storage_pool_name = LVMPOOL
     end
     router.vm.provision "shell", inline: $fixsysconf
     router.vm.provision "shell", inline: $fixhosts
@@ -103,7 +105,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     epic.vm.provider :libvirt do |lv|
       lv.cpus = 4
       lv.memory = 6148
-      lv.storage_pool_name = "lv-vmdisks"
+      lv.storage_pool_name = LVMPOOL
     end
     epic.vm.provision "shell", inline: $fixsysconf
     epic.vm.provision "shell", inline: $fixhosts
@@ -111,6 +113,13 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     epic.vm.provision "shell", inline: $routerasdefault
     epic.vm.provision "shell", inline: "netplan apply"
     epic.vm.provision "shell", inline: $epicmgr
+
+    epic.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
+    epic.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
+    epic.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
+    epic.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
+
+
   end
 
   config.vm.define 'mk8s' do |mk8s|
@@ -126,7 +135,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 4096
-      lv.storage_pool_name = "lv-vmdisks"
+      lv.storage_pool_name = LVMPOOL
     end
     mk8s.vm.provision "shell", inline: $fixsysconf
     mk8s.vm.provision "shell", inline: $fixhosts
@@ -140,7 +149,11 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
     mk8s.vm.provision "file", source: "../files/kubens", destination: "kubens"
     mk8s.vm.provision "shell", inline: "mv kubens /usr/local/bin"
 
-    mk8s.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
+    mk8s.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases"
+
+
+    mk8s.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
+    mk8s.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
     
   
     

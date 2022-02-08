@@ -2,17 +2,23 @@
 
 This project provides scripts to install and use Vagrant to create representative Customer Environments.
 
+# Environment Notes
+The ACNDEV environment disables IPv6 currently.  May be updated in the future.
+
 
 ## If your running it on a host at Hurricane
 
- They are already setup.  Just clone into your home directory on the host you want to use and start the version you want. 
+ Vagrant is already setup, clone the into your home directory.  You will need to change the EXTBRIDGE in both singlenode and multinode vagrant file to reflect the configuration created by MaaS.
+
+ EXTBRIDGE should be set to br-eno2
+
 
 
 ## To use in your Environment
 
 You should be able to run the single node version, the multinode version is 7 host, take a look at the resources required in the vagrantfile
 
-Before cloning the repo a bridge connecting the router to your network is required.  The netplan configuration will look like this.
+Before cloning the repo a bridge connecting the router to your network is required.  A sample netplan configuration is below.  The external bridge in this case is brext0. This is the default in the vagrant scripts but can be changed in using the variable EXTBRIDGE.  
 
 ```
 network:
@@ -51,9 +57,9 @@ $ vagrant box add router2 --name frrouter
 
 Execute Vagrant up in the singlenode directory to create three VMs and a bridge ($user-epic0) that connects these three VMs together.  The VM have static IP addresses on $user-epic0
 
-1. router VM. (192.168.254.1)  This is a prebuilt router with FRR running and a FRR configuraiton that will accept BGP peers based upon the defaults used in EPIC.  It is connected to the host network and routes/NAT between the host network and the VM network.  The host network provides an address via DHCP.
+1. router VM. (192.168.254.1)  This is a prebuilt router with FRR running and a FRR configuration that will accept BGP peers based upon the defaults used in EPIC.  It is connected to the host network and routes/NAT between the host network and the VM network.  The host network provides an address via DHCP.
 2. EPIC VM. (192.168.254.10)  This is a VM that is prepared for the installation of EPIC.  Installation of EPIC is not automated.  It is connected to the bridge $user-epic0 and the default route is configured via the router VM
-3. mk8s VM. (192.168.254.100)  This VM has the same configuration as above.  In addition mk8s is installed in this VM and some based additional tools such as aliases and kubens are added.  The mk8s is ready for the installation of Purelb(Ego)
+3. mk8s VM. (192.168.254.100)  This VM has the same configuration as above.  In addition mk8s is installed in this VM and some based additional tools such as aliases and kubens are added.  The mk8s is ready for the installation of PureGW
 
 
 
