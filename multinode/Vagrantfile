@@ -38,6 +38,7 @@ Vagrant.configure("2") do |config|
 
 BRIDGE = "#{ENV['USER']}" + "-epic0"
 EXTBRIDGE = "brext0"
+LVMPOOL = "default"
 
 
   config.vm.define 'router' do |router|

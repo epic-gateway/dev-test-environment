@@ -25,7 +25,8 @@ libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev \
 libguestfs-tools
 
 # sudo vagrant plugin install vagrant-libvirt
-CFLAGS="-I/opt/vagrant/embedded/include/ruby-3.0.0/ruby" vagrant plugin install vagrant-libvirt
+#CFLAGS="-I/opt/vagrant/embedded/include/ruby-3.0.0/ruby" vagrant plugin install vagrant-libvirt
+CONFIGURE_ARGS='with-ldflags=-L/opt/vagrant/embedded/lib with-libvirt-include=/usr/include/libvirt with-libvirt-lib=/usr/lib' GEM_HOME=~/.vagrant.d/gems GEM_PATH=$GEM_HOME:/opt/vagrant/embedded/gems PATH=/opt/vagrant/embedded/bin:$PATH vagrant plugin install vagrant-libvirt
 
 # add environment variable for vagrant provider
 
@@ -35,6 +36,6 @@ sudo  sed -Ei '$ a export VAGRANT_DEFAULT_PROVIDER=libvirt' /etc/environment
 
 sudo cp ./brmgr.sh /usr/local/bin
 sudo chmod 755 /usr/local/bin/brmgr.sh
-sudo cp ./files/50-bridge-priv /etc/sudoers.d/50-bridge-priv
+sudo cp ../files/50-bridge-priv /etc/sudoers.d/50-bridge-priv
 
 

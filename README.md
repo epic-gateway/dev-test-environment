@@ -11,6 +11,8 @@ The ACNDEV environment disables IPv6 currently.  May be updated in the future.
  Vagrant is already setup, clone the into your home directory.  You will need to change the EXTBRIDGE in both singlenode and multinode vagrant file to reflect the configuration created by MaaS.
 
  EXTBRIDGE should be set to br-eno2
+ LVMPOOL should be set to vagrant
+
 
 
 
