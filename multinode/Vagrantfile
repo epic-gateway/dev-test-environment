@@ -38,6 +38,10 @@ $epicmgr = <<-SCRIPT
 groupadd --force --system epicmgr
 # add vagrant to some useful groups
 usermod -G systemd-journal,root,epicmgr -a vagrant
+cat <<-ENVVARS >> /etc/environment
+# set an env var so epicmgr will allow k8s to pull images from an insecure registry
+EPIC_PRIVATE_REGISTRY="#{EPIC_PRIVATE_REGISTRY}"
+ENVVARS
 SCRIPT
 
 $installmk8s = <<-SCRIPT
