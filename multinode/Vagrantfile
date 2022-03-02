@@ -33,6 +33,13 @@ SCRIPT
 # when you run "microk8s.enable registry".
 EPIC_PRIVATE_REGISTRY = ENV.fetch('EPIC_PRIVATE_REGISTRY', 'localhost:32000')
 
+$epicmgr = <<-SCRIPT
+# create the epicmgr group so I can add the vagrant user to it
+groupadd --force --system epicmgr
+# add vagrant to some useful groups
+usermod -G systemd-journal,root,epicmgr -a vagrant
+SCRIPT
+
 $installmk8s = <<-SCRIPT
 snap install microk8s --classic --channel=1.22/stable
 usermod -a -G microk8s vagrant
@@ -106,6 +113,7 @@ LVMPOOL = "default"
     epic1.vm.provision "shell", inline: $deleth0dhcpdefault
     epic1.vm.provision "shell", inline: $routerasdefault
     epic1.vm.provision "shell", inline: "netplan apply"
+    epic1.vm.provision "shell", inline: $epicmgr
 
     epic1.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
     epic1.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
@@ -135,6 +143,7 @@ LVMPOOL = "default"
     epic2.vm.provision "shell", inline: $deleth0dhcpdefault
     epic2.vm.provision "shell", inline: $routerasdefault
     epic2.vm.provision "shell", inline: "netplan apply"
+    epic2.vm.provision "shell", inline: $epicmgr
 
     epic2.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
     epic2.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
@@ -163,6 +172,7 @@ LVMPOOL = "default"
     epic3.vm.provision "shell", inline: $deleth0dhcpdefault
     epic3.vm.provision "shell", inline: $routerasdefault
     epic3.vm.provision "shell", inline: "netplan apply"
+    epic3.vm.provision "shell", inline: $epicmgr
 
     epic3.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
     epic3.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
