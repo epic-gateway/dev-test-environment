@@ -24,6 +24,14 @@ SCRIPT
 
 
 
+# This var (which can be overridden with the EPIC_PRIVATE_REGISTRY env
+# var) tells the snap package to configure containerd to use a private
+# (i.e., insecure) registry. For example, if the value of
+# EPIC_PRIVATE_REGISTRY is 192.168.1.80:5000 then containerd will be
+# able to pull images from that registry using plain http. The default
+# value is localhost:32000 which works with the registry that you get
+# when you run "microk8s.enable registry".
+EPIC_PRIVATE_REGISTRY = ENV.fetch('EPIC_PRIVATE_REGISTRY', 'localhost:32000')
 
 $installmk8s = <<-SCRIPT
 snap install microk8s --classic --channel=1.22/stable
@@ -31,6 +39,8 @@ usermod -a -G microk8s vagrant
 chown -f -R vagrant ~/.kube
 microk8s status --wait-ready
 microk8s enable dns rbac helm3
+# hack containerd config to allow k8s to pull images from an insecure registry
+sed --in-place=.bak --expression="s@localhost:32000@#{EPIC_PRIVATE_REGISTRY}@g" /var/snap/microk8s/current/args/containerd-template.toml ; microk8s.stop ; microk8s.start
 SCRIPT
 
 
