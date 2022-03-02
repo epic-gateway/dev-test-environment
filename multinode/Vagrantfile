@@ -52,6 +52,8 @@ microk8s status --wait-ready
 microk8s enable dns rbac helm3
 # hack containerd config to allow k8s to pull images from an insecure registry
 sed --in-place=.bak --expression="s@localhost:32000@#{EPIC_PRIVATE_REGISTRY}@g" /var/snap/microk8s/current/args/containerd-template.toml ; microk8s.stop ; microk8s.start
+# set up a kubectl config file to share with the host
+microk8s config > /vagrant/mk8s-admin.conf
 SCRIPT
 
 
