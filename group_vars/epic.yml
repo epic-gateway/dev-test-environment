@@ -6,40 +6,27 @@ true_ingress_interface: "{{ lookup('env', 'EPIC_TRUE_INGRESS_INTF') | default('e
 # Bird config
 bird_remote_path: /opt/acnodal/bird
 
-# k8s configuration
-pod_cidr: "10.212.0.0/16"
 
-extra_docker_config: ""
 
 ansible_user: adamd
 
-# purelb configuration
-
-subnet: "192.168.66.0/24"
-pool: "192.168.66.1-192.168.66.10"
 
 # artifacts that we download from Gitlab
 
-# v0.7.1
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/jobs/1167266817/artifacts
+# v0.18.6
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/packages/generic/manifest/v0.18.6/epic-resource-model.yaml
 
-# v0.1.0
-web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/jobs/1166904882/artifacts
+# v0.4.4
+web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/packages/generic/manifest/v0.4.4/web-service.yaml
 
-# v0.8.0
-true_ingress_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Ftrue-ingress/jobs/1129682331/artifacts/pkg/true-ingress.tar.bz2
+# v0.13.0
+true_ingress_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Ftrue-ingress/packages/generic/true-ingress/v0.13.0/true-ingress.tar.bz2
 
-# v0.1.0
-epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/jobs/1129697374/artifacts/epicctl
+# v0.7.0
+epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/epicctll
 
-# v0.1.0
-eds_server_image: "{{ lookup('env', 'EPIC_ED_IMG') | default('registry.gitlab.com/acnodal/epic/eds-server:v0.1.0', True) }}"
+# v0.7.0
+epicctl_scanlogs_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/scan-logs
 
-# v0.1.1
-envoy_image: "{{ lookup('env', 'EPIC_EY_IMG') | default('registry.gitlab.com/acnodal/epic/envoy:v0.1.1', True) }}"
 
-# FIXME: this image is a little different from the others in that we
-# don't expect to run a fork indefinitely. Hopefully we'll get our
-# fixes merged upstream and be able to go back to not overriding the
-# defaults.
-marin3r_image: "{{ lookup('env', 'EPIC_XD_IMG') | default('caboteria/marin3r:v0.7.0-5-gb0d2dfd', True) }}"
+

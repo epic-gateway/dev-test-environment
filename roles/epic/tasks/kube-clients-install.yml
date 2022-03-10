@@ -5,23 +5,24 @@
     update_cache: yes
     name:
     - apt-transport-https
+    - ca-certificates
     - curl
     - ipvsadm
     install_recommends: no
-  become: yes
+  become: true
 
 - name: get gpg key
   apt_key:
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
     state: present
-  become: yes
+  become: true
 
 - name: copy repo file
   apt_repository:
     repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
     state: present
     update_cache: yes
-  become: yes
+  become: true
 
 - name: install k8s executables
   apt:
@@ -30,33 +31,88 @@
     - kubelet
     - kubeadm
     - kubectl
-  become: yes
+  become: true
 
 - name: install python client libraries
   # I'd rather use the debian/ubuntu package but it's way too old
   command: pip3 install kubernetes~=12.0
-  become: yes
+  become: true
 
 - name: mark for version hold
   shell: apt-mark hold kubelet kubeadm kubectl
-  become: yes
+  become: true
 
 - name: add kubens
   copy:
     src: files/kubens
     dest: /usr/local/bin/kubens
     mode: '0755'
-  become: yes
+  become: true
 
 - name: upload kustomize install script
   copy:
     src: files/install_kustomize.sh
     dest: /root
     mode: '0755'
-  become: yes
+  become: true
+
 - name: install kustomize
   command:
     cmd: /root/install_kustomize.sh 3.8.10
     chdir: /usr/local/bin
     creates: /usr/local/bin/kustomize
-  become: yes
+  become: true
+
+- name: create haproxy directory
+  file:
+    path: /etc/haproxy
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: create haproxy config
+  template:
+    src: haproxy.j2
+    dest: /etc/haproxy/haproxy.cfg
+  become: true
+
+- name: create keepalived directory
+  file:
+    path: /etc/keepalived
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: create keepalived config 
+  template:
+    src: keepalived.j2
+    dest: /etc/keepalived/keepalived.conf
+  become: true
+
+- name: create keepalived check file
+  template:
+    src: check_apiserver.j2
+    dest: /etc/keepalived/check_apiserver.sh
+  become: true
+
+- name: create kubernetes manifests directory
+  file:
+    path: /etc/kubernetes/manifests
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: copy haproxy manifest
+  copy:
+    src: files/haproxy.yaml
+    dest: /etc/kubernetes/manifests
+  become: true
+
+- name: copy keepalived manifest
+  copy:
+    src: files/keepalived.yaml
+    dest: /etc/kubernetes/manifests
+  become: true
+  
+
+

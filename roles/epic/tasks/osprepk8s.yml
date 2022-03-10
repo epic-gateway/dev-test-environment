@@ -4,6 +4,11 @@
     src: files/k8s.conf
     dest: /etc/sysctl.d/k8s.conf
 
+- name: copy modules file
+  copy:
+    src: files/k8s-modules.conf
+    dest: /etc/modules-load.d/k8s.conf
+
 - name: update sysctl
   command: /sbin/sysctl --system
 

@@ -20,6 +20,7 @@
   copy:
     src: files/bird-cm.yml
     dest: bird-cm.yml
+    
 - name: apply bird configmap
   command: kubectl apply -f bird-cm.yml
 

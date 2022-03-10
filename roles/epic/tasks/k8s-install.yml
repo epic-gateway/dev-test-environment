@@ -3,10 +3,12 @@
   template:
     src: kubeinit.j2
     dest: /root/epic.conf
-  become: yes
+  become: true
+
+
 - name: install kubernetes
-  command: kubeadm init --config /root/epic.conf
-  become: yes
+  command: kubeadm init --config /root/epic.conf --upload-certs
+  become: true
   args:
     creates: /etc/kubernetes/pki/ca.key
 
@@ -14,10 +16,10 @@
   file:
     path: /etc/kubernetes/admin.conf
     mode: g+r
-  become: yes
+  become: true
 
 - name: configure kubectl for all users
-  become: yes
+  become: true
   copy:
     dest: /etc/profile.d/kubecfg.sh
     mode: ugo+r
@@ -27,9 +29,7 @@
       alias k=kubectl
       complete -F __start_kubectl k
 
-# There's not much sense running two DNS pods on a single-node system
-- name: scale dns down to one pod
-  command: kubectl scale deployment -n kube-system --replicas=1 coredns
+
 
 # We do this taint/untaint dance because "taint --overwrite" is
 # idempotent so this pair of commands will work on new clusters and
@@ -43,6 +43,7 @@
   template:
     src: kube-flannel.j2
     dest: kube-flannel.yml
+    
 - name: add flannel - K8s CNI
   command: kubectl apply -f kube-flannel.yml
 

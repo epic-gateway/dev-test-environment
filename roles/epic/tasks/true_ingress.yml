@@ -5,6 +5,7 @@
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
     url: "{{ true_ingress_artifact }}"
     dest: /root
+    
 - name: untar artifacts
   unarchive:
     src: /root/true-ingress.tar.bz2
