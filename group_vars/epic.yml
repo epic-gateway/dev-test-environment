@@ -6,10 +6,20 @@ true_ingress_interface: "{{ lookup('env', 'EPIC_TRUE_INGRESS_INTF') | default('e
 # Bird config
 bird_remote_path: /opt/acnodal/bird
 
-
-
 ansible_user: adamd
 
+k8s_ipaddr: "192.168.10.43"
+k8s_nic: "ens4"
+k8s_cluster_vip: "192.168.10.25"
+
+# kubeadm  init parameters
+
+pod_cidr: "172.20.0.0/16"
+svc_cidr: "172.21.0.0/16"
+
+# flannel configuration
+
+cni_network: "172.20.0.0/16"
 
 # artifacts that we download from Gitlab
 
