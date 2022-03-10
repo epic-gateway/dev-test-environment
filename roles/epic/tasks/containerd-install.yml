@@ -2,13 +2,12 @@
 
 - name: install containerd
   apt:
-    name: 
+    name:
     - containerd
-  become: true
 
 - name: create containerd config directory
   file:
-    path: /etc/containerd 
+    path: /etc/containerd
     state: directory
     mode: '0755'
 
