@@ -23,10 +23,7 @@ web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-se
 true_ingress_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Ftrue-ingress/packages/generic/true-ingress/v0.13.0/true-ingress.tar.bz2
 
 # v0.7.0
-epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/epicctll
+epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/epicctl
 
 # v0.7.0
 epicctl_scanlogs_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/scan-logs
-
-
-
