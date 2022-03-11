@@ -2,3 +2,6 @@
 *.retry
 *-admin.conf
 .ansible-vault-password
+tmp/config
+tmp/deploy
+tmp/*tar*

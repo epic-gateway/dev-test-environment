@@ -1,31 +1,34 @@
 ---
-- name: download resource model artifacts from gitlab
-  get_url:
+- name:  create namespace
+  command: kubectl create namespace epic
+  register: result
+  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+
+- name: create secret for acnodal private registry in epic namespace
+  command: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  no_log: true
+  register: result
+  failed_when: result.rc != 0 and "already exists" not in result.stderr
+
+- name: download resource model install artifacts from gitlab to host
+  local_action:
+    module: ansible.builtin.get_url
     headers:
       PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
     url: "{{ resource_model_artifact }}"
-    dest: ./
-- name: unzip artifacts
-  unarchive:
-    src: artifacts.zip
-    remote_src: yes
-    dest: ./
+    dest: ./tmp/
+- name: unarchive install artifacts on host
+  local_action:
+    module: ansible.builtin.command
+    cmd: tar -C tmp -xzf tmp/epic-install.tar.gz
+    warn: false
 
-- name: override docker image if EPIC_CM_IMG is set
-  when: lookup('env', 'EPIC_CM_IMG') != ""
-  shell:
-    # we should be able to run "kubectl apply -k config/default" but the
-    # version of kustomize that's build into kubectl is so old that it
-    # doesn't work. For example, kubectl doesn't substitute the
-    # namespace properly so it creates a "system" namespace, which is
-    # wrong.
-    #
-    # FIXME: use "kubectl -k" when "kubectl -k" works, and don't install
-    # kustomize
-    cmd: "kustomize build config/default | IMG={{ lookup('env', 'EPIC_CM_IMG') }} envsubst > deploy/epic-resource-model.yaml"
-
-- name: Create epic namespace, crds, and operator
-  command: kubectl apply -f deploy/epic-resource-model.yaml
+- name: copy core manifest to target
+  copy:
+    src: ./tmp/deploy/epic-resource-model.yaml
+    dest: ./
+- name: Install EPIC
+  command: kubectl apply -f epic-resource-model.yaml
   # this play can fail when we're bringing up the system because
   # various components (e.g., cert-manager) are in the process of
   # starting up. Back off for a few seconds to give things a chance to
@@ -35,22 +38,16 @@
   register: result
   until: result is not failed
 
-- name: create secret for acnodal private registry in epic namespace
-  command: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
-  no_log: true
-  register: result
-  failed_when: result.rc != 0 and "already exists" not in result.stderr
-
-- name: maybe override the config singleton marin3r image (only if the override variable is set)
-  when: marin3r_image is defined
-  lineinfile:
-    path: config/samples/epic_v1_epic.yaml
-    insertafter: '^spec:'
-    regexp: '^  xds-image:'
-    line: "  xds-image: {{ marin3r_image }}"
-
+- name: process templates
+  template:
+    src: "tmp/config/install/{{ item }}.j2"
+    dest: "{{ item }}"
+  loop:
+  - epic_v1_epic.yaml
+  - epic_v1_serviceprefix.yaml
+  - epic_v1_lbservicegroup.yaml
 - name: Create sample config singleton, with overrides
-  shell: cat config/samples/epic_v1_epic.yaml | sed "s/enp1s0/{{ true_ingress_interface }}/" | sed "s~registry.gitlab.com/acnodal/xds-operator:latest~{{ eds_server_image }}~" | kubectl apply -f -
+  command: kubectl apply -f epic_v1_epic.yaml
   # this play can fail when we're bringing up the system because the
   # controller-manager webhooks are in the process of starting up so
   # you can't connect to them. Back off for a few seconds to give
@@ -60,20 +57,19 @@
   register: result
   until: result is not failed
 
-- name: Create sample serviceprefix and account
-  command: kubectl apply -f config/samples/epic_v1_serviceprefix.yaml
+- name: Create sample serviceprefix
+  command: kubectl apply -f epic_v1_serviceprefix.yaml
 
 - name: Create sample org/namespace
-  command: /opt/acnodal/bin/epicctl create org --uuidoverride epic-sample
-
-- name: Create sample account
-  command: kubectl apply -f config/samples/epic_v1_account.yaml
+  command: /opt/acnodal/bin/epicctl create user-namespace "{{ group_org_name }}" "{{gitlab_user}}" "{{gitlab_secret}}"
+  register: result
+  failed_when: result.rc != 0 and "already exists" not in result.stderr
 
 - name: create secret for acnodal private registry in epic-sample namespace
-  command: kubectl -n epic-sample create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  command: kubectl -n "{{ group_org_ns }}" create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
   no_log: true
   register: result
   failed_when: result.rc != 0 and "already exists" not in result.stderr
 
-- name: Create sample service group (with envoy docker image override)
-  shell: cat config/samples/epic_v1_lbservicegroup.yaml | sed "s~registry.gitlab.com/acnodal/epic/envoy:latest~{{ envoy_image }}~" | kubectl apply -f -
+- name: Create sample service group
+  command: kubectl apply -f epic_v1_lbservicegroup.yaml
