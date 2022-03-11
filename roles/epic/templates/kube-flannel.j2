@@ -126,8 +126,10 @@ data:
   net-conf.json: |
     {
       "Network": "{{ cni_network  }}",
+{% if cni_IPv6network is defined %}
       "EnableIPv6": true,
       "IPv6Network": "{{ cni_IPv6network }}",
+{% endif %}
       "Backend": {
         "Type": "host-gw"
       }
