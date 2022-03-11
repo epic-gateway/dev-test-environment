@@ -21,7 +21,11 @@ svc_cidr: "172.21.0.0/16"
 
 cni_network: "172.20.0.0/16"
 
-# artifacts that we download from Gitlab
+# public artifacts
+
+certmanager_artifact: https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.yaml
+
+# Private artifacts that we download from Gitlab
 
 # v0.18.6
 resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/packages/generic/manifest/v0.18.6/epic-resource-model.yaml
