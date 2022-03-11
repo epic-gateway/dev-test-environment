@@ -35,6 +35,12 @@ service_prefix_subnet: 192.168.77.0/24
 service_prefix_pool: 192.168.77.2-192.168.77.7
 service_prefix_aggregation: "/32"
 
+# PureLB values
+
+purelb_subnet: 192.168.254.0/24
+purelb_pool: 192.168.254.200-192.168.254.201
+purelb_aggregation: "/32"
+
 # LBServiceGroup values
 
 group_org_name: root
