@@ -10,11 +10,12 @@
   register: result
   failed_when: result.rc != 0 and "already exists" not in result.stderr
 
-- name: Upload manifest
-  template:
-    src: files/marin3r-manifest.yml
-    dest: marin3r-manifest.yml
+- name: download manifest from gitlab
+  get_url:
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
+    url: "{{ marin3r_artifact }}"
+    dest: ./
 
-- name: Apply manifest, not overriding the marin3r image
-  when: marin3r_image is not defined
-  command: kubectl apply -f marin3r-manifest.yml
+- name: Apply manifest
+  command: kubectl apply -f marin3r-manifest-epic.yaml

@@ -21,6 +21,10 @@ svc_cidr: "172.21.0.0/16"
 
 cni_network: "172.20.0.0/16"
 
+# Images
+
+marin3r_version: v0.10.0-epic3
+marin3r_image: "registry.gitlab.com/acnodal/epic/marin3r:{{ marin3r_version }}"
 # public artifacts
 
 certmanager_artifact: https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.yaml
@@ -41,3 +45,5 @@ epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/pa
 
 # v0.7.0
 epicctl_scanlogs_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/scan-logs
+
+marin3r_artifact: "https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fmarin3r/packages/generic/manifest/{{ marin3r_version }}/marin3r-manifest-epic.yaml"
