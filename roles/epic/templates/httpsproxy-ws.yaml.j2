@@ -5,7 +5,7 @@ metadata:
   namespace: epic
 spec:
   dnsNames:
-  - {{ ansible_fqdn + '-ctl' }}
+  - {{ ws_hostname }}
   secretName: ws-service-cert
   issuerRef:
     name: selfsigned-issuer
@@ -18,14 +18,22 @@ metadata:
   namespace: epic
 spec:
   virtualhost:
-    fqdn: {{ ansible_fqdn + '-ctl' }}
+    fqdn: {{ ws_hostname }}
     tls:
       secretName: ws-service-cert
     authorization:
+      failOpen: false
       extensionRef:
         name: epicauth
         namespace: epicauth
+      responseTimeout: 2s
   routes:
+  - conditions:
+    - prefix: /api/epic/healthz
+    permitInsecure: true
+    services:
+    - name: web-service
+      port: 8080
   - conditions:
     - prefix: /api/epic
     services:

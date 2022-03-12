@@ -21,6 +21,10 @@ svc_cidr: "172.21.0.0/16"
 
 cni_network: "172.20.0.0/16"
 
+# Web Service
+
+ws_hostname: epic-ctl
+
 # Images
 
 marin3r_version: v0.10.0-epic3
@@ -68,3 +72,5 @@ epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/pa
 epicctl_scanlogs_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/scan-logs
 
 marin3r_artifact: "https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fmarin3r/packages/generic/manifest/{{ marin3r_version }}/marin3r-manifest-epic.yaml"
+
+contour_artifact: https://charts.bitnami.com/bitnami/contour-7.0.6.tgz
