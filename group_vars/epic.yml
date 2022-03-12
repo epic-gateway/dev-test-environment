@@ -30,7 +30,7 @@ ws_hostname: epic-ctl
 marin3r_version: v0.10.0-epic3
 marin3r_image: "registry.gitlab.com/acnodal/epic/marin3r:{{ marin3r_version }}"
 eds_image: registry.gitlab.com/acnodal/epic/eds-server:v0.1.15
-envoy_image: registry.gitlab.com/acnodal/epic/envoy:v0.4.2
+envoy_image: registry.gitlab.com/acnodal/epic/envoy:v0.4.4
 
 # ServicePrefix values
 
@@ -56,8 +56,8 @@ certmanager_artifact: https://github.com/cert-manager/cert-manager/releases/down
 
 # Private artifacts that we download from Gitlab
 
-# v0.18.8
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/packages/generic/manifest-package/v0.18.8-dbg0/epic-install.tar.gz
+# v0.19.0
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/packages/generic/manifest-package/v0.19.0/epic-install.tar.gz
 
 # v0.4.4
 web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/packages/generic/manifest/v0.4.4/web-service.yaml
