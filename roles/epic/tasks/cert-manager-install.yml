@@ -1,9 +1,4 @@
 ---
-- name: install cert-manager which the epic operator webhook needs
+- name: install cert-manager
   # https://cert-manager.io/docs/installation/kubernetes/#installing-with-regular-manifests
   command: kubectl apply -f "{{ certmanager_artifact }}"
-
-- name: Wait for cert manager to be ready so marin3r will load
-  # marin3r requires that cert-manager's webhooks be operational but
-  # that takes a few seconds so we need to explicitly wait
-  command: kubectl wait --for=condition=Ready --timeout=5m -n cert-manager pods --all
