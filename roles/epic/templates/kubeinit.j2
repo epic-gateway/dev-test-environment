@@ -10,8 +10,3 @@ networking:
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 mode: ipvs
-
----
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-address: {{ k8s_ipaddr }}

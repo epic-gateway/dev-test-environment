@@ -13,7 +13,14 @@
     mode: '0755'
 
 - name: create containerd defaults
-  command: containerd config default > /etc/containerd/config.toml
+  shell: containerd config default > /etc/containerd/config.toml
+
+- name: update systemd cgroup in /etc/containerd/config.toml
+  ansible.builtin.lineinfile:
+    path: /etc/containerd/config.toml
+    regexp: '^SystemdCgroup'
+    line: SystemdCgroup = true
+
 
 - name: restart containerd
   systemd:

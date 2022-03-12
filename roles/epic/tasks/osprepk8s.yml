@@ -12,6 +12,9 @@
 - name: update sysctl
   command: /sbin/sysctl --system
 
+- name: run modprobe
+  command: /usr/sbin/modprobe br_netfilter
+
 - name: disable swap
   command: /sbin/swapoff -a
 
