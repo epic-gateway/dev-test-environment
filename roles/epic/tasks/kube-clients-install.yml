@@ -49,20 +49,6 @@
     mode: '0755'
   become: true
 
-- name: upload kustomize install script
-  copy:
-    src: files/install_kustomize.sh
-    dest: /root
-    mode: '0755'
-  become: true
-
-- name: install kustomize
-  command:
-    cmd: /root/install_kustomize.sh 3.8.10
-    chdir: /usr/local/bin
-    creates: /usr/local/bin/kustomize
-  become: true
-
 - name: create haproxy directory
   file:
     path: /etc/haproxy
