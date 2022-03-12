@@ -1,14 +1,10 @@
 ---
 - name:  create namespace
-  command: kubectl create namespace epic
-  register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+  shell: kubectl create namespace epic --dry-run=client -oyaml | kubectl apply -f -
 
 - name: create secret for acnodal private registry in epic namespace
-  command: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  shell: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
   no_log: true
-  register: result
-  failed_when: result.rc != 0 and "already exists" not in result.stderr
 
 - name: download resource model install artifacts from gitlab to host
   local_action:
@@ -66,10 +62,8 @@
   failed_when: result.rc != 0 and "already exists" not in result.stderr
 
 - name: create secret for acnodal private registry in epic-sample namespace
-  command: kubectl -n "{{ group_org_ns }}" create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  shell: kubectl -n "{{ group_org_ns }}" create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
   no_log: true
-  register: result
-  failed_when: result.rc != 0 and "already exists" not in result.stderr
 
 - name: Create sample service group
   command: kubectl apply -f epic_v1_lbservicegroup.yaml

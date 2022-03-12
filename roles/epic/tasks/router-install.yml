@@ -6,21 +6,17 @@
     mode: ugo+rx
 
 - name:  create router namespace
-  command: kubectl create namespace router
-  register: result
-  failed_when: result.rc != 0 and "AlreadyExists" not in result.stderr
+  shell: kubectl create namespace router --dry-run=client -oyaml | kubectl apply -f -
 
 - name: create secret for acnodal private registry
-  command: kubectl -n router create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}}
+  shell: kubectl -n router create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
   no_log: true
-  register: result
-  failed_when: result.rc != 0 and "already exists" not in result.stderr
 
 - name: copy bird configmap
   copy:
     src: files/bird-cm.yml
     dest: bird-cm.yml
-    
+
 - name: apply bird configmap
   command: kubectl apply -f bird-cm.yml
 
