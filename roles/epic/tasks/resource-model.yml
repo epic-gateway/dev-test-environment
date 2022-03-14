@@ -14,10 +14,7 @@
     url: "{{ resource_model_artifact }}"
     dest: ./tmp/
 - name: unarchive install artifacts on host
-  local_action:
-    module: ansible.builtin.command
-    cmd: tar -C tmp -xzf tmp/epic-install.tar.gz
-    warn: false
+  local_action: ansible.builtin.command tar -C tmp -xzf tmp/epic-install.tar.gz
 
 - name: copy core manifest to target
   copy:
