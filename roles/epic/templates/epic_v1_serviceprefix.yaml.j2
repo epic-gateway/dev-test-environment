@@ -1,0 +1,13 @@
+---
+apiVersion: epic.acnodal.io/v1
+kind: ServicePrefix
+metadata:
+  name: {{ service_prefix_name }}
+  namespace: epic
+  labels:
+    app.kubernetes.io/component: serviceprefix
+    app.kubernetes.io/part-of: epic
+spec:
+  subnet: {{ service_prefix_subnet }}
+  pool: {{ service_prefix_pool }}
+  aggregation: {{ service_prefix_aggregation }}

@@ -6,16 +6,6 @@
   shell: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
   no_log: true
 
-- name: download resource model install artifacts from gitlab to host
-  local_action:
-    module: ansible.builtin.get_url
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: "{{ resource_model_artifact }}"
-    dest: ./tmp/
-- name: unarchive install artifacts on host
-  local_action: ansible.builtin.command tar -C tmp -xzf tmp/epic-install.tar.gz
-
 - name: copy core manifest to target
   copy:
     src: ./tmp/deploy/epic-resource-model.yaml
@@ -33,7 +23,7 @@
 
 - name: process templates
   template:
-    src: "tmp/config/install/{{ item }}.j2"
+    src: "{{ item }}.j2"
     dest: "{{ item }}"
   loop:
   - epic_v1_epic.yaml
