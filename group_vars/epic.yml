@@ -8,9 +8,6 @@ bird_remote_path: /opt/acnodal/bird
 
 ansible_user: adamd
 
-k8s_ipaddr: "192.168.10.43"
-k8s_nic: "ens4"
-k8s_cluster_vip: "192.168.10.25"
 
 # kubeadm  init parameters
 

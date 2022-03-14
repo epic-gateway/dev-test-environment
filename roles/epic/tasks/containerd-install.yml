@@ -15,10 +15,10 @@
   shell: containerd config default > /etc/containerd/config.toml
 
 - name: update systemd cgroup in /etc/containerd/config.toml
-  ansible.builtin.lineinfile:
+  replace:
     path: /etc/containerd/config.toml
-    regexp: '^SystemdCgroup'
-    line: SystemdCgroup = true
+    regexp: '^(\s*)SystemdCgroup.*'
+    replace: '\1SystemdCgroup = true'
 
 
 - name: restart containerd
