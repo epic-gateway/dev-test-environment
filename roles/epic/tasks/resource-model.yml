@@ -6,9 +6,11 @@
   shell: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
   no_log: true
 
-- name: copy core manifest to target
-  copy:
-    src: ./tmp/deploy/epic-resource-model.yaml
+- name: download manifest from gitlab
+  get_url:
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
+    url: "{{ resource_model_artifact }}"
     dest: ./
 - name: Install EPIC
   command: kubectl apply -f epic-resource-model.yaml
