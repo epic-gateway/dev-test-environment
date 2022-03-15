@@ -27,7 +27,7 @@ ws_hostname: epic-ctl
 marin3r_version: v0.10.0-epic3
 marin3r_image: "registry.gitlab.com/acnodal/epic/marin3r:{{ marin3r_version }}"
 eds_image: registry.gitlab.com/acnodal/epic/eds-server:v0.1.15
-envoy_image: registry.gitlab.com/acnodal/epic/envoy:v0.4.4
+envoy_image: registry.gitlab.com/acnodal/epic/envoy:v0.5.1
 
 # ServicePrefix values
 
