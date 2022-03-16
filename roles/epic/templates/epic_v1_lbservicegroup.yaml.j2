@@ -187,17 +187,18 @@ spec:
                     {{- if $route.Rules}}
                     routes:
                     {{- range $route.Rules}}
+                    {{- $rule := . }}
+                    {{- if .Matches }}
+                    {{- range .Matches }}
                     - route:
                         weighted_clusters:
                           clusters:
-                          {{- range .BackendRefs}}
+                          {{- range $rule.BackendRefs}}
                           - name: {{ .Name }}
                             weight: {{ .Weight }}
                           {{- end }}
-                          total_weight: {{ .BackendRefs | RefWeightsTotal }}
-                      {{- if .Matches }}
+                          total_weight: {{ $rule.BackendRefs | RefWeightsTotal }}
                       match:
-                      {{- range .Matches }}
                         {{- if .Path }}
                         prefix: "{{ .Path.Value }}"
                         {{- end }}
@@ -215,8 +216,8 @@ spec:
                           {{- end }}
                         {{- end }}
                         {{- end }}
-                      {{- end }}
-                      {{- end }}
+                    {{- end }}
+                    {{- end }}
                     {{- end }}
                     {{- end }}
                   {{- end }}
