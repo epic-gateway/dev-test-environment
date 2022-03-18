@@ -42,3 +42,5 @@ Run "make" to get a list of the goals.
 You can override the True Ingress interface device with the
 ```EPIC_TRUE_INGRESS_INTF``` environment variable. This will almost
 always be ```eth1``` for Vagrant-created EPIC instances.
+
+You can configure a private image registry with the ```EPIC_PRIVATE_REGISTRY``` env var. This playbook will configure containerd to pull images from that registry using plaintext http.
