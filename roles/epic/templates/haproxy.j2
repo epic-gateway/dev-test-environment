@@ -20,10 +20,10 @@ defaults
     option                  redispatch
     retries                 1
     timeout http-request    10s
-    timeout queue           20s
+    timeout queue           30s
     timeout connect         5s
-    timeout client          20s
-    timeout server          20s
+    timeout client          90s
+    timeout server          90s
     timeout http-keep-alive 10s
     timeout check           10s
 
