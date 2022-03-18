@@ -55,8 +55,8 @@ certmanager_artifact: https://github.com/cert-manager/cert-manager/releases/down
 
 # Private artifacts that we download from Gitlab
 
-# v0.19.1
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/packages/generic/manifest-package/v0.19.1/epic-resource-model.yaml
+# Resource Model v0.21.0
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/packages/generic/manifest-package/v0.21.0/epic-resource-model.yaml
 
 # v0.4.4
 web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/packages/generic/manifest/v0.4.4/web-service.yaml
