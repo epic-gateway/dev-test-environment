@@ -50,6 +50,7 @@
 - include_tasks: marin3r-install.yml
 
 - include_tasks: resource-model.yml
+- include_tasks: gwsm.yml
 - include_tasks: web-service-install.yml
 - include_tasks: purelb.yml
 - include_tasks: contour-ingress.yml
