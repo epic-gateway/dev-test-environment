@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/component: serviceprefix
     app.kubernetes.io/part-of: epic
 spec:
-  subnet: {{ service_prefix_subnet }}
-  pool: {{ service_prefix_pool }}
-  aggregation: {{ service_prefix_aggregation }}
+  public-pool:
+    subnet: {{ service_prefix_subnet }}
+    pool: {{ service_prefix_pool }}
+    aggregation: {{ service_prefix_aggregation }}
