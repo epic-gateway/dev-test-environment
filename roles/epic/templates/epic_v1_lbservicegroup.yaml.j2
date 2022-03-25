@@ -111,7 +111,7 @@ spec:
 {% raw %}
   can-be-shared: yes
   endpoint-template:
-    dnsName: "{{.LBName}}.{{.LBSGName}}.client.acnodal.io"
+    dnsName: "{{.ClusterServiceName}}.{{.ClusterServiceNS}}.{{.Account}}.uswest.epick8sgw.net"
     recordTTL: 180
     recordType: A
   envoy-replica-count: 1
