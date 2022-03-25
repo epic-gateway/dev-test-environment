@@ -238,7 +238,7 @@ metadata:
     app.kubernetes.io/component: lbservicegroup
     app.kubernetes.io/part-of: epic
     epic.acnodal.io/owning-account: {{ group_org_name }}
-    epic.acnodal.io/owning-serviceprefix: ipv6
+    epic.acnodal.io/owning-serviceprefix: {{ service_prefix_name }}-ipv6
   name: gatewayhttpv6
   namespace: {{ group_org_ns }}
 spec:
