@@ -176,6 +176,10 @@ spec:
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
                 stat_prefix: {{ .ServiceName }}
+                server_name: epicsf
+                add_user_agent: true
+                use_remote_address: true
+                via: epicsf
                 route_config:
                   name: local_route
                   virtual_hosts:
