@@ -183,8 +183,12 @@ if __name__ == "__main__":
     api = kubernetes.client.CustomObjectsApi()
     config = get_epic_config(api)
     intf = get_gui_nic(config)
-    addr = get_intf_address(intf)
-    print("GUE Ingress interface " + intf + " has address " + addr)
+    try:
+        addr = get_intf_address(intf)
+        print("GUE Ingress interface " + intf + " has address " + addr)
+    except ValueError as e:
+        print("ERROR getting interface info. Is %s the correct interface? Message: %s" % (intf, e))
+        exit(1)
 
     k8_api = kubernetes.client.CoreV1Api()
     watch = kubernetes.watch.Watch()
