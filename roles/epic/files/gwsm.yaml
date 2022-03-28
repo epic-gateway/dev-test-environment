@@ -16,6 +16,34 @@ rules:
   - update
   - patch
 - apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - projectcontour.io
+  resources:
+  - httpproxies
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - epic.acnodal.io
+  resources:
+  - accounts
+  - epics
+  - gwproxies
+  - gwroutes
+  - gwendpointslices
+  - lbservicegroups
+  - serviceprefixes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - epic.acnodal.io
   resources:
   - accounts
@@ -41,6 +69,14 @@ rules:
   - serviceprefixes/status
   verbs:
   - get
+- apiGroups:
+  - marin3r.3scale.net
+  resources:
+  - envoyconfig
+  - envoyconfigrevisions
+  verbs:
+  - get
+  - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
