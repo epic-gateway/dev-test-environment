@@ -13,7 +13,7 @@ spec:
 {% raw %}
   can-be-shared: yes
   endpoint-template:
-    dnsName: "{{.ClusterServiceName}}.{{.ClusterServiceNS}}.{{.Account}}.uswest.epick8sgw.net"
+    dnsName: "{{.ClusterServiceName}}-{{.ClusterServiceNS}}-{{.Account}}-uswest.epick8sgw.net"
     recordTTL: 180
     recordType: A
   envoy-replica-count: 1
@@ -157,7 +157,7 @@ spec:
 {% raw %}
   can-be-shared: true
   endpoint-template:
-    dnsName: "{{.ClusterServiceName}}.{{.ClusterServiceNS}}.{{.Account}}.uswest.epick8sgw.net"
+    dnsName: "{{.ClusterServiceName}}-{{.ClusterServiceNS}}-{{.Account}}-uswest.epick8sgw.net"
     recordTTL: 180
     recordType: AAAA
   envoy-replica-count: 1
