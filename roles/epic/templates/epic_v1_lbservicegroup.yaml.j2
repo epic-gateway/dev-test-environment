@@ -133,6 +133,13 @@ spec:
                   {{- end }}
                   {{- end }}
                 http_filters:
+                - name: envoy.filters.http.bandwidth_limit
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.bandwidth_limit.v3.BandwidthLimit
+                    stat_prefix: bandwidth_limiter_default
+                    enable_mode: REQUEST_AND_RESPONSE
+                    limit_kbps: 1000
+                    fill_interval: 0.1s
                 - name: envoy.filters.http.router
 {% endraw %}
 ---
@@ -264,6 +271,13 @@ spec:
                   {{- end }}
                   {{- end }}
                 http_filters:
+                - name: envoy.filters.http.bandwidth_limit
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.bandwidth_limit.v3.BandwidthLimit
+                    stat_prefix: bandwidth_limiter_default
+                    enable_mode: REQUEST_AND_RESPONSE
+                    limit_kbps: 1000
+                    fill_interval: 0.1s
                 - name: envoy.filters.http.router
     nodeID: SET_BY_EPIC
     serialization: yaml
