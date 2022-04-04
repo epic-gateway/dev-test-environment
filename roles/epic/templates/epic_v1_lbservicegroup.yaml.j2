@@ -106,8 +106,11 @@ spec:
                           {{- end }}
                           total_weight: {{ $rule.BackendRefs | RefWeightsTotal }}
                       match:
-                        {{- if .Path }}
+                        {{- if .Path.Type | PathTypePathPrefix }}
                         prefix: "{{ .Path.Value }}"
+                        {{- end }}
+                        {{- if .Path.Type | PathTypeExact }}
+                        path: "{{ .Path.Value }}"
                         {{- end }}
                         {{- if .Headers }}
                         headers:
