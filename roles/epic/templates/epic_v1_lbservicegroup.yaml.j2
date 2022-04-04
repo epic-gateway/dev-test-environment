@@ -203,7 +203,8 @@ spec:
           name: {{.PortName}}
           address:
             socket_address:
-              address: 0.0.0.0
+              address: "::"
+              ipv4_compat: yes
               port_value: {{.Port}}
               protocol: {{.Protocol | ToUpper}}
           filter_chains:
