@@ -15,7 +15,6 @@ spec:
   endpoint-template:
     dnsName: "{{.ClusterServiceName}}-{{.ClusterServiceNS}}-{{.Account}}-uswest.epick8sgw.net"
     recordTTL: 180
-    recordType: A
   envoy-replica-count: 1
   envoy-template:
     envoyAPI: v3
@@ -159,7 +158,6 @@ spec:
   endpoint-template:
     dnsName: "{{.ClusterServiceName}}-{{.ClusterServiceNS}}-{{.Account}}-uswest.epick8sgw.net"
     recordTTL: 180
-    recordType: AAAA
   envoy-replica-count: 1
   envoy-template:
     envoyAPI: v3
