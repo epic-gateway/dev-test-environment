@@ -127,7 +127,8 @@ LVMPOOL = "default"
     epic1.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
     epic1.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
 
-
+    epic1.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+    epic1.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
 
   config.vm.define 'epic2' do |epic2|
@@ -157,7 +158,6 @@ LVMPOOL = "default"
     epic2.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
     epic2.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
     epic2.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-
   end
 
   config.vm.define 'epic3' do |epic3|
@@ -187,7 +187,6 @@ LVMPOOL = "default"
     epic3.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
     epic3.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
     epic3.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-
   end
 
   config.vm.define 'mk8s1' do |mk8s1|
@@ -225,7 +224,6 @@ LVMPOOL = "default"
 
     mk8s1.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
     mk8s1.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-    
   end
 
   config.vm.define 'mk8s2' do |mk8s2|
@@ -262,7 +260,6 @@ LVMPOOL = "default"
 
     mk8s2.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
     mk8s2.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-  
   end
   
   config.vm.define 'mk8s3' do |mk8s3|
@@ -300,9 +297,6 @@ LVMPOOL = "default"
 
     mk8s3.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
     mk8s3.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-    
-    
   end
 
- 
 end
