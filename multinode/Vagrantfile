@@ -109,6 +109,9 @@ LVMPOOL = "default"
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.11"
     config.vm.synced_folder './', '/vagrant', type: 'nfs'
+    epic1.trigger.before :up do |uptrigger|
+      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.11; ssh-keygen -f ~/.ssh/known_hosts -R epic1; true'" }
+    end
 
     epic1.vm.provider :libvirt do |lv|
       lv.cpus = 4
@@ -141,6 +144,9 @@ LVMPOOL = "default"
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.12"
     config.vm.synced_folder './', '/vagrant', type: 'nfs'
+    epic2.trigger.before :up do |uptrigger|
+      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.12; ssh-keygen -f ~/.ssh/known_hosts -R epic2; true'" }
+    end
 
     epic2.vm.provider :libvirt do |lv|
       lv.cpus = 4
@@ -170,6 +176,9 @@ LVMPOOL = "default"
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.13"
     config.vm.synced_folder './', '/vagrant', type: 'nfs'
+    epic3.trigger.before :up do |uptrigger|
+      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.13; ssh-keygen -f ~/.ssh/known_hosts -R epic3; true'" }
+    end
 
     epic3.vm.provider :libvirt do |lv|
       lv.cpus = 4
