@@ -6,9 +6,11 @@ import netifaces
 import subprocess
 import grpc
 import kubernetes
+import time
 from containerd.services.containers.v1 import containers_pb2_grpc, containers_pb2
 from subprocess import PIPE
 from kubernetes.client.exceptions import ApiException
+from urllib3.exceptions import ProtocolError
 
 
 EPIC_NAMESPACE="epic"
@@ -192,6 +194,11 @@ if __name__ == "__main__":
 
     k8_api = kubernetes.client.CoreV1Api()
     watch = kubernetes.watch.Watch()
-    for event in watch.stream(k8_api.list_pod_for_all_namespaces, label_selector='app.kubernetes.io/part-of=epic,app.kubernetes.io/component=envoy-deployment'):
-        print("Event: %s %s %s" % (event['type'], event['object'].metadata.name, event['object'].metadata.namespace))
-        handle_event(event, addr)
+    while True:
+        try:
+            for event in watch.stream(k8_api.list_pod_for_all_namespaces, label_selector='app.kubernetes.io/part-of=epic,app.kubernetes.io/component=envoy-deployment'):
+                print("Event: %s %s %s" % (event['type'], event['object'].metadata.name, event['object'].metadata.namespace))
+                handle_event(event, addr)
+        except ProtocolError as e:
+            print("urllib3.exceptions.ProtocolError: %s. Pausing and will reconnect" % (e))
+            time.sleep(3)
