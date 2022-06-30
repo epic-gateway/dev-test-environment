@@ -125,6 +125,35 @@ spec:
                             weight: {{ .Weight }}
                           {{- end }}
                           total_weight: {{ $rule.BackendRefs | RefWeightsTotal }}
+                      {{- if $rule.Filters }}
+                      {{- range $rule.Filters }}
+                      {{- if .RequestHeaderModifier }}
+                      {{- if (or .RequestHeaderModifier.Set .RequestHeaderModifier.Add) }}
+                      request_headers_to_add:
+                      {{- range .RequestHeaderModifier.Set }}
+                      - header:
+                          key: {{ .Name }}
+                          value: {{ .Value }}
+                        append: no
+                      {{- end }}
+                      {{- end }}
+                      {{- if .RequestHeaderModifier.Add }}
+                      {{- range .RequestHeaderModifier.Add }}
+                      - header:
+                          key: {{ .Name }}
+                          value: {{ .Value }}
+                        append: yes
+                      {{- end }}
+                      {{- end }}
+                      {{- if .RequestHeaderModifier.Remove }}
+                      request_headers_to_remove:
+                      {{- range .RequestHeaderModifier.Remove }}
+                      - {{ . }}
+                      {{- end }}
+                      {{- end }}
+                      {{- end }}
+                      {{- end }}
+                      {{- end }}
                       match:
                         {{- if .Path.Type | PathTypePathPrefix }}
                         prefix: "{{ .Path.Value }}"
@@ -285,6 +314,35 @@ spec:
                           {{- end }}
                           total_weight: {{ .BackendRefs | RefWeightsTotal }}
                       {{- if .Matches }}
+                      {{- if $rule.Filters }}
+                      {{- range $rule.Filters }}
+                      {{- if .RequestHeaderModifier }}
+                      {{- if (or .RequestHeaderModifier.Set .RequestHeaderModifier.Add) }}
+                      request_headers_to_add:
+                      {{- range .RequestHeaderModifier.Set }}
+                      - header:
+                          key: {{ .Name }}
+                          value: {{ .Value }}
+                        append: no
+                      {{- end }}
+                      {{- end }}
+                      {{- if .RequestHeaderModifier.Add }}
+                      {{- range .RequestHeaderModifier.Add }}
+                      - header:
+                          key: {{ .Name }}
+                          value: {{ .Value }}
+                        append: yes
+                      {{- end }}
+                      {{- end }}
+                      {{- if .RequestHeaderModifier.Remove }}
+                      request_headers_to_remove:
+                      {{- range .RequestHeaderModifier.Remove }}
+                      - {{ . }}
+                      {{- end }}
+                      {{- end }}
+                      {{- end }}
+                      {{- end }}
+                      {{- end }}
                       match:
                       {{- range .Matches }}
                         {{- if .Path }}
