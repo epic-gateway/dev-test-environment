@@ -97,6 +97,27 @@ spec:
                     {{- if .Matches }}
                     {{- range .Matches }}
                     - route:
+                        {{- if $rule.Filters }}
+                        {{- range $rule.Filters }}
+                        {{- if .URLRewrite }}
+                        {{- if .URLRewrite.Hostname }}
+                        host_rewrite_literal: "{{ .URLRewrite.Hostname }}"
+                        {{- end }}
+                        {{- if .URLRewrite.Path }}
+                        {{- if .URLRewrite.Path.ReplacePrefixMatch }}
+                        prefix_rewrite: "{{ .URLRewrite.Path.ReplacePrefixMatch }}"
+                        {{- end }}
+                        {{- if .URLRewrite.Path.ReplaceFullPath }}
+                        regex_rewrite:
+                          pattern:
+                            google_re2: {}
+                            regex: "^.*$"
+                          substitution: "{{- .URLRewrite.Path.ReplaceFullPath }}"
+                        {{- end }}
+                        {{- end }}
+                        {{- end }}
+                        {{- end }}
+                        {{- end }}
                         weighted_clusters:
                           clusters:
                           {{- range $rule.BackendRefs}}
@@ -235,6 +256,27 @@ spec:
                     routes:
                     {{- range $route.Rules}}
                     - route:
+                        {{- if $rule.Filters }}
+                        {{- range $rule.Filters }}
+                        {{- if .URLRewrite }}
+                        {{- if .URLRewrite.Hostname }}
+                        host_rewrite_literal: "{{ .URLRewrite.Hostname }}"
+                        {{- end }}
+                        {{- if .URLRewrite.Path }}
+                        {{- if .URLRewrite.Path.ReplacePrefixMatch }}
+                        prefix_rewrite: "{{ .URLRewrite.Path.ReplacePrefixMatch }}"
+                        {{- end }}
+                        {{- if .URLRewrite.Path.ReplaceFullPath }}
+                        regex_rewrite:
+                          pattern:
+                            google_re2: {}
+                            regex: "^.*$"
+                          substitution: "{{- .URLRewrite.Path.ReplaceFullPath }}"
+                        {{- end }}
+                        {{- end }}
+                        {{- end }}
+                        {{- end }}
+                        {{- end }}
                         weighted_clusters:
                           clusters:
                           {{- range .BackendRefs}}
