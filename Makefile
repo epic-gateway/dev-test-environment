@@ -13,3 +13,8 @@ help: ## Display this help
 epic-playbook: ## Run the EPIC playbook on a target host (specified by TARGET, e.g., "make epic-playbook TARGET=epic.acnodal.io")
 	@test -n "${TARGET}" || (echo "TARGET not set. It must contain the name or address of the host to be provisioned." ; exit 1)
 	ansible-playbook --verbose --ask-become-pass --vault-password-file=.ansible-vault-password --inventory=hosts.yml --limit=${TARGET} site.yml
+
+.PHONY: refresh-lbsg
+refresh-lbsg: ## Refresh the lbservicegroups in epic-root
+	@test -n "${TARGET}" || (echo "TARGET not set. It must contain the name or address of the host to be provisioned." ; exit 1)
+	ansible-playbook --verbose --ask-become-pass --vault-password-file=.ansible-vault-password --inventory=hosts.yml --limit=${TARGET} --tags lbsg site.yml

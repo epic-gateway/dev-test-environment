@@ -32,6 +32,7 @@
   - epic_v1_serviceprefix.yaml
   - epic_v1_lbservicegroup.yaml
   - epic_v1_lbservicegroup_v6.yaml
+  tags: [ lbsg ]
 - name: Create sample config singleton, with overrides
   command: kubectl apply -f epic_v1_epic.yaml
   # this play can fail when we're bringing up the system because the
@@ -57,5 +58,7 @@
 
 - name: Create sample service group
   command: kubectl apply -f epic_v1_lbservicegroup.yaml
+  tags: [ lbsg ]
 - name: Create IPV6 sample service group
   command: kubectl apply -f epic_v1_lbservicegroup_v6.yaml
+  tags: [ lbsg ]
