@@ -79,13 +79,50 @@
                     - "{{ . }}"
                     {{- if $route.Rules}}
                     routes:
-                    {{- range $route.Rules}}
-                    {{- $rule := . }}
-                    {{- if .Matches }}
-                    {{- range .Matches }}
-                    - route:
-                        {{- if $rule.Filters }}
-                        {{- range $rule.Filters }}
+                    {{- range $route.Rules }}
+                    -
+                      {{- if .Matches }}
+                      match:
+                        {{- $match := (index .Matches 0) }}
+                        {{- if $match.Path.Type | PathTypePathPrefix }}
+                        prefix: "{{ $match.Path.Value }}"
+                        {{- end }}
+                        {{- if $match.Path.Type | PathTypeExact }}
+                        path: "{{ $match.Path.Value }}"
+                        {{- end }}
+                        {{- if $match.Headers }}
+                        headers:
+                        {{- range $match.Headers }}
+                        - name: "{{ .Name }}"
+                          string_match:
+                          {{- if .Type | HeaderTypeRegex }}
+                            safe_regex:
+                              google_re2: {}
+                              regex: "{{ .Value }}"
+                          {{- else }}
+                            exact: "{{ .Value }}"
+                          {{- end }}
+                        {{- end }}
+                        {{- end }}
+                      {{- end }}{{- /* if .Matches */}}
+
+                      {{- if . | RuleRedirect }}
+                      redirect:
+                      {{- else }}
+                      route:
+                      {{- end }}
+
+                      {{- if .BackendRefs}}
+                        weighted_clusters:
+                          clusters:
+                          {{- range .BackendRefs}}
+                          - name: {{ .Name }}
+                            weight: {{ .Weight }}
+                          {{- end }}
+                          total_weight: {{ .BackendRefs | RefWeightsTotal }}
+                      {{- end }}
+
+                      {{- range .Filters }}
                         {{- if .URLRewrite }}
                         {{- if .URLRewrite.Hostname }}
                         host_rewrite_literal: "{{ .URLRewrite.Hostname }}"
@@ -100,74 +137,66 @@
                             google_re2: {}
                             regex: "^.*$"
                           substitution: "{{- .URLRewrite.Path.ReplaceFullPath }}"
+                        {{- end }}{{- /* if .URLRewrite.Path.ReplaceFullPath */}}
+                        {{- end }}{{- /* .URLRewrite.Path */}}
+                        {{- end }}{{- /* .URLRewrite */}}
+
+                        {{- if .RequestRedirect }}
+                        {{- if .RequestRedirect.Path }}
+                        {{- if .RequestRedirect.Path.ReplaceFullPath }}
+                        path_redirect: {{ .RequestRedirect.Path.ReplaceFullPath }}
+                        {{- end }}
+                        {{- if .RequestRedirect.Path.ReplacePrefixMatch }}
+                        prefix_rewrite: {{ .RequestRedirect.Path.ReplacePrefixMatch }}
                         {{- end }}
                         {{- end }}
+                        {{- if .RequestRedirect.Scheme }}
+                        scheme_redirect: {{ .RequestRedirect.Scheme }}
+                        {{- end }}
+                        {{- if .RequestRedirect.StatusCode }}
+                        response_code: {{ .RequestRedirect.StatusCode | StatusToResponse }}
+                        {{- end }}
+                        {{- if .RequestRedirect.Port }}
+                        port_redirect: {{ .RequestRedirect.Port }}
+                        {{- end }}
+                        {{- if .RequestRedirect.Hostname }}
+                        host_redirect: {{ .RequestRedirect.Hostname }}
                         {{- end }}
                         {{- end }}
-                        {{- end }}
-                        weighted_clusters:
-                          clusters:
-                          {{- range $rule.BackendRefs}}
-                          - name: {{ .Name }}
-                            weight: {{ .Weight }}
-                          {{- end }}
-                          total_weight: {{ $rule.BackendRefs | RefWeightsTotal }}
-                      {{- if $rule.Filters }}
-                      {{- range $rule.Filters }}
-                      {{- if .RequestHeaderModifier }}
-                      {{- if (or .RequestHeaderModifier.Set .RequestHeaderModifier.Add) }}
+
+                        {{- if .RequestHeaderModifier }}
+                        {{- if (or .RequestHeaderModifier.Set .RequestHeaderModifier.Add) }}
                       request_headers_to_add:
-                      {{- range .RequestHeaderModifier.Set }}
+                        {{- range .RequestHeaderModifier.Set }}
                       - header:
                           key: {{ .Name }}
                           value: {{ .Value }}
                         append: no
-                      {{- end }}
-                      {{- end }}
-                      {{- if .RequestHeaderModifier.Add }}
-                      {{- range .RequestHeaderModifier.Add }}
+                        {{- end }}
+                        {{- end }}
+                        {{- if .RequestHeaderModifier.Add }}
+                        {{- range .RequestHeaderModifier.Add }}
                       - header:
                           key: {{ .Name }}
                           value: {{ .Value }}
                         append: yes
-                      {{- end }}
-                      {{- end }}
-                      {{- if .RequestHeaderModifier.Remove }}
+                        {{- end }}
+                        {{- end }}
+                        {{- if .RequestHeaderModifier.Remove }}
                       request_headers_to_remove:
-                      {{- range .RequestHeaderModifier.Remove }}
+                        {{- range .RequestHeaderModifier.Remove }}
                       - {{ . }}
-                      {{- end }}
-                      {{- end }}
-                      {{- end }}
-                      {{- end }}
-                      {{- end }}
-                      match:
-                        {{- if .Path.Type | PathTypePathPrefix }}
-                        prefix: "{{ .Path.Value }}"
-                        {{- end }}
-                        {{- if .Path.Type | PathTypeExact }}
-                        path: "{{ .Path.Value }}"
-                        {{- end }}
-                        {{- if .Headers }}
-                        headers:
-                        {{- range .Headers }}
-                        - name: "{{ .Name }}"
-                          string_match:
-                          {{- if .Type | HeaderTypeRegex }}
-                            safe_regex:
-                              google_re2: {}
-                              regex: "{{ .Value }}"
-                          {{- else }}
-                            exact: "{{ .Value }}"
-                          {{- end }}
                         {{- end }}
                         {{- end }}
-                    {{- end }}
-                    {{- end }}
-                    {{- end }}
-                    {{- end }}
-                  {{- end }}
-                  {{- end }}
+
+                        {{- end }}{{- /* if .RequestHeaderModifier */}}
+                      {{- end }}{{- /* range .Filters */}}
+
+                    {{- end }}{{- /* range $route.Rules */}}
+                    {{- end }}{{- /* if $route.Rules */}}
+                  {{- end }}{{- /* range $route.Hostnames | HostnameOrDefault */}}
+                  {{- end }}{{- /* range .Routes */}}
+
                 http_filters:
                 - name: envoy.filters.http.bandwidth_limit
                   typed_config:
