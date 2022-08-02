@@ -1,3 +1,6 @@
 - hosts: epic
   roles:
   - epic
+- hosts: client
+  roles:
+  - client

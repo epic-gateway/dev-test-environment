@@ -1,0 +1,54 @@
+---
+- name: create k8s config file
+  template:
+    src: kubeinit.j2
+    dest: /root/epic.conf
+  become: true
+
+- name: install kubernetes
+  command: kubeadm init --config /root/epic.conf --upload-certs
+  become: true
+  args:
+    creates: /etc/kubernetes/pki/ca.key
+
+- name: allow users in the root group to use admin.conf
+  file:
+    path: /etc/kubernetes/admin.conf
+    mode: g+r
+  become: true
+
+- name: configure kubectl for all users
+  become: true
+  copy:
+    dest: /etc/profile.d/kubecfg.sh
+    mode: ugo+r
+    content: |
+      export KUBECONFIG=/etc/kubernetes/admin.conf
+      source <(kubectl completion bash)
+      alias k=kubectl
+      complete -F __start_kubectl k
+
+
+
+# We do this taint/untaint dance because "taint --overwrite" is
+# idempotent so this pair of commands will work on new clusters and
+# also work when we're updating an existing cluster
+- name: taint controller
+  command: kubectl taint nodes --all --overwrite node-role.kubernetes.io/master:NoSchedule
+- name: untaint controller
+  command: kubectl taint nodes --all node-role.kubernetes.io/master-
+- name: taint controller
+  command: kubectl taint nodes --all --overwrite node-role.kubernetes.io/control-plane:NoSchedule
+- name: untaint controller
+  command: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+
+- name: create local flannel.yml
+  template:
+    src: kube-flannel.j2
+    dest: kube-flannel.yml
+    
+- name: add flannel - K8s CNI
+  command: kubectl apply -f kube-flannel.yml
+
+- name: Wait for nodes to be ready
+  command: kubectl wait --for=condition=Ready --timeout=5m --all nodes

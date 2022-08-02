@@ -1,0 +1,24 @@
+---
+# tasks file for epic
+
+- name: Figure out the name of the user running on the target
+  command: whoami
+  register: target_user
+
+- name: Pull in the secrets
+  include_vars: files/vault.yml
+  no_log: true
+
+- include_tasks: osprepk8s.yml
+  args:
+    apply:
+      become: yes
+
+- include_tasks: containerd-install.yml
+  args: {apply: {become: true}}
+- include_tasks: kube-clients-install.yml
+- include_tasks: k8s-install.yml
+
+- name: reset any persistent namespace that we might have set
+  command: kubectl config set-context --current --namespace=
+  become: true
