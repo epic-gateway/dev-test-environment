@@ -5,6 +5,7 @@ metadata:
   namespace: purelb
 spec:
   local:
-    subnet: {{ purelb_subnet }}
-    pool: {{ purelb_pool }}
-    aggregation: {{ purelb_aggregation }}
+    v4pools:
+    - pool: {{ purelb_pool }}
+      subnet: {{ purelb_subnet }}
+      aggregation: {{ purelb_aggregation }}
