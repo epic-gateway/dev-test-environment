@@ -55,8 +55,8 @@ certmanager_artifact: https://github.com/cert-manager/cert-manager/releases/down
 
 # Private artifacts that we download from Gitlab
 
-# Resource Model v0.44.0
-resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/packages/generic/manifest-package/v0.44.0/epic-resource-model.yaml
+# Resource Model v0.45.3
+resource_model_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fresource-model/packages/generic/manifest-package/v0.45.3/epic-resource-model.yaml
 
 # v0.8.0
 web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-service/packages/generic/manifest/v0.8.0/web-service.yaml
@@ -64,12 +64,16 @@ web_service_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fweb-se
 # v0.16.0
 true_ingress_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Ftrue-ingress/packages/generic/true-ingress/v0.16.0/true-ingress.tar.bz2
 
-# v0.7.0
-epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/epicctl
+# v0.8.3
+epicctl_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.8.3/epicctl
 
-# v0.7.0
-epicctl_scanlogs_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.7.0/scan-logs
+# v0.8.3
+epicctl_scanlogs_artifact: https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fepicctl/packages/generic/epicctl/v0.8.3/scan-logs
 
 marin3r_artifact: "https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fmarin3r/packages/generic/manifest/{{ marin3r_version }}/marin3r-manifest-epic.yaml"
 
-contour_artifact: https://charts.bitnami.com/bitnami/contour-7.0.6.tgz
+contour_chart: contour-7.0.6.tgz
+contour_artifact: https://charts.bitnami.com/bitnami/{{ contour_chart }}
+
+purelb_chart: purelb-v0.0.0-109-multi-range-pools-5164936a.tgz
+purelb_artifact: https://gitlab.com/api/v4/projects/purelb%2Fpurelb/packages/helm/stable/charts/{{ purelb_chart }}

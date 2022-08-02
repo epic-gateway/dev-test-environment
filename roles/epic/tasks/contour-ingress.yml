@@ -4,7 +4,7 @@
     url: "{{ contour_artifact }}"
     dest: ./
 - name: install contour helm package
-  command: helm install --create-namespace --namespace=projectcontour contour contour-7.0.6.tgz
+  command: helm install --create-namespace --namespace=projectcontour contour {{ contour_chart }}
   register: result
   failed_when: result.rc != 0 and "cannot re-use a name that is still in use" not in result.stderr
 
