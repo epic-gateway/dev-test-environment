@@ -44,28 +44,6 @@ EPIC_PRIVATE_REGISTRY="#{EPIC_PRIVATE_REGISTRY}"
 ENVVARS
 SCRIPT
 
-$installmk8s = <<-SCRIPT
-snap install microk8s --classic --channel=1.24/stable
-usermod -a -G microk8s vagrant
-chown -f -R vagrant ~/.kube
-microk8s status --wait-ready
-microk8s enable dns rbac helm3
-
-# hack containerd config to allow k8s to pull images from an insecure registry
-# https://microk8s.io/docs/registry-private
-mkdir -p "/var/snap/microk8s/current/args/certs.d/#{EPIC_PRIVATE_REGISTRY}"
-cat <<HOSTNAME > '/var/snap/microk8s/current/args/certs.d/#{EPIC_PRIVATE_REGISTRY}/hosts.toml'
-server = "http://#{EPIC_PRIVATE_REGISTRY}"
-
-[host."http://#{EPIC_PRIVATE_REGISTRY}"]
-  capabilities = ["pull", "resolve"]
-HOSTNAME
-microk8s.stop ; microk8s.start
-
-# set up a kubectl config file to share with the host
-microk8s config > /vagrant/mk8s-admin.conf
-SCRIPT
-
 
 Vagrant.configure("2") do |config|
 
@@ -218,6 +196,9 @@ LVMPOOL = "default"
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.101"
     config.vm.synced_folder './', '/vagrant', type: 'nfs'
+    mk8s1.trigger.before :up do |uptrigger|
+      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.101; ssh-keygen -f ~/.ssh/known_hosts -R mk8s1; true'" }
+    end
 
     mk8s1.vm.provider :libvirt do |lv|
       lv.cpus = 2
@@ -229,20 +210,16 @@ LVMPOOL = "default"
     mk8s1.vm.provision "shell", inline: $deleth0dhcpdefault
     mk8s1.vm.provision "shell", inline: $routerasdefault
     mk8s1.vm.provision "shell", inline: "netplan apply"
+    mk8s1.vm.provision "shell", inline: $epicmgr
 
     mk8s1.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
     mk8s1.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
-   
-
-    mk8s1.vm.provision "shell", inline: $installmk8s
 
     mk8s1.vm.provision "file", source: "../files/kubens", destination: "kubens"
     mk8s1.vm.provision "shell", inline: "mv kubens /usr/local/bin"
 
-    mk8s1.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
-
-    mk8s1.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    mk8s1.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
+    mk8s1.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+    mk8s1.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
 
   config.vm.define 'mk8s2' do |mk8s2|
@@ -255,6 +232,9 @@ LVMPOOL = "default"
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.102"
     config.vm.synced_folder './', '/vagrant', type: 'nfs'
+    mk8s2.trigger.before :up do |uptrigger|
+      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.102; ssh-keygen -f ~/.ssh/known_hosts -R mk8s2; true'" }
+    end
 
     mk8s2.vm.provider :libvirt do |lv|
       lv.cpus = 2
@@ -266,19 +246,16 @@ LVMPOOL = "default"
     mk8s2.vm.provision "shell", inline: $deleth0dhcpdefault
     mk8s2.vm.provision "shell", inline: $routerasdefault
     mk8s2.vm.provision "shell", inline: "netplan apply"
+    mk8s2.vm.provision "shell", inline: $epicmgr
 
     mk8s2.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
     mk8s2.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
-    
-    mk8s2.vm.provision "shell", inline: $installmk8s
 
     mk8s2.vm.provision "file", source: "../files/kubens", destination: "kubens"
     mk8s2.vm.provision "shell", inline: "mv kubens /usr/local/bin"
 
-    mk8s2.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
-
-    mk8s2.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    mk8s2.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
+    mk8s2.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+    mk8s2.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
   
   config.vm.define 'mk8s3' do |mk8s3|
@@ -291,6 +268,9 @@ LVMPOOL = "default"
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.103"
     config.vm.synced_folder './', '/vagrant', type: 'nfs'
+    mk8s3.trigger.before :up do |uptrigger|
+      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.103; ssh-keygen -f ~/.ssh/known_hosts -R mk8s3; true'" }
+    end
 
     mk8s3.vm.provider :libvirt do |lv|
       lv.cpus = 2
@@ -302,20 +282,16 @@ LVMPOOL = "default"
     mk8s3.vm.provision "shell", inline: $deleth0dhcpdefault
     mk8s3.vm.provision "shell", inline: $routerasdefault
     mk8s3.vm.provision "shell", inline: "netplan apply"
+    mk8s3.vm.provision "shell", inline: $epicmgr
 
     mk8s3.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
     mk8s3.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
 
-
-    mk8s3.vm.provision "shell", inline: $installmk8s
-
     mk8s3.vm.provision "file", source: "../files/kubens", destination: "kubens"
     mk8s3.vm.provision "shell", inline: "mv kubens /usr/local/bin"
 
-    mk8s3.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases" 
-
-    mk8s3.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    mk8s3.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
+    mk8s3.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+    mk8s3.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
 
 end

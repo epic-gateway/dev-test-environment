@@ -56,30 +56,21 @@ $ vagrant box add router2 --name frrouter
 
 ## How to use.
 
+The singlenode directory is probably rusty because I (Toby) have been using multinode/ to manage everything.
 
-Execute Vagrant up in the singlenode directory to create three VMs and a bridge ($user-epic0) that connects these three VMs together.  The VM have static IP addresses on $user-epic0
+`vagrant status` will output a list of the VMs that this Vagrantfile can generate.
+
+Execute `vagrant up router` in the multinode directory to create a router VM and a bridge ($user-epic0) to connect the VMs together.
+
+The VM have static IP addresses on $user-epic0
 
 1. router VM. (192.168.254.1)  This is a prebuilt router with FRR running and a FRR configuration that will accept BGP peers based upon the defaults used in EPIC.  It is connected to the host network and routes/NAT between the host network and the VM network.  The host network provides an address via DHCP.
-2. EPIC VM. (192.168.254.10)  This is a VM that is prepared for the installation of EPIC.  Installation of EPIC is not automated.  It is connected to the bridge $user-epic0 and the default route is configured via the router VM
-3. mk8s VM. (192.168.254.100)  This VM has the same configuration as above.  In addition mk8s is installed in this VM and some based additional tools such as aliases and kubens are added.  The mk8s is ready for the installation of PureGW
-
-
-
-
-Multinode
-This is basically the same as above but creates 3 nodes for epic and 3 nodes for mk8s
-
-epic1-192.168.254.11
-epic2-192.168.254.12
-epic3-192.168.254.13
-
-mk8s1-192.168.254.101
-mk8s2-192.168.254.102
-mk8s3-192.168.254.103
-
-Note:  mk8s setup installs microk8s but does not combine them into a cluster.  Use the standard microk8s commands if thats what you want.
-
+2. EPIC VM. (192.168.254.11-13)  This is a VM that is prepared for the installation of EPIC.  Installation of EPIC is not automated.  It is connected to the bridge $user-epic0 and the default route is configured via the router VM
+3. mk8s VM. (192.168.254.101-3)  This VM has the same configuration as above.  In addition mk8s is installed in this VM and some based additional tools such as aliases and kubens are added.  The mk8s is ready for the installation of PureGW
 
 The VM are accessed from the host machine using vagrant ssh
 
-Services that are exposed by epic are accessed via the host network on the router VM.  A static route to the network exposed (default 192.168.77.0/24) from your workstation to the vagrant router box is required to access LB services. 
+Services that are exposed by epic are accessed via the host network on the router VM.  A static route to the network exposed (default 192.168.77.0/24) from your workstation to the vagrant router box is required to access LB services.
+
+I (Toby) use the devops project to install k8s on client nodes since we switched from microk8s to upstream k8s. The ansible plays in this project are deprecated and probably no longer work.
+
