@@ -42,13 +42,6 @@
   shell: apt-mark hold kubelet kubeadm kubectl
   become: true
 
-- name: add kubens
-  copy:
-    src: files/kubens
-    dest: /usr/local/bin/kubens
-    mode: '0755'
-  become: true
-
 - name: create haproxy directory
   file:
     path: /etc/haproxy
