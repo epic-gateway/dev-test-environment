@@ -1,0 +1,44 @@
+---
+- name: check dependencies installed
+  apt:
+    update_cache: yes
+    name:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - ipvsadm
+    install_recommends: no
+
+- name: get gpg key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: copy repo file
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    update_cache: yes
+
+- name: install k8s executables
+  apt:
+    update_cache: yes
+    name:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: set up system-wide environment variables
+  lineinfile:
+    path: /etc/environment
+    regexp: 'KUBECONFIG='
+    line: KUBECONFIG="/etc/kubernetes/kubelet.conf"
+
+- name: configure kubectl for all users
+  copy:
+    dest: /etc/profile.d/kubecfg.sh
+    mode: ugo+r
+    content: |
+      source <(kubectl completion bash)
+      alias k=kubectl
+      complete -F __start_kubectl k

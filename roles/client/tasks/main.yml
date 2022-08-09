@@ -1,14 +1,6 @@
 ---
 # tasks file for epic
 
-- name: Figure out the name of the user running on the target
-  command: whoami
-  register: target_user
-
-- name: Pull in the secrets
-  include_vars: files/vault.yml
-  no_log: true
-
 - include_tasks: osprepk8s.yml
   args:
     apply:
@@ -18,6 +10,17 @@
   args: {apply: {become: true}}
 - include_tasks: kube-clients-install.yml
 - include_tasks: k8s-install.yml
+
+# now that the controlplane is ready we can tell other nodes how to join
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+- name: Copy join command to local file
+  local_action:
+    module: copy
+    content: "#!/bin/sh\n{{ join_command.stdout_lines[0] }}\n"
+    dest: "{{ join_script }}"
+    mode: +x
 
 - name: reset any persistent namespace that we might have set
   command: kubectl config set-context --current --namespace=

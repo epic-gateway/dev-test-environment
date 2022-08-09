@@ -1,0 +1,32 @@
+---
+- name: copy modules file
+  copy:
+    src: files/k8s-modules.conf
+    dest: /etc/modules-load.d/k8s.conf
+
+- name: run modprobe
+  command: /usr/sbin/modprobe br_netfilter
+
+- name: disable swap
+  command: /sbin/swapoff -a
+
+- name: edit fstab
+  lineinfile:
+    path: /etc/fstab
+    regexp: 'swap'
+    state: absent
+
+- name: install system tools
+  apt:
+    update_cache: yes
+    name:
+    - ipset
+    - linux-tools-common
+    - acl
+    - jq
+    - bridge-utils
+    - unzip
+    install_recommends: no
+
+- name: Reset ssh connection to allow user changes to affect 'current login user'
+  meta: reset_connection

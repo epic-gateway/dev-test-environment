@@ -5,3 +5,4 @@
 tmp/config
 tmp/deploy
 tmp/*tar*
+join-cluster

@@ -1,0 +1,12 @@
+---
+ansible_user: adamd
+
+# optional private registry (for development)
+private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
+
+# kubeadm  init parameters
+pod_cidr: "172.20.0.0/16"
+svc_cidr: "172.21.0.0/16"
+
+# flannel configuration
+cni_network: "172.20.0.0/16"
