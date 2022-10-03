@@ -23,7 +23,7 @@ sed -i  '$ a \\     \\ gateway4: 192.168.254.1' /etc/netplan/50-vagrant.yaml
 SCRIPT
 
 
-
+NODE_HOSTNAME = 'mk8s'
 
 # This var (which can be overridden with the EPIC_PRIVATE_REGISTRY env
 # var) tells the snap package to configure containerd to use a private
@@ -52,6 +52,7 @@ BRIDGE = "#{ENV['USER']}" + "-epic0"
 EXTBRIDGE = "brext0"
 LVMPOOL = "default"
 
+  config.vm.box = "generic/ubuntu2004"
 
   config.vm.define 'router' do |router|
     router.trigger.before :up do |uptrigger|
@@ -90,7 +91,6 @@ LVMPOOL = "default"
  
   config.vm.define 'epic1' do |epic1|
     epic1.vm.hostname = 'epic1'
-    epic1.vm.box = "generic/ubuntu2004"
     epic1.vm.network :public_network, 
       :dev => BRIDGE,
       :mode => "bridge",
@@ -125,7 +125,6 @@ LVMPOOL = "default"
 
   config.vm.define 'epic2' do |epic2|
     epic2.vm.hostname = 'epic2'
-    epic2.vm.box = "generic/ubuntu2004"
     epic2.vm.network :public_network, 
       :dev => BRIDGE,
       :mode => "bridge",
@@ -187,112 +186,43 @@ LVMPOOL = "default"
     epic3.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
   end
 
-  config.vm.define 'mk8s1' do |mk8s1|
-    mk8s1.vm.hostname = 'mk8s1'
-    mk8s1.vm.box = "generic/ubuntu2004"
-    mk8s1.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      ip: "192.168.254.101"
-    config.vm.synced_folder './', '/vagrant', type: 'nfs'
-    mk8s1.trigger.before :up do |uptrigger|
-      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.101; ssh-keygen -f ~/.ssh/known_hosts -R mk8s1; true'" }
+  (1..3).each do |i|
+    name = "#{NODE_HOSTNAME}#{i}"
+    config.vm.define name do |vm|
+      vm.vm.hostname = name
+      vm.vm.network :public_network, auto_config: false,
+                       :dev => BRIDGE,
+                       :mode => "bridge",
+                       :type => "bridge",
+                       :trust_guest_rx_filters => "true",
+                       ip: "192.168.254.10#{i}"
+      config.vm.synced_folder './', '/vagrant', type: 'nfs'
+      vm.trigger.before :up do |uptrigger|
+        uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.10#{i}; ssh-keygen -f ~/.ssh/known_hosts -R #{name}; true'" }
+      end
+
+      vm.vm.provider :libvirt do |lv|
+        lv.cpus = 2
+        lv.memory = 4096
+        lv.storage_pool_name = LVMPOOL
+      end
+      vm.vm.provision "shell", inline: $fixsysconf
+      vm.vm.provision "shell", inline: $fixhosts
+      vm.vm.provision "shell", inline: $deleth0dhcpdefault
+      # vm.vm.provision "shell", inline: $routerasdefault
+      vm.vm.provision "file", source: "../files/60-#{name}-netplan.yaml", destination: "60-acndev.yaml"
+      vm.vm.provision "shell", inline: "mv 60-acndev.yaml /etc/netplan"
+      vm.vm.provision "shell", inline: "netplan apply"
+      vm.vm.provision "shell", inline: $epicmgr
+
+      vm.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
+      vm.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
+
+      vm.vm.provision "file", source: "../files/kubens", destination: "kubens"
+      vm.vm.provision "shell", inline: "mv kubens /usr/local/bin"
+
+      vm.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+      vm.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
     end
-
-    mk8s1.vm.provider :libvirt do |lv|
-      lv.cpus = 2
-      lv.memory = 4096
-      lv.storage_pool_name = LVMPOOL
-    end
-    mk8s1.vm.provision "shell", inline: $fixsysconf
-    mk8s1.vm.provision "shell", inline: $fixhosts
-    mk8s1.vm.provision "shell", inline: $deleth0dhcpdefault
-    mk8s1.vm.provision "shell", inline: $routerasdefault
-    mk8s1.vm.provision "shell", inline: "netplan apply"
-    mk8s1.vm.provision "shell", inline: $epicmgr
-
-    mk8s1.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
-    mk8s1.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
-
-    mk8s1.vm.provision "file", source: "../files/kubens", destination: "kubens"
-    mk8s1.vm.provision "shell", inline: "mv kubens /usr/local/bin"
-
-    mk8s1.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-    mk8s1.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
-
-  config.vm.define 'mk8s2' do |mk8s2|
-    mk8s2.vm.hostname = 'mk8s2'
-    mk8s2.vm.box = "generic/ubuntu2004"
-    mk8s2.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      ip: "192.168.254.102"
-    config.vm.synced_folder './', '/vagrant', type: 'nfs'
-    mk8s2.trigger.before :up do |uptrigger|
-      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.102; ssh-keygen -f ~/.ssh/known_hosts -R mk8s2; true'" }
-    end
-
-    mk8s2.vm.provider :libvirt do |lv|
-      lv.cpus = 2
-      lv.memory = 4096
-      lv.storage_pool_name = LVMPOOL
-    end
-    mk8s2.vm.provision "shell", inline: $fixsysconf
-    mk8s2.vm.provision "shell", inline: $fixhosts
-    mk8s2.vm.provision "shell", inline: $deleth0dhcpdefault
-    mk8s2.vm.provision "shell", inline: $routerasdefault
-    mk8s2.vm.provision "shell", inline: "netplan apply"
-    mk8s2.vm.provision "shell", inline: $epicmgr
-
-    mk8s2.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
-    mk8s2.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
-
-    mk8s2.vm.provision "file", source: "../files/kubens", destination: "kubens"
-    mk8s2.vm.provision "shell", inline: "mv kubens /usr/local/bin"
-
-    mk8s2.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-    mk8s2.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
-  end
-  
-  config.vm.define 'mk8s3' do |mk8s3|
-    mk8s3.vm.hostname = 'mk8s3'
-    mk8s3.vm.box = "generic/ubuntu2004"
-    mk8s3.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      ip: "192.168.254.103"
-    config.vm.synced_folder './', '/vagrant', type: 'nfs'
-    mk8s3.trigger.before :up do |uptrigger|
-      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.103; ssh-keygen -f ~/.ssh/known_hosts -R mk8s3; true'" }
-    end
-
-    mk8s3.vm.provider :libvirt do |lv|
-      lv.cpus = 2
-      lv.memory = 4096
-      lv.storage_pool_name = LVMPOOL
-    end
-    mk8s3.vm.provision "shell", inline: $fixsysconf
-    mk8s3.vm.provision "shell", inline: $fixhosts
-    mk8s3.vm.provision "shell", inline: $deleth0dhcpdefault
-    mk8s3.vm.provision "shell", inline: $routerasdefault
-    mk8s3.vm.provision "shell", inline: "netplan apply"
-    mk8s3.vm.provision "shell", inline: $epicmgr
-
-    mk8s3.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
-    mk8s3.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
-
-    mk8s3.vm.provision "file", source: "../files/kubens", destination: "kubens"
-    mk8s3.vm.provision "shell", inline: "mv kubens /usr/local/bin"
-
-    mk8s3.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-    mk8s3.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
-  end
-
 end
