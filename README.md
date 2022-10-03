@@ -3,8 +3,6 @@
 This project provides scripts to install and use Vagrant to create representative Customer Environments.
 
 # Environment Notes
-The ACNDEV environment disables IPv6 currently.  May be updated in the future.
-
 
 ## If your running it on a host at Hurricane
 
@@ -12,9 +10,6 @@ The ACNDEV environment disables IPv6 currently.  May be updated in the future.
 
  EXTBRIDGE should be set to br-eno2
  LVMPOOL should be set to vagrant
-
-
-
 
 ## To use in your Environment
 

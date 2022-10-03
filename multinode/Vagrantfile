@@ -1,6 +1,7 @@
 
 $fixsysconf = <<-SCRIPT
-sed -i '/net.ipv6.conf.all.disable_ipv6/d' /etc/sysctl.conf
+sed -i 's/disable_ipv6=1/disable_ipv6=0/' /etc/modprobe.d/local.conf
+sed -i 's/net.ipv6.conf.all.disable_ipv6 = 1/net.ipv6.conf.all.disable_ipv6 = 0/' /etc/sysctl.conf
 sed -i 's/^#net.ipv4.ip_forward/net.ipv4.ip_forward/' /etc/sysctl.conf
 sed -i 's/^#net.ipv6.conf.all.forwarding/net.ipv6.conf.all.forwarding/' /etc/sysctl.conf
 sed -i 's/^#net.ipv4.conf.all.log_martians/net.ipv4.conf.all.log_martians/' /etc/sysctl.conf
