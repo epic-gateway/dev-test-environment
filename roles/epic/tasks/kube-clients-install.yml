@@ -42,56 +42,9 @@
   shell: apt-mark hold kubelet kubeadm kubectl
   become: true
 
-- name: create haproxy directory
-  file:
-    path: /etc/haproxy
-    state: directory
-    mode: '0755'
-  become: true
-
-- name: create haproxy config
-  template:
-    src: haproxy.j2
-    dest: /etc/haproxy/haproxy.cfg
-  become: true
-
-- name: create keepalived directory
-  file:
-    path: /etc/keepalived
-    state: directory
-    mode: '0755'
-  become: true
-
-- name: create keepalived config 
-  template:
-    src: keepalived.j2
-    dest: /etc/keepalived/keepalived.conf
-  become: true
-
-- name: create keepalived check file
-  template:
-    src: check_apiserver.j2
-    dest: /etc/keepalived/check_apiserver.sh
-  become: true
-
 - name: create kubernetes manifests directory
   file:
     path: /etc/kubernetes/manifests
     state: directory
     mode: '0755'
   become: true
-
-- name: copy haproxy manifest
-  copy:
-    src: files/haproxy.yaml
-    dest: /etc/kubernetes/manifests
-  become: true
-
-- name: copy keepalived manifest
-  copy:
-    src: files/keepalived.yaml
-    dest: /etc/kubernetes/manifests
-  become: true
-  
-
-
