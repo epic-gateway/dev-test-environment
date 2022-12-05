@@ -1,2 +1,7 @@
 ---
 join_script: join-cluster
+k8s_nic: eth1
+ansible_user: vagrant
+# optional private registry (for development)
+private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
+k8s_cluster_vip: 192.168.254.101

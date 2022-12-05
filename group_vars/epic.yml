@@ -6,8 +6,6 @@ true_ingress_interface: "{{ lookup('env', 'EPIC_TRUE_INGRESS_INTF') | default('e
 # Bird config
 bird_remote_path: /opt/acnodal/bird
 
-ansible_user: adamd
-
 # optional private registry (for development)
 private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
 

@@ -12,15 +12,14 @@
   local_action:
     module: wait_for
     path: "{{ join_script }}"
-- name: upload cluster join script
-  copy:
-    src: "{{ join_script }}"
-    dest: /root
-    mode: +x
+- name: Upload cluster join script
+  template:
+    src: k8s-join.yaml.j2
+    dest: /root/k8s-join.yaml
   become: yes
 - name: Join the cluster
   shell:
-    cmd: "/root/{{ join_script }}"
+    cmd: kubeadm join --config /root/k8s-join.yaml
     creates: /etc/kubernetes/kubelet.conf
   become: yes
   retries: 3
