@@ -1,7 +1,6 @@
 ---
-- name: check dependencies installed
+- name: install dependency packages
   apt:
-    update_cache: yes
     name:
     - apt-transport-https
     - ca-certificates
@@ -26,18 +25,15 @@
     - kubelet={{ k8s_version_apt }}
     - kubeadm={{ k8s_version_apt }}
     - kubectl={{ k8s_version_apt }}
+- name: mark for version hold
+  shell: apt-mark hold kubelet kubeadm kubectl
 
-- name: set up system-wide environment variables
-  lineinfile:
-    path: /etc/environment
-    regexp: 'KUBECONFIG='
-    line: KUBECONFIG="/etc/kubernetes/kubelet.conf"
+- name: install python client libraries
+  # I'd rather use the debian/ubuntu package but it's way too old
+  command: pip3 install kubernetes~=12.0
 
-- name: configure kubectl for all users
-  copy:
-    dest: /etc/profile.d/kubecfg.sh
-    mode: ugo+r
-    content: |
-      source <(kubectl completion bash)
-      alias k=kubectl
-      complete -F __start_kubectl k
+- name: create kubernetes manifests directory
+  file:
+    path: /etc/kubernetes/manifests
+    state: directory
+    mode: '0755'

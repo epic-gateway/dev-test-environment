@@ -1,40 +1,29 @@
 ---
 # tasks file for client worker nodes
 
-- include_tasks: osprepk8s.yml
-  args: {apply: {become: true}}
-- include_tasks: containerd-install.yml
-  args: {apply: {become: true}}
-- include_tasks: kube-clients-install.yml
-  args: {apply: {become: true}}
-
 - name: Wait for the controlplane playbook to write the join script
   local_action:
     module: wait_for
     path: "{{ join_script }}"
 - name: Upload cluster join script
   template:
-    src: k8s-join.yaml.j2
-    dest: /root/k8s-join.yaml
+    src: "{{ join_script }}"
+    dest: /root/{{ join_script }}
+    mode: +x
+  become: yes
+- name: Upload admin kubectl conf
+  template:
+    src: mk8s-admin.conf
+    dest: /etc/kubernetes/admin.conf
   become: yes
 - name: Join the cluster
   shell:
-    cmd: kubeadm join --config /root/k8s-join.yaml
+    cmd: /root/{{ join_script }}
     creates: /etc/kubernetes/kubelet.conf
   become: yes
-  retries: 3
-  delay: 30
+  retries: 2
+  delay: 10
   register: result
   until: result is not failed
-- name: allow users in the root group to use kubelet.conf
-  shell:
-    cmd: chmod --recursive ug+r /etc/kubernetes/kubelet.conf /var/lib/kubelet
-    warn: false
-  become: yes
-- name: allow users in the root group to use kubelet.conf
-  shell:
-    cmd: chmod ug+rx /var/lib/kubelet /var/lib/kubelet/pki
-    warn: false
-  become: yes
 - name: Wait for the node to become ready
-  command: kubectl --kubeconfig=/etc/kubernetes/kubelet.conf wait --for=condition=ready --timeout=5m node/{{ ansible_hostname }}
+  command: kubectl wait --for=condition=ready --timeout=1m node/{{ ansible_hostname }}

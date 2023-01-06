@@ -1,18 +1,8 @@
 ---
 # tasks file for epic
-
-- name: Figure out the name of the user running on the target
-  command: whoami
-  register: target_user
-
 - name: Pull in the secrets
   include_vars: files/vault.yml
   no_log: true
-
-- include_tasks: osprepk8s.yml
-  args:
-    apply:
-      become: yes
 
 - name: install acnodal CLI tools
   block:
@@ -25,22 +15,17 @@
   - include_tasks: epicctl.yml
   become: true
 
-- include_tasks: containerd-install.yml
-  args: {apply: {become: true}}
-- include_tasks: kube-clients-install.yml
-- include_tasks: helm-install.yml
-  args: {apply: {become: true}}
 - include_tasks: k8s-install.yml
-
-- name: reset any persistent namespace that we might have set
-  command: kubectl config set-context --current --namespace=
-  become: true
 
 - name: Fetch the EPIC admin kubeconfig # so we can use kubectl from the host
   fetch:
     src: /etc/kubernetes/admin.conf
     dest: epic-admin.conf
     flat: yes
+  become: true
+
+- name: reset any persistent namespace that we might have set
+  command: kubectl config set-context --current --namespace=
   become: true
 
 - include_tasks: multus-install.yml

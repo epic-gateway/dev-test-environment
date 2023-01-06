@@ -1,9 +1,12 @@
 - hosts: epic
   roles:
+  - k8s
   - epic
 - hosts: client
   roles:
+  - k8s
   - client
 - hosts: node
   roles:
+  - k8s
   - node

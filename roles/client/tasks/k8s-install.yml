@@ -23,11 +23,10 @@
     dest: /etc/profile.d/kubecfg.sh
     mode: ugo+r
     content: |
+      export KUBECONFIG=/etc/kubernetes/admin.conf
       source <(kubectl completion bash)
       alias k=kubectl
       complete -F __start_kubectl k
-
-
 
 # We do this taint/untaint dance because "taint --overwrite" is
 # idempotent so this pair of commands will work on new clusters and
@@ -45,7 +44,7 @@
   template:
     src: kube-flannel.j2
     dest: kube-flannel.yml
-    
+
 - name: add flannel - K8s CNI
   command: kubectl apply -f kube-flannel.yml
 

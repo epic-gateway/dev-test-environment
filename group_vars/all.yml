@@ -9,3 +9,7 @@ k8s_cluster_vip: 192.168.254.101
 k8s_version: 1.26.0
 k8s_version_apt: "{{ k8s_version }}-00"
 k8s_version_kubeadm: "v{{ k8s_version }}"
+
+# TRUE_INGRESS config
+true_ingress_remote_path: /opt/acnodal/bin
+true_ingress_interface: "{{ lookup('env', 'EPIC_TRUE_INGRESS_INTF') | default('enp1s0', True) }}"

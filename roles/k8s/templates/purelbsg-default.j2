@@ -1,0 +1,11 @@
+apiVersion: purelb.io/v1
+kind: ServiceGroup
+metadata:
+  name: default
+  namespace: purelb
+spec:
+  local:
+    v4pools:
+    - pool: {{ purelb_pool }}
+      subnet: {{ purelb_subnet }}
+      aggregation: {{ purelb_aggregation }}
