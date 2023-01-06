@@ -73,5 +73,5 @@ marin3r_artifact: "https://gitlab.com/api/v4/projects/acnodal%2Fepic%2Fmarin3r/p
 contour_chart: contour-7.0.6.tgz
 contour_artifact: https://charts.bitnami.com/bitnami/{{ contour_chart }}
 
-purelb_chart: purelb-v0.0.0-109-multi-range-pools-5164936a.tgz
+purelb_chart: purelb-v0.0.0-109-multi-range-pools-3390ec17.tgz
 purelb_artifact: https://gitlab.com/api/v4/projects/purelb%2Fpurelb/packages/helm/stable/charts/{{ purelb_chart }}
