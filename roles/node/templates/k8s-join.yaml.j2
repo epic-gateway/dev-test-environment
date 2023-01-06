@@ -2,7 +2,7 @@ apiVersion: kubeadm.k8s.io/v1beta3
 kind: JoinConfiguration
 discovery:
   bootstrapToken:
-    apiServerEndpoint: {{ k8s_cluster_vip }}:6443
+    apiServerEndpoint: {{ k8s_cluster_vip }}
     token: f4jrbs.381l8wz39sfdwvsv
     caCertHashes:
     - "sha256:b03d04e56cfbabe34c7329f6e14b358ec3cdf0ac82f7cb4b008312d3bb482af1"
