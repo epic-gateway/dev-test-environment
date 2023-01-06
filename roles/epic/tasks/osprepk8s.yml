@@ -35,6 +35,7 @@
     - bridge-utils
     - python3-pip
     - unzip
+    - bzip2
     install_recommends: no
 
 
