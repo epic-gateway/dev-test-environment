@@ -5,3 +5,7 @@ ansible_user: vagrant
 # optional private registry (for development)
 private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
 k8s_cluster_vip: 192.168.254.101
+
+k8s_version: 1.26.0
+k8s_version_apt: "{{ k8s_version }}-00"
+k8s_version_kubeadm: "v{{ k8s_version }}"

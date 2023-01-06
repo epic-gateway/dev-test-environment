@@ -22,11 +22,10 @@
 
 - name: install k8s executables
   apt:
-    update_cache: yes
     name:
-    - kubelet
-    - kubeadm
-    - kubectl
+    - kubelet={{ k8s_version_apt }}
+    - kubeadm={{ k8s_version_apt }}
+    - kubectl={{ k8s_version_apt }}
 
 - name: set up system-wide environment variables
   lineinfile:
