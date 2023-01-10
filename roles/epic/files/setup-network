@@ -16,6 +16,7 @@ from urllib3.exceptions import ProtocolError
 EPIC_NAMESPACE="epic"
 GROUP="epic.acnodal.io"
 V1="v1"
+LB_PLURAL="loadbalancers"
 PROXY_PLURAL="gwproxies"
 EPIC_PLURAL="epics"
 EPIC_CONFIG_NAME="epic"
@@ -115,6 +116,18 @@ def handle_event(event, addr):
         # figure out this container's service name and namespace
         container_name = event['object'].status.container_statuses[0].name
         namespace = event['object'].metadata.namespace
+
+        try:
+            service_name = event['object'].metadata.labels['epic.acnodal.io/owning-loadbalancer']
+
+            # write the ifname and ifindex into the service status
+            patch = {'spec':{'proxy-if-info':{event['object'].metadata.name: {'epic-node-address': addr, 'index':ifindex, 'name':ifname, 'epic-port': {'appProtocol': 'gue', 'port': 6080, 'protocol': 'UDP'}}}}}
+            api = kubernetes.client.CustomObjectsApi()
+            api.patch_namespaced_custom_object(group=GROUP,version=V1,plural=LB_PLURAL,namespace=namespace,name=service_name,body=patch)
+        except KeyError:
+            print("Pod has no owning LB label")
+        except ApiException:
+            print("Pod has no owning LB")
 
         try:
             proxy_name = event['object'].metadata.labels['epic.acnodal.io/owning-proxy']
