@@ -1,6 +1,8 @@
-# EPIC nodes
 
+# EPIC nodes
 192.168.254.11 epic1
 192.168.254.12 epic2
 192.168.254.13 epic3
 
+# EPIC web service
+192.168.254.200 acndev-ctl

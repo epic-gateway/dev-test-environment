@@ -1,5 +1,8 @@
-#mk8s cluster hosts
 
+# mk8s cluster hosts
 192.168.254.101 mk8s1
 192.168.254.102 mk8s2
 192.168.254.103 mk8s3
+
+# EPIC web service
+192.168.254.200 acndev-ctl
