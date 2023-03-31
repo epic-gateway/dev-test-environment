@@ -5,14 +5,14 @@ bird_remote_path: /opt/acnodal/bird
 # optional private registry (for development)
 private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
 
-# kubeadm  init parameters
-
-pod_cidr: "172.20.0.0/16"
-svc_cidr: "172.21.0.0/16"
+# kubeadm init parameters
+pod_cidr: "172.20.0.0/16,fd01::/60"
+svc_cidr: "172.21.0.0/16,fd02::/112"
 
 # flannel configuration
 
 cni_network: "172.20.0.0/16"
+cni_IPv6network: "fd01::/60"
 
 # Web Service
 
