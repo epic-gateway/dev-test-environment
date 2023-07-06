@@ -1,5 +1,4 @@
 ---
-join_script: join-cluster
 k8s_nic: eth1
 ansible_user: vagrant
 # optional private registry (for development)

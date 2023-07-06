@@ -20,7 +20,7 @@
 - name: move admin.conf to /vagrant so it can be used on the host
   copy:
     src: /etc/kubernetes/admin.conf
-    dest: /vagrant/epic-admin.conf
+    dest: /vagrant/{{ admin_conf }}
     remote_src: true
   become: true
 

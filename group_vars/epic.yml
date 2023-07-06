@@ -62,3 +62,6 @@ contour_artifact: https://charts.bitnami.com/bitnami/{{ contour_chart }}
 
 purelb_chart: purelb-v0.0.0-109-multi-range-pools-3390ec17.tgz
 purelb_artifact: https://gitlab.com/api/v4/projects/purelb%2Fpurelb/packages/helm/stable/charts/{{ purelb_chart }}
+
+join_script: join-epic-cluster
+admin_conf: epic-admin.conf

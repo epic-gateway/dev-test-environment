@@ -5,4 +5,5 @@
 tmp/config
 tmp/deploy
 tmp/*tar*
-join-cluster
+join-client-cluster
+join-epic-cluster

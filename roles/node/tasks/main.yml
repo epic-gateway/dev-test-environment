@@ -13,7 +13,7 @@
   become: yes
 - name: Upload admin kubectl conf
   template:
-    src: mk8s-admin.conf
+    src: "{{ admin_conf }}"
     dest: /etc/kubernetes/admin.conf
   become: yes
 - name: Join the cluster
