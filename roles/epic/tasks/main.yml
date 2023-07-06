@@ -1,9 +1,5 @@
 ---
 # tasks file for epic
-- name: Pull in the secrets
-  include_vars: files/vault.yml
-  no_log: true
-
 - name: install acnodal CLI tools
   block:
   - name: create acnodal installation directory
