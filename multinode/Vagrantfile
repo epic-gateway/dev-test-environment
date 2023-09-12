@@ -152,6 +152,9 @@ LVMPOOL = "default"
     epic2.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
     epic2.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
     epic2.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
+
+    epic2.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+    epic2.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
 
   config.vm.define 'epic3' do |epic3|
@@ -184,6 +187,9 @@ LVMPOOL = "default"
     epic3.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
     epic3.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
     epic3.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
+
+    epic3.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+    epic3.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
 
   (1..3).each do |i|
