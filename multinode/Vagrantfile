@@ -64,7 +64,7 @@ LVMPOOL = "default"
       destroytrigger.run = {inline: "/usr/local/bin/brmgr.sh destroy"}
     end
     router.vm.hostname = 'router'
-    router.vm.box = "frrouter"
+    router.vm.box = "epic-gateway/frrouter"
     router.vm.network :public_network, 
       :dev => BRIDGE,
       :mode => "bridge",
