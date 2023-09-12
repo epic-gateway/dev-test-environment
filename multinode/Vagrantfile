@@ -97,7 +97,7 @@ LVMPOOL = "default"
       :type => "bridge",
       :trust_guest_rx_filters => "true",
       ip: "192.168.254.11"
-    config.vm.synced_folder './', '/vagrant', type: 'nfs'
+    config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false
     epic1.trigger.before :up do |uptrigger|
       uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.11; ssh-keygen -f ~/.ssh/known_hosts -R epic1; true'" }
     end
@@ -196,7 +196,7 @@ LVMPOOL = "default"
                        :type => "bridge",
                        :trust_guest_rx_filters => "true",
                        ip: "192.168.254.10#{i}"
-      config.vm.synced_folder './', '/vagrant', type: 'nfs'
+      config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false
       vm.trigger.before :up do |uptrigger|
         uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.10#{i}; ssh-keygen -f ~/.ssh/known_hosts -R #{name}; true'" }
       end
