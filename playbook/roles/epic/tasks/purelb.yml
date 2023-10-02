@@ -1,0 +1,13 @@
+---
+- name: install purelb helm package
+  command: helm install --create-namespace --namespace=purelb purelb {{ purelb_artifact }}
+  register: result
+  failed_when: result.rc != 0 and "cannot re-use a name that is still in use" not in result.stderr
+
+- name: create default service group
+  template:
+    src: purelbsg-default.j2
+    dest: purelbsg-default.yml
+
+- name: create default servicegroup
+  command: kubectl apply -f purelbsg-default.yml

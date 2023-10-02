@@ -1,0 +1,12 @@
+---
+- name: download epicctl CLI
+  get_url:
+    url: "{{ epicctl_artifact }}"
+    dest: "{{ true_ingress_remote_path }}"
+    mode: +x
+
+- name: download epicscanlogs CLI
+  get_url:
+    url: "{{ epicctl_scanlogs_artifact }}"
+    dest: "{{ true_ingress_remote_path }}"
+    mode: +x

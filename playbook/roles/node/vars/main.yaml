@@ -1,0 +1,3 @@
+---
+join_script: join-client-cluster
+admin_conf: mk8s-admin.conf

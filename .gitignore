@@ -1,3 +1,8 @@
-singlenode/.vagrant/*
-boxes/*
-multinode/.vagrant/*
+*/.vagrant
+*/*.retry
+*/*-admin.conf
+*/tmp/config
+*/tmp/deploy
+*/tmp/*tar*
+*/join-client-cluster
+*/join-epic-cluster

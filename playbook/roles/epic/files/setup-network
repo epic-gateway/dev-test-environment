@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+
+import containerd
+import json
+import netifaces
+import subprocess
+import grpc
+import kubernetes
+import time
+from containerd.services.containers.v1 import containers_pb2_grpc, containers_pb2
+from subprocess import PIPE
+from kubernetes.client.exceptions import ApiException
+from urllib3.exceptions import ProtocolError
+
+
+EPIC_NAMESPACE="epic"
+GROUP="epic.acnodal.io"
+V1="v1"
+LB_PLURAL="loadbalancers"
+PROXY_PLURAL="gwproxies"
+EPIC_PLURAL="epics"
+EPIC_CONFIG_NAME="epic"
+
+# This will change depending on whether you're running native k8s or
+# epicmgr, and based on the name of the epicmgr package
+CONTAINERD_SOCKET='unix:///run/containerd/containerd.sock'
+
+# FIXME: get this from the serviceprefix
+MULTUS_BRIDGE_NAME = 'multus0'
+
+
+def find_veth(container_id):
+    containerd_channel = grpc.insecure_channel(CONTAINERD_SOCKET)
+    containersv1 = containers_pb2_grpc.ContainersStub(containerd_channel)
+
+    # use the container id to find the container info
+    try:
+        main = containersv1.Get(containers_pb2.GetContainerRequest(id=container_id), metadata=(('containerd-namespace', 'k8s.io'),))
+    except grpc.RpcError as e:
+        if e.code() == grpc.StatusCode.NOT_FOUND:
+            # the container is running on a different node
+            print("Container not found:", container_id)
+            return False, -1
+        raise e
+
+    # get the "/pause" container ID from the main container spec
+    spec = json.loads(main.container.spec.value)
+    pause_id = spec['annotations']['io.kubernetes.cri.sandbox-id']
+    print("Pause container ID: ", pause_id)
+
+    # use the primary pod container to find the "pause" container
+    pause = containersv1.Get(containers_pb2.GetContainerRequest(id=pause_id), metadata=(('containerd-namespace', 'k8s.io'),))
+
+    # get the network namespace file from the pause container spec
+    spec = json.loads(pause.container.spec.value)
+    print(spec['linux']['namespaces'])
+    for ns in spec['linux']['namespaces']:
+        if ns['type'] == 'network':
+            netns = ns['path']
+    # /var/run is a symlink to /run. containerd uses /var/run but lsns
+    # uses /run so we need to remove the "/var" prefix if it's there
+    if netns.startswith('/var'):
+        netns = netns[len('/var'):]
+    print("Network ns: ", netns)
+
+    # find all of the net namespaces
+    cp = subprocess.run(['/usr/bin/lsns', '-Jt', 'net'], stdout=PIPE, stderr=PIPE)
+    if cp.returncode != 0:
+        print("error running lsns", cp.stderr)
+        return
+    nss = json.loads(cp.stdout)['namespaces']
+
+    # find the namespace that contains the "pause" container
+    for ns in filter(lambda ns: ns['nsfs'] == netns, nss):
+        nsid = int(ns['netnsid'])
+        print("Netnsid: ", nsid)
+
+        # get veth interface
+        d = subprocess.run(["/bin/ip", "-j", "link", "show"], stdout=PIPE, stderr=PIPE)
+        if d.returncode == 0:
+            for dev in json.loads(d.stdout):
+                if 'master' in dev and dev['master'] == MULTUS_BRIDGE_NAME and 'link_netnsid' in dev and dev['link_netnsid'] == nsid:
+                    ifname = dev['ifname']
+                    ifindex = dev['ifindex']
+                    print("veth: ", ifname, " ifindex: ", ifindex)
+                    return ifname, ifindex
+
+    print("veth not found for container", container_id)
+    return False, -1
+
+
+def handle_event(event, addr):
+
+    if event['type'] not in ['ADDED', 'MODIFIED']:
+        print("Event is not an ADDED/MODIFIED type, ignoring")
+        return
+
+    if None == event['object'].status.container_statuses:
+        print("Event has no container status, cannot proceed")
+        return
+
+    if None == event['object'].status.container_statuses[0].container_id:
+        print("Container doesn't have an id yet, cannot proceed")
+        return
+
+    if all(key in event['object'].metadata.annotations for key in ('epic.acnodal.io/ifindex', 'epic.acnodal.io/ifname')):
+        print("Pod already has the necessary annotations")
+        return
+
+    # start by finding the container id
+    containerid = event['object'].status.container_statuses[0].container_id.split('://')[1]
+    print("Container ID: ", containerid)
+
+    ifname, ifindex = find_veth(containerid)
+    if ifname:
+        # figure out this container's service name and namespace
+        container_name = event['object'].status.container_statuses[0].name
+        namespace = event['object'].metadata.namespace
+
+        try:
+            service_name = event['object'].metadata.labels['epic.acnodal.io/owning-loadbalancer']
+
+            # write the ifname and ifindex into the service status
+            patch = {'spec':{'proxy-if-info':{event['object'].metadata.name: {'epic-node-address': addr, 'index':ifindex, 'name':ifname, 'epic-port': {'appProtocol': 'gue', 'port': 6080, 'protocol': 'UDP'}}}}}
+            api = kubernetes.client.CustomObjectsApi()
+            api.patch_namespaced_custom_object(group=GROUP,version=V1,plural=LB_PLURAL,namespace=namespace,name=service_name,body=patch)
+        except KeyError:
+            print("Pod has no owning LB label")
+        except ApiException:
+            print("Pod has no owning LB")
+
+        try:
+            proxy_name = event['object'].metadata.labels['epic.acnodal.io/owning-proxy']
+
+            # write the ifname and ifindex into the proxy status
+            patch = {'spec':{'proxy-if-info':{event['object'].metadata.name: {'epic-node-address': addr, 'index':ifindex, 'name':ifname, 'epic-port': {'appProtocol': 'gue', 'port': 6080, 'protocol': 'UDP'}}}}}
+            api = kubernetes.client.CustomObjectsApi()
+            api.patch_namespaced_custom_object(group=GROUP,version=V1,plural=PROXY_PLURAL,namespace=namespace,name=proxy_name,body=patch)
+        except KeyError:
+            print("Pod has no owning proxy label")
+        except ApiException:
+            print("Pod has no owning proxy")
+
+        # write the ifname and ifindex into the pod annotations
+        core_api = kubernetes.client.CoreV1Api()
+        core_api.patch_namespaced_pod(
+            namespace=namespace,
+            name=event['object'].metadata.name,
+            body={
+                'metadata': {
+                'annotations': {
+                    'epic.acnodal.io/ifindex': str(ifindex),
+                    'epic.acnodal.io/ifname': ifname
+                }
+                }
+            }
+        )
+
+
+def get_epic_config(api):
+    '''Read the epic config singleton. It's the object named "epic" in the "epic" namespace.'''
+    return api.get_namespaced_custom_object(
+        group=GROUP,
+        version=V1,
+        plural=EPIC_PLURAL,
+        namespace=EPIC_NAMESPACE,
+        name=EPIC_CONFIG_NAME
+    )
+
+
+def get_gui_nic(config):
+    '''Get the nic that we want to use for GUE tunnel endpoints.'''
+    return config['spec']['base']['gue-ingress-nics'][0]
+
+
+def get_intf_address(intf):
+    '''Find the IPV4 address of the intf interface. Can raise a few different errors if things go wrong: KeyError, IndexError, ValueError.'''
+    return netifaces.ifaddresses(intf)[netifaces.AF_INET][0]['addr']
+
+
+if __name__ == "__main__":
+    print("daemon running...")
+    kubernetes.config.load_kube_config()
+
+    api = kubernetes.client.CustomObjectsApi()
+    config = get_epic_config(api)
+    intf = get_gui_nic(config)
+    try:
+        addr = get_intf_address(intf)
+        print("GUE Ingress interface " + intf + " has address " + addr)
+    except ValueError as e:
+        print("ERROR getting interface info. Is %s the correct interface? Message: %s" % (intf, e))
+        exit(1)
+
+    k8_api = kubernetes.client.CoreV1Api()
+    watch = kubernetes.watch.Watch()
+    while True:
+        try:
+            for event in watch.stream(k8_api.list_pod_for_all_namespaces, label_selector='app.kubernetes.io/part-of=epic,app.kubernetes.io/component=envoy-deployment'):
+                print("Event: %s %s %s" % (event['type'], event['object'].metadata.name, event['object'].metadata.namespace))
+                handle_event(event, addr)
+        except ProtocolError as e:
+            print("urllib3.exceptions.ProtocolError: %s. Pausing and will reconnect" % (e))
+            time.sleep(3)

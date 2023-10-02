@@ -1,0 +1,4 @@
+---
+- name: install cert-manager
+  # https://cert-manager.io/docs/installation/kubernetes/#installing-with-regular-manifests
+  command: kubectl apply -f "{{ certmanager_artifact }}"

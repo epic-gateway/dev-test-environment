@@ -1,0 +1,13 @@
+---
+apiVersion: epic.acnodal.io/v1
+kind: LBServiceGroup
+metadata:
+  namespace: {{ group_org_ns }}
+  name: gatewayhttp
+  labels:
+    epic.acnodal.io/owning-account: {{ group_org_name }}
+    epic.acnodal.io/owning-serviceprefix: {{ service_prefix_name }}
+    app.kubernetes.io/component: lbservicegroup
+    app.kubernetes.io/part-of: epic
+spec:
+{{ lookup('file', 'epic_v1_lbservicegroup_spec.yaml') }}

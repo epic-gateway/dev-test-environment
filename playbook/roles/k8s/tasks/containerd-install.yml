@@ -1,0 +1,66 @@
+#  Install Containerd and its dependencies
+
+- name: install runc
+  apt:
+    name:
+    - runc
+
+- name: download CNI plugins
+  get_url:
+    url: https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz
+    dest: /root
+- name: create CNI plugin directory
+  file:
+    path: /opt/cni/bin
+    state: directory
+    mode: '0755'
+- name: untar CNI plugins
+  unarchive:
+    src: /root/cni-plugins-linux-amd64-v1.1.1.tgz
+    dest: /opt/cni/bin
+    remote_src: yes
+
+- name: download containerd
+  get_url:
+    url: https://github.com/containerd/containerd/releases/download/v1.6.14/containerd-1.6.14-linux-amd64.tar.gz
+    dest: /root
+- name: untar containerd
+  unarchive:
+    src: /root/containerd-1.6.14-linux-amd64.tar.gz
+    dest: /usr/local
+    remote_src: yes
+- name: create local containerd service unit directory
+  file:
+    path: /usr/local/lib/systemd/system/
+    state: directory
+    mode: '0755'
+- name: download containerd service unit file
+  get_url:
+    url: https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
+    dest: /usr/local/lib/systemd/system/
+- name: tell systemd to rescan services
+  command: systemctl daemon-reload
+
+- name: create containerd config directory
+  file:
+    path: /etc/containerd
+    state: directory
+    mode: '0755'
+- name: create containerd defaults
+  shell: containerd config default > /etc/containerd/config.toml
+- name: update systemd cgroup in /etc/containerd/config.toml
+  replace:
+    path: /etc/containerd/config.toml
+    regexp: '^(\s*)SystemdCgroup.*'
+    replace: '\1SystemdCgroup = true'
+- name: enable development registry
+  blockinfile:
+    path: /etc/containerd/config.toml
+    insertafter: \[plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+    block: |
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ private_registry }}"]
+      endpoint = ["http://{{ private_registry }}"]
+  when: private_registry != ""
+
+- name: enable containerd service
+  command: systemctl enable --now containerd

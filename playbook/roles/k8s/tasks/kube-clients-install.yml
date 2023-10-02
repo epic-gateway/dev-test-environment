@@ -1,0 +1,39 @@
+---
+- name: install dependency packages
+  apt:
+    name:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - ipvsadm
+    install_recommends: no
+
+- name: get gpg key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: copy repo file
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    update_cache: yes
+
+- name: install k8s executables
+  apt:
+    name:
+    - kubelet={{ k8s_version_apt }}
+    - kubeadm={{ k8s_version_apt }}
+    - kubectl={{ k8s_version_apt }}
+- name: mark for version hold
+  shell: apt-mark hold kubelet kubeadm kubectl
+
+- name: install python client libraries
+  # I'd rather use the debian/ubuntu package but it's way too old
+  command: pip3 install kubernetes~=12.0
+
+- name: create kubernetes manifests directory
+  file:
+    path: /etc/kubernetes/manifests
+    state: directory
+    mode: '0755'

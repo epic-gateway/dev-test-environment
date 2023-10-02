@@ -1,0 +1,9 @@
+---
+# Installs the bits and pieces that k8s needs but doesn't configure it
+# (that's for the other roles).
+- include_tasks: containerd-install.yml
+  args: {apply: {become: true}}
+- include_tasks: kube-clients-install.yml
+  args: {apply: {become: true}}
+- include_tasks: helm-install.yml
+  args: {apply: {become: true}}

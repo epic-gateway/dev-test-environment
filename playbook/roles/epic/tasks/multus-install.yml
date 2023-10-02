@@ -1,0 +1,10 @@
+---
+
+- name:  (multus-install.yml) transfer multus yaml
+  copy:
+    src: files/multus-daemonset.yml
+    dest: multus-daemonset.yml
+
+- name:  Apply multus daemonset
+  command: kubectl apply -f multus-daemonset.yml
+

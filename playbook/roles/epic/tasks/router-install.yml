@@ -1,0 +1,25 @@
+---
+- name: create bird config directory
+  file:
+    path: "{{ bird_remote_path }}"
+    state: directory
+    mode: ugo+rx
+
+- name:  create router namespace
+  shell: kubectl create namespace router --dry-run=client -oyaml | kubectl apply -f -
+
+- name: copy bird configmap
+  copy:
+    src: files/bird-cm.yml
+    dest: bird-cm.yml
+
+- name: apply bird configmap
+  command: kubectl apply -f bird-cm.yml
+
+- name: create bird configuration
+  copy:
+    src: files/bird-epic.yml
+    dest: bird-epic.yml
+
+- name: create router - bird deployment
+  command: kubectl apply -f bird-epic.yml

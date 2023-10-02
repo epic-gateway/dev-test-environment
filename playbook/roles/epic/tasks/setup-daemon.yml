@@ -1,0 +1,47 @@
+---
+- name: install python client libraries
+  pip:
+    name:
+    - kubernetes~=12.0
+    - containerd~=1.4.1
+  become: true
+
+- name: install network setup daemon
+  copy:
+    src: setup-network
+    dest: "{{ true_ingress_remote_path }}"
+    mode: +x
+
+- name: create systemd service directory
+  file:
+    path: /usr/local/lib/systemd/system
+    state: directory
+- name: install systemd service file for the network setup daemon
+  copy:
+    content: |
+      [Unit]
+      Description=Envoy pod veth config daemon
+      After=network.target
+      
+      [Service]
+      Environment=KUBECONFIG=/etc/kubernetes/admin.conf \
+                  PYTHONUNBUFFERED=1 \
+                  PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+      ExecStartPre=/usr/bin/kubectl wait --for=condition=Ready --timeout=5m --all -n kube-system pods
+      ExecStart="{{ true_ingress_remote_path }}"/setup-network
+      User=root
+      Group=root
+      WorkingDirectory=/root
+      Restart=always
+      RestartSec=10
+      
+      [Install]
+      WantedBy=multi-user.target
+    dest: /usr/local/lib/systemd/system/setup-network.service
+
+- name: enable and start network setup daemon
+  systemd:
+    name: setup-network.service
+    enabled: yes
+    state: restarted
+    daemon_reload: yes

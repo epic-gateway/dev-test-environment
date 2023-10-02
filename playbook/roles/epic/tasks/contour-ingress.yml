@@ -1,0 +1,22 @@
+---
+- name: install contour helm package
+  command: helm install --create-namespace --namespace=projectcontour contour {{ contour_artifact }}
+  register: result
+  failed_when: result.rc != 0 and "cannot re-use a name that is still in use" not in result.stderr
+
+# httpproxy is configured to use self signed cert, uses issuer previously installed in
+# namespace by resource-model.yml
+
+- name: template httpsproxy-ws.yaml
+  template:
+    src: httpsproxy-ws.yaml.j2
+    dest: httpsproxy-ws.yaml
+- name: apply httpsproxy-ws.yaml
+  command: kubectl apply -f httpsproxy-ws.yaml
+
+- name: transfer authserver.yaml
+  copy:
+    src: files/authserver.yaml
+    dest: authserver.yaml
+- name: apply authserver.yaml
+  command: kubectl apply -f authserver.yaml

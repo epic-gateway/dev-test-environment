@@ -1,0 +1,51 @@
+---
+# tasks file for epic
+- name: install acnodal CLI tools
+  block:
+  - name: create acnodal installation directory
+    file:
+      path: "{{ true_ingress_remote_path }}"
+      state: directory
+      mode: ugo+rx
+  - include_tasks: true_ingress.yml
+  - include_tasks: epicctl.yml
+  become: true
+
+- include_tasks: k8s-install.yml
+
+- name: Fetch the EPIC admin kubeconfig # so we can use kubectl from the host
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ admin_conf }}"
+    flat: yes
+  become: true
+
+# now that the controlplane is ready we can tell other nodes how to join
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+- name: Copy join command to local file
+  local_action:
+    module: copy
+    content: "#!/bin/sh\n{{ join_command.stdout_lines[0] }}\n"
+    dest: "{{ join_script }}"
+    mode: +x
+
+- name: reset any persistent namespace that we might have set
+  command: kubectl config set-context --current --namespace=
+  become: true
+
+- include_tasks: multus-install.yml
+- include_tasks: router-install.yml
+  args: {apply: {become: true}}
+- include_tasks: cert-manager-install.yml
+- include_tasks: marin3r-install.yml
+
+- include_tasks: resource-model.yml
+  tags: [ lbsg ]
+- include_tasks: gwsm.yml
+- include_tasks: web-service-install.yml
+- include_tasks: purelb.yml
+- include_tasks: contour-ingress.yml
+- include_tasks: setup-daemon.yml
+  args: {apply: {become: true}}

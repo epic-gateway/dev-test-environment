@@ -1,0 +1,20 @@
+---
+- name: download True Ingress artifacts
+  get_url:
+    url: "{{ true_ingress_artifact }}"
+    dest: /root
+
+- name: untar artifacts
+  unarchive:
+    src: /root/true-ingress.tar.bz2
+    dest: "{{ true_ingress_remote_path }}"
+    extra_opts:
+    - --strip-components=1
+    remote_src: yes
+
+- name: mount BPF filesystem
+  mount:
+    state: mounted
+    fstype: bpf
+    src: bpf
+    path: /sys/fs/bpf

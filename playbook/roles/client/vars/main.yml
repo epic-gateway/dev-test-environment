@@ -1,0 +1,10 @@
+---
+join_script: join-client-cluster
+admin_conf: mk8s-admin.conf
+
+# kubeadm init parameters
+pod_cidr: 172.24.0.0/16,fd04::/60
+svc_cidr: 172.25.0.0/16,fd05::/112
+# flannel configuration
+cni_network: 172.24.0.0/16
+cni_IPv6network: fd04::/60

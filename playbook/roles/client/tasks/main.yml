@@ -1,0 +1,19 @@
+---
+# tasks file for k8s client
+- include_tasks: k8s-install.yml
+- name: Fetch the cluster admin kubeconfig # so we can use kubectl from the host
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ admin_conf }}"
+    flat: yes
+
+# now that the controlplane is ready we can tell other nodes how to join
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+- name: Copy join command to local file
+  local_action:
+    module: copy
+    content: "#!/bin/sh\n{{ join_command.stdout_lines[0] }}\n"
+    dest: "{{ join_script }}"
+    mode: +x

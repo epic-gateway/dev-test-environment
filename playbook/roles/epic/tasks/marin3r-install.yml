@@ -1,0 +1,14 @@
+---
+- name:  create namespace
+  shell: kubectl create namespace marin3r-system --dry-run=client -oyaml | kubectl apply -f -
+
+- name: Apply manifest
+  command: kubectl apply -f "{{ marin3r_artifact }}"
+  # this play can fail when we're bringing up the system because the
+  # controller-manager webhooks are in the process of starting up so
+  # you can't connect to them. Back off for a few seconds to give
+  # things a chance to settle down and try again.
+  retries: 5
+  delay: 30
+  register: result
+  until: result is not failed

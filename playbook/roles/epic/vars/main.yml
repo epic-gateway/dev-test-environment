@@ -1,0 +1,63 @@
+---
+# Bird config
+bird_remote_path: /opt/acnodal/bird
+
+# kubeadm init parameters
+pod_cidr: "172.20.0.0/16,fd01::/60"
+svc_cidr: "172.21.0.0/16,fd02::/112"
+
+# flannel configuration
+cni_network: "172.20.0.0/16"
+cni_IPv6network: "fd01::/60"
+
+# Web Service
+ws_hostname: epic-ctl
+
+# Images
+marin3r_version: v0.12.2-epic21
+marin3r_image: "quay.io/epic-gateway/marin3r:{{ marin3r_version }}"
+eds_image: quay.io/epic-gateway/eds-server:v0.8.2
+envoy_image: quay.io/epic-gateway/envoy:v1.23.2-epic1
+
+# ServicePrefix values
+service_prefix_name: default
+service_prefix_subnet: 192.168.77.0/24
+service_prefix_pool: 192.168.77.2-192.168.77.77
+service_prefix_aggregation: "/32"
+
+# PureLB values
+purelb_subnet: 192.168.254.0/24
+purelb_pool: 192.168.254.200-192.168.254.201
+purelb_aggregation: "/32"
+
+# LBServiceGroup values
+group_org_name: root
+group_org_ns: "epic-{{ group_org_name }}"
+
+# Resource Model
+resource_model_artifact: https://github.com/epic-gateway/resource-model/releases/download/v0.55.6/epic-resource-model.yaml
+
+# Web Service
+web_service_artifact: https://github.com/epic-gateway/web-service/releases/download/v0.11.3/web-service.yaml
+
+# TrueIngress
+true_ingress_artifact: https://github.com/epic-gateway/true-ingress/releases/download/v0.22.4/true-ingress.tar.bz2
+
+# Epicctl
+epicctl_artifact: https://github.com/epic-gateway/epicctl/releases/download/v0.11.1/epicctl
+epicctl_scanlogs_artifact: https://github.com/epic-gateway/epicctl/releases/download/v0.11.1/scan-logs
+
+marin3r_artifact: https://github.com/epic-gateway/marin3r/releases/download/{{ marin3r_version }}/marin3r-manifest-epic.yaml
+
+certmanager_artifact: https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.yaml
+
+contour_artifact: https://charts.bitnami.com/bitnami/contour-7.0.6.tgz
+
+purelb_artifact: https://gitlab.com/api/v4/projects/purelb%2Fpurelb/packages/helm/stable/charts/purelb-v0.7.1.tgz
+
+join_script: join-epic-cluster
+admin_conf: epic-admin.conf
+
+# Ubuntu 20.04 doesn't have "python" by default and ansible doesn't
+# seem to be able to figure out which python to use
+ansible_python_interpreter: /usr/bin/python3

@@ -1,0 +1,15 @@
+- hosts: epic
+  roles:
+  - focal
+  - k8s
+  - epic
+- hosts: client
+  roles:
+  - focal
+  - k8s
+  - client
+- hosts: node
+  roles:
+  - focal
+  - k8s
+  - node

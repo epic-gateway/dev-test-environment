@@ -1,0 +1,50 @@
+---
+- name:  create namespace
+  shell: kubectl create namespace epic --dry-run=client -oyaml | kubectl apply -f -
+
+- name: Install EPIC
+  command: kubectl apply -f "{{ resource_model_artifact }}"
+  # this play can fail when we're bringing up the system because
+  # various components (e.g., cert-manager) are in the process of
+  # starting up. Back off for a few seconds to give things a chance to
+  # settle down and try again.
+  retries: 3
+  delay: 30
+  register: result
+  until: result is not failed
+
+- name: process templates
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ item }}"
+  loop:
+  - epic_v1_epic.yaml
+  - epic_v1_serviceprefix.yaml
+  - epic_v1_lbservicegroup.yaml
+  - epic_v1_lbservicegroup_v6.yaml
+  tags: [ lbsg ]
+- name: Create sample config singleton, with overrides
+  command: kubectl apply -f epic_v1_epic.yaml
+  # this play can fail when we're bringing up the system because the
+  # controller-manager webhooks are in the process of starting up so
+  # you can't connect to them. Back off for a few seconds to give
+  # things a chance to settle down and try again.
+  retries: 5
+  delay: 30
+  register: result
+  until: result is not failed
+
+- name: Create sample serviceprefix
+  command: kubectl apply -f epic_v1_serviceprefix.yaml
+
+- name: Create sample org/namespace
+  command: /opt/acnodal/bin/epicctl create user-namespace "{{ group_org_name }}" deprecated deprecated
+  register: result
+  failed_when: result.rc != 0 and "already exists" not in result.stderr
+
+- name: Create sample service group
+  command: kubectl apply -f epic_v1_lbservicegroup.yaml
+  tags: [ lbsg ]
+- name: Create IPV6 sample service group
+  command: kubectl apply -f epic_v1_lbservicegroup_v6.yaml
+  tags: [ lbsg ]
