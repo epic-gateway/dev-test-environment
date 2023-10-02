@@ -1,10 +1,6 @@
 ---
-- name: download contour helm package
-  get_url:
-    url: "{{ contour_artifact }}"
-    dest: ./
 - name: install contour helm package
-  command: helm install --create-namespace --namespace=projectcontour contour {{ contour_chart }}
+  command: helm install --create-namespace --namespace=projectcontour contour {{ contour_artifact }}
   register: result
   failed_when: result.rc != 0 and "cannot re-use a name that is still in use" not in result.stderr
 
@@ -24,7 +20,3 @@
     dest: authserver.yaml
 - name: apply authserver.yaml
   command: kubectl apply -f authserver.yaml
-
-- name: create secret for acnodal private registry
-  shell: kubectl -n epicauth create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
-  no_log: true

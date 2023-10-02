@@ -27,8 +27,6 @@ Dependencies
 
 Requires ubuntu 20.04LTS
 
-Requires a gitlab account and token from acnodal gitlab account to download our envoy build
-
 How to use
 ----------------
 

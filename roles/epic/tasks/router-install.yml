@@ -8,10 +8,6 @@
 - name:  create router namespace
   shell: kubectl create namespace router --dry-run=client -oyaml | kubectl apply -f -
 
-- name: create secret for acnodal private registry
-  shell: kubectl -n router create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
-  no_log: true
-
 - name: copy bird configmap
   copy:
     src: files/bird-cm.yml

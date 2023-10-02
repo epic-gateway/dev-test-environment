@@ -2,19 +2,8 @@
 - name:  create namespace
   shell: kubectl create namespace marin3r-system --dry-run=client -oyaml | kubectl apply -f -
 
-- name: create secret for acnodal private registry
-  shell: kubectl -n marin3r-system create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
-  no_log: true
-
-- name: download manifest from gitlab
-  get_url:
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: "{{ marin3r_artifact }}"
-    dest: ./
-
 - name: Apply manifest
-  command: kubectl apply -f marin3r-manifest-epic.yaml
+  command: kubectl apply -f "{{ marin3r_artifact }}"
   # this play can fail when we're bringing up the system because the
   # controller-manager webhooks are in the process of starting up so
   # you can't connect to them. Back off for a few seconds to give

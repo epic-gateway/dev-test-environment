@@ -1,6 +1,0 @@
----
-# optional private registry (for development)
-private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
-
-join_script: join-client-cluster
-admin_conf: mk8s-admin.conf

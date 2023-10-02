@@ -41,7 +41,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: registry.gitlab.com/acnodal/epic/router:v0.3.3
+        image: quay.io/epic-gateway/router:v2.0.8-epic0
         imagePullPolicy: Always
         name: bird-epic
         resources:
@@ -62,8 +62,6 @@ spec:
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
       hostNetwork: true
-      imagePullSecrets:
-      - name: gitlab
       volumes:
       - hostPath:
           path: /opt/acnodal/bird

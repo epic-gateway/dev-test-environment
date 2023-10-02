@@ -108,7 +108,7 @@ spec:
         - --auth-realm=epicauth
         command:
         - /contour-authserver
-        image: registry.gitlab.com/acnodal/epic/contour-authserver:v0.1.2
+        image: quay.io/epic-gateway/contour-authserver:v2.0.0-epic0
         imagePullPolicy: Always
         name: epicauth
         ports:
@@ -119,8 +119,6 @@ spec:
         - mountPath: /tls
           name: tls
           readOnly: true
-      imagePullSecrets:
-      - name: gitlab
       serviceAccountName: epicauth
       volumes:
       - name: tls

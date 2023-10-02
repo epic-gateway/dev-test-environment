@@ -1,10 +1,3 @@
 ---
-- name: download manifest from gitlab
-  get_url:
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: "{{ web_service_artifact }}"
-    dest: ./
-
 - name:  Launch web service
-  shell: kubectl apply -f web-service.yaml
+  shell: kubectl apply -f "{{ web_service_artifact }}"

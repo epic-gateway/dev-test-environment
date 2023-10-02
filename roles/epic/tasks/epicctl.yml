@@ -1,18 +1,12 @@
 ---
-- name: download epicctl CLI from gitlab
+- name: download epicctl CLI
   get_url:
     url: "{{ epicctl_artifact }}"
     dest: "{{ true_ingress_remote_path }}"
     mode: +x
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
 
-
-- name: download epicscanlogs CLI from gitlab
+- name: download epicscanlogs CLI
   get_url:
     url: "{{ epicctl_scanlogs_artifact }}"
     dest: "{{ true_ingress_remote_path }}"
     mode: +x
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-

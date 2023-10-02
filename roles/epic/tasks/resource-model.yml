@@ -2,18 +2,8 @@
 - name:  create namespace
   shell: kubectl create namespace epic --dry-run=client -oyaml | kubectl apply -f -
 
-- name: create secret for acnodal private registry in epic namespace
-  shell: kubectl -n epic create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
-  no_log: true
-
-- name: download manifest from gitlab
-  get_url:
-    headers:
-      PRIVATE-TOKEN: "{{ gitlab_toby_ansible_ro }}"
-    url: "{{ resource_model_artifact }}"
-    dest: ./
 - name: Install EPIC
-  command: kubectl apply -f epic-resource-model.yaml
+  command: kubectl apply -f "{{ resource_model_artifact }}"
   # this play can fail when we're bringing up the system because
   # various components (e.g., cert-manager) are in the process of
   # starting up. Back off for a few seconds to give things a chance to
@@ -48,13 +38,9 @@
   command: kubectl apply -f epic_v1_serviceprefix.yaml
 
 - name: Create sample org/namespace
-  command: /opt/acnodal/bin/epicctl create user-namespace "{{ group_org_name }}" "{{gitlab_user}}" "{{gitlab_secret}}"
+  command: /opt/acnodal/bin/epicctl create user-namespace "{{ group_org_name }}" deprecated deprecated
   register: result
   failed_when: result.rc != 0 and "already exists" not in result.stderr
-
-- name: create secret for acnodal private registry in epic-sample namespace
-  shell: kubectl -n "{{ group_org_ns }}" create secret docker-registry gitlab --docker-server=registry.gitlab.com --docker-username={{gitlab_user}} --docker-password={{gitlab_secret}} --dry-run=client -oyaml | kubectl apply -f -
-  no_log: true
 
 - name: Create sample service group
   command: kubectl apply -f epic_v1_lbservicegroup.yaml
