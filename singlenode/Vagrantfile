@@ -1,163 +1,72 @@
+# Vagrantfile for a simple demo environment.
+#
+# 2 virtual machines:
+#  * "gateway" is a single-node k8s cluster running the epic gateway host
+#  * "client" is a single-node k8s cluster running the gateway-api client
 
 $fixsysconf = <<-SCRIPT
-sed -i '/net.ipv6.conf.all.disable_ipv6/d' /etc/sysctl.conf
+sed -i 's/net.ipv6.conf.all.disable_ipv6 = 1/net.ipv6.conf.all.disable_ipv6 = 0/' /etc/sysctl.conf
 sed -i 's/^#net.ipv4.ip_forward/net.ipv4.ip_forward/' /etc/sysctl.conf
 sed -i 's/^#net.ipv6.conf.all.forwarding/net.ipv6.conf.all.forwarding/' /etc/sysctl.conf
 sed -i 's/^#net.ipv4.conf.all.log_martians/net.ipv4.conf.all.log_martians/' /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf
 SCRIPT
 
-$deleth0dhcpdefault = <<-SCRIPT
-sed -i '/^[[:space:]]*dhcp4:[[:space:]]true/a \\     \\ dhcp4-overrides:' /etc/netplan/01-netcfg.yaml
-sed -i '/^[[:space:]]*dhcp4-overrides:/a \\       \\ use-routes: false'  /etc/netplan/01-netcfg.yaml 
-SCRIPT
-
-$fixhosts = <<-SCRIPT
-sed -i '/ubuntu2004/d' /etc/hosts
-sed -i 's/^127.0.2.1/127.0.1.1/' /etc/hosts
-SCRIPT
-
-$routerasdefault = <<-SCRIPT
-sed -i  '$ a \\     \\ gateway4: 192.168.254.1' /etc/netplan/50-vagrant.yaml
-SCRIPT
-
-# This var tells the snap package to configure containerd to use a
-# private (i.e., insecure) registry. For example, if the value of
-# EPIC_PRIVATE_REGISTRY is refectory.caboteria.org:5000 then
-# containerd will be able to pull images from that registry using
-# plaintext http.
-EPIC_PRIVATE_REGISTRY = ENV.fetch('EPIC_PRIVATE_REGISTRY', nil)
-
-$epicmgr = <<-SCRIPT
-# optionally set an env var that allows k8s to pull images from an insecure registry
-#{EPIC_PRIVATE_REGISTRY && "" || "#"} sed --quiet --in-place --expression='/^EPIC_PRIVATE_REGISTRY=/!p' --expression="\\$aEPIC_PRIVATE_REGISTRY=\\"#{EPIC_PRIVATE_REGISTRY}\\"" /etc/environment
-# create the epicmgr group so I can add the vagrant user to it
-groupadd --force --system epicmgr
-# add me to some useful groups
-usermod -G systemd-journal,root,epicmgr -a vagrant
-# set up some handy aliases for things we do often
-cat <<-ALIASES > /etc/profile.d/snap-aliases.sh
-alias snap-install-epic="snap install --classic --dangerous"
-ALIASES
-SCRIPT
-
-$installmk8s = <<-SCRIPT
-snap install microk8s --classic --channel=1.22/stable
-usermod -a -G systemd-journal,root,microk8s vagrant
-chown -f -R vagrant ~/.kube
-microk8s status --wait-ready
-microk8s enable dns rbac helm3
-SCRIPT
-
+BRIDGE = "#{ENV['USER']}-epic0"
+WEB_SERVICE = 'gwdev-ctl'
+PLAYBOOK = '../playbook/site.yml'
+GROUPS = {
+  epic: ['gateway'],
+  client: ['client']
+}
 
 Vagrant.configure("2") do |config|
 
-BRIDGE = "#{ENV['USER']}" + "-epic0"
-EXTBRIDGE = "brext0"
-LVMPOOL = "default"
+  config.vm.box = 'generic/ubuntu2004'
 
+  config.vm.define :gateway do |vm|
+    vm.vm.hostname = 'epic-gateway.localdomain'
+    vm.vm.network :public_network,
+                  dev: BRIDGE,
+                  ip: "192.168.254.21"
 
-  config.vm.define 'router' do |router|
-    router.trigger.before :up do |uptrigger|
-      uptrigger.info = "running before up"
-      uptrigger.run = {inline: "/usr/local/bin/brmgr.sh up" }
-    end
-    router.trigger.after :destroy do |destroytrigger|
-      destroytrigger.info = "running after destroy"
-      destroytrigger.run = {inline: "/usr/local/bin/brmgr.sh destroy"}
-    end
-    router.vm.hostname = 'router'
-    router.vm.box = "frrouter"
-    router.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      auto_config: false
-    router.vm.network :public_network,
-      :dev => EXTBRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      auto_config: false
-    
-    router.vm.provider :libvirt do |lv|
-      lv.cpus = 2
-      lv.memory = 2048
-      lv.storage_pool_name = LVMPOOL
-    end
-    router.vm.provision "shell", inline: $fixsysconf
-    router.vm.provision "shell", inline: $fixhosts
-    router.vm.provision "shell", inline: $deleth0dhcpdefault
-    router.vm.provision "shell", inline: "netplan apply"  
-  end
- 
-  config.vm.define 'epic' do |epic|
-    epic.vm.hostname = 'epic'
-    epic.vm.box = "generic/ubuntu2004"
-    epic.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      ip: "192.168.254.10"
-
-    epic.vm.provider :libvirt do |lv|
+    vm.vm.provider :libvirt do |lv|
       lv.cpus = 4
       lv.memory = 6148
-      lv.storage_pool_name = LVMPOOL
     end
-    epic.vm.provision "shell", inline: $fixsysconf
-    epic.vm.provision "shell", inline: $fixhosts
-    epic.vm.provision "shell", inline: $deleth0dhcpdefault
-    epic.vm.provision "shell", inline: $routerasdefault
-    epic.vm.provision "shell", inline: "netplan apply"
-    epic.vm.provision "shell", inline: $epicmgr
 
-    epic.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
-    epic.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
-    epic.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    epic.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-
-
+    vm.vm.provision 'shell', inline: $fixsysconf
+    vm.vm.provision 'ansible' do |ansible|
+      ansible.playbook = PLAYBOOK
+      ansible.groups = GROUPS
+      ansible.extra_vars = {
+        purelb_pool: '192.168.254.210-192.168.254.211',
+        ws_hostname: WEB_SERVICE
+      }
+    end
   end
 
-  config.vm.define 'mk8s' do |mk8s|
-    mk8s.vm.hostname = 'mk8s'
-    mk8s.vm.box = "generic/ubuntu2004"
-    mk8s.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      ip: "192.168.254.100"
+  config.vm.define :client do |vm|
+    vm.vm.hostname = 'epic-client.localdomain'
+    vm.vm.network :public_network,
+                  dev: BRIDGE,
+                  ip: "192.168.254.121"
 
-    mk8s.vm.provider :libvirt do |lv|
+    vm.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 4096
-      lv.storage_pool_name = LVMPOOL
     end
-    mk8s.vm.provision "shell", inline: $fixsysconf
-    mk8s.vm.provision "shell", inline: $fixhosts
-    mk8s.vm.provision "shell", inline: $deleth0dhcpdefault
-    mk8s.vm.provision "shell", inline: $routerasdefault
-    mk8s.vm.provision "shell", inline: "netplan apply"
-    
 
-    mk8s.vm.provision "shell", inline: $installmk8s
-
-    mk8s.vm.provision "file", source: "../files/kubens", destination: "kubens"
-    mk8s.vm.provision "shell", inline: "mv kubens /usr/local/bin"
-
-    mk8s.vm.provision "file", source: "../files/bash_aliases", destination: ".bash_aliases"
-
-
-    mk8s.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    mk8s.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-    
-  
-    
+    vm.vm.provision 'shell', inline: $fixsysconf
+    vm.vm.provision 'ansible' do |ansible|
+      ansible.playbook = PLAYBOOK
+      ansible.groups = GROUPS
+      ansible.extra_vars = {
+        k8s_cluster_vip: '192.168.254.121',
+        k8s_nodeaddr: '192.168.254.121,fd00:254::121',
+        ws_hostname: WEB_SERVICE
+      }
+    end
   end
 
- 
 end
