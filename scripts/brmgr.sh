@@ -2,9 +2,15 @@
 
 brname=$USER-epic0
 
+if [ "X$1" = "X" ]; then
+    echo $0
+    echo "Needs a parameter: either \"up\" or \"destroy\""
+    exit 1
+fi
+
 if [ $1 = "up" ]; then
 
-    brctl show $brname 
+    brctl show $brname 2> /dev/null
 
     if [ $? = 1 ]; then
         echo "creating $brname"
@@ -15,12 +21,11 @@ fi
 
 if [ $1 = "destroy" ]; then
 
-    brctl show $brname 
+    brctl show $brname > /dev/null 2>&1
 
     if [ $? = 0 ]; then
-        echo "deleting $brname"
+        echo "destroying $brname"
         sudo ip link set $brname down
         sudo brctl delbr $brname
-
     fi
 fi
