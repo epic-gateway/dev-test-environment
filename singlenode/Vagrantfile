@@ -2,7 +2,6 @@
 #
 # 2 virtual machines:
 #  * "gateway" is a single-node k8s cluster running the epic gateway host
-#  * "client" is a single-node k8s cluster running the gateway-api client
 
 $fixsysconf = <<-SCRIPT
 sed -i 's/net.ipv6.conf.all.disable_ipv6 = 1/net.ipv6.conf.all.disable_ipv6 = 0/' /etc/sysctl.conf
@@ -11,13 +10,14 @@ sed -i 's/^#net.ipv6.conf.all.forwarding/net.ipv6.conf.all.forwarding/' /etc/sys
 sed -i 's/^#net.ipv4.conf.all.log_martians/net.ipv4.conf.all.log_martians/' /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf
 SCRIPT
+#  * "gwclient" is a single-node k8s cluster running the gateway-api client
 
 BRIDGE = "#{ENV['USER']}-epic0"
 WEB_SERVICE = 'gwdev-ctl'
 PLAYBOOK = '../playbook/site.yml'
 GROUPS = {
   epic: ['gateway'],
-  client: ['client']
+  client: ['gwclient']
 }
 
 Vagrant.configure("2") do |config|
@@ -46,7 +46,7 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.define :client do |vm|
+  config.vm.define :gwclient do |vm|
     vm.vm.hostname = 'epic-client.localdomain'
     vm.vm.network :public_network,
                   dev: BRIDGE,
