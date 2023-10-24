@@ -2,14 +2,6 @@
 #
 # 2 virtual machines:
 #  * "gateway" is a single-node k8s cluster running the epic gateway host
-
-$fixsysconf = <<-SCRIPT
-sed -i 's/net.ipv6.conf.all.disable_ipv6 = 1/net.ipv6.conf.all.disable_ipv6 = 0/' /etc/sysctl.conf
-sed -i 's/^#net.ipv4.ip_forward/net.ipv4.ip_forward/' /etc/sysctl.conf
-sed -i 's/^#net.ipv6.conf.all.forwarding/net.ipv6.conf.all.forwarding/' /etc/sysctl.conf
-sed -i 's/^#net.ipv4.conf.all.log_martians/net.ipv4.conf.all.log_martians/' /etc/sysctl.conf
-sysctl -p /etc/sysctl.conf
-SCRIPT
 #  * "gwclient" is a single-node k8s cluster running the gateway-api client
 
 BRIDGE = "#{ENV['USER']}-epic0"
@@ -35,7 +27,6 @@ Vagrant.configure("2") do |config|
       lv.memory = 6148
     end
 
-    vm.vm.provision 'shell', inline: $fixsysconf
     vm.vm.provision 'ansible' do |ansible|
       ansible.playbook = PLAYBOOK
       ansible.groups = GROUPS
@@ -57,7 +48,6 @@ Vagrant.configure("2") do |config|
       lv.memory = 4096
     end
 
-    vm.vm.provision 'shell', inline: $fixsysconf
     vm.vm.provision 'ansible' do |ansible|
       ansible.playbook = PLAYBOOK
       ansible.groups = GROUPS
