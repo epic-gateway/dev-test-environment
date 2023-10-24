@@ -9,6 +9,13 @@
   register: result
   until: result is not failed
 
+- name: Poll the web service to make sure that it's alive
+  command: curl --insecure -s -o /dev/null -w "%{http_code}" https://gwdev-ctl/api/epic
+  register: result
+  until: result.stdout == '401'
+  retries: 36
+  delay: 10
+
 - name: Wait for the epic playbook to write the sample GatewayClassConfig
   local_action:
     module: wait_for
