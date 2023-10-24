@@ -9,7 +9,7 @@
   # starting up. Back off for a few seconds to give things a chance to
   # settle down and try again.
   retries: 3
-  delay: 30
+  delay: 10
   register: result
   until: result is not failed
 
@@ -30,7 +30,7 @@
   # you can't connect to them. Back off for a few seconds to give
   # things a chance to settle down and try again.
   retries: 5
-  delay: 30
+  delay: 10
   register: result
   until: result is not failed
 
