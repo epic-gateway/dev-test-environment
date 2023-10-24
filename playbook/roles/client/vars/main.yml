@@ -8,3 +8,6 @@ svc_cidr: 172.25.0.0/16,fd05::/112
 # flannel configuration
 cni_network: 172.24.0.0/16
 cni_IPv6network: fd04::/60
+
+gw_api_artifact: https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.1/experimental-install.yaml
+gw_epic_artifact: https://github.com/epic-gateway/pure-gateway/releases/download/v0.22.0/pure-gateway-development.yaml

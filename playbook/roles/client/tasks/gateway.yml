@@ -1,0 +1,25 @@
+---
+- name: Install the SIG Gateway APIs
+  command: "kubectl apply -f {{ gw_api_artifact }}"
+
+- name: Install the EPIC PureGW client (the version with the dev/test hostnames)
+  command: "kubectl apply -f {{ gw_epic_artifact }}"
+  retries: 2
+  delay: 10
+  register: result
+  until: result is not failed
+
+- name: Wait for the epic playbook to write the sample GatewayClassConfig
+  local_action:
+    module: wait_for
+    path: "{{ sample_gw_config }}"
+- name: Upload the sample GatewayClassConfig
+  template:
+    src: "{{ sample_gw_config }}"
+    dest: "{{ sample_gw_config }}"
+- name: Apply the sample GatewayClassConfig
+  command: "kubectl apply -f {{ sample_gw_config }}"
+  retries: 2
+  delay: 10
+  register: result
+  until: result is not failed

@@ -1,0 +1,36 @@
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: GatewayClass
+metadata:
+  name: gwdev-http4
+spec:
+  controllerName: epic-gateway.org/puregw
+  parametersRef:
+    name: gwdev-http4
+    namespace: default
+    group: puregw.epic-gateway.org
+    kind: GatewayClassConfig
+---
+apiVersion: puregw.epic-gateway.org/v1
+kind: GatewayClassConfig
+metadata:
+  name: gwdev-http4
+spec:
+  epic:
+    cluster-name: gwdev
+    gateway-hostname: gwdev-ctl
+    service-account: {{ ws_sample_username }}
+    service-key: {{ password.stdout }}
+    user-namespace: root
+    gateway-template: gatewayhttp
+  trueIngress:
+    decapAttachment:
+      direction: ingress
+      interface: default
+      flags: 1
+      qid: 0
+    encapAttachment:
+      direction: egress
+      interface: default
+      flags: 20
+      qid: 1

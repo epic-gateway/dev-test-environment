@@ -17,3 +17,5 @@
     content: "#!/bin/sh\n{{ join_command.stdout_lines[0] }}\n"
     dest: "{{ join_script }}"
     mode: +x
+
+- include_tasks: gateway.yml
