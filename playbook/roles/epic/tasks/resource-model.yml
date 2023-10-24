@@ -38,9 +38,35 @@
   command: kubectl apply -f epic_v1_serviceprefix.yaml
 
 - name: Create sample org/namespace
-  command: /opt/acnodal/bin/epicctl create user-namespace "{{ group_org_name }}" deprecated deprecated
+  command: "{{ true_ingress_remote_path }}/epicctl create user-namespace {{ group_org_name }} deprecated deprecated"
   register: result
   failed_when: result.rc != 0 and "already exists" not in result.stderr
+
+- name: Generate sample API user password
+  command: openssl rand -base64 12
+  register: password
+  no_log: true
+
+- name: Create sample API user
+  command: "{{ true_ingress_remote_path }}/epicctl create api-user {{ ws_sample_username }} {{ group_org_name }}"
+  args:
+    stdin: |
+      {{ password.stdout }}
+      {{ password.stdout }}
+  register: result
+  failed_when: result.rc != 0 and "api-user {{ ws_sample_username }} exists" not in result.stderr
+
+- name: Generate sample GatewayClass/Config
+  template:
+    src: "{{ sample_gw_config }}.j2"
+    dest: "{{ sample_gw_config }}"
+  when: result.rc == 0
+- name: Fetch sample GatewayClass/Config
+  fetch:
+    src: "{{ sample_gw_config }}"
+    dest: "{{ sample_gw_config }}"
+    flat: yes
+  when: result.rc == 0
 
 - name: Create sample service group
   command: kubectl apply -f epic_v1_lbservicegroup.yaml

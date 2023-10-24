@@ -12,6 +12,7 @@ cni_IPv6network: "fd01::/60"
 
 # Web Service
 ws_hostname: epic-ctl
+ws_sample_username: user1
 
 # Images
 marin3r_version: v0.12.2-epic21
