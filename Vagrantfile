@@ -6,7 +6,7 @@
 
 BRIDGE = "#{ENV['USER']}-epic0"
 WEB_SERVICE = 'gwdev-ctl'
-PLAYBOOK = '../playbook/site.yml'
+PLAYBOOK = 'playbook/site.yml'
 GROUPS = {
   epic: ['gateway'],
   client: ['gwclient']
@@ -26,15 +26,15 @@ Vagrant.configure("2") do |config|
   config.vm.define :gateway do |vm|
     vm.trigger.before :up do |t|
       t.info = "Creating network bridge"
-      t.run = {inline: "../scripts/brmgr.sh up"}
+      t.run = {inline: "scripts/brmgr.sh up"}
     end
     vm.trigger.after :destroy do |t|
       t.info = "Removing sample GatewayClass"
-      t.run = {inline: "rm -f ../playbook/gateway_v1a2_gatewayclass-gwdev.yaml"}
+      t.run = {inline: "rm -f playbook/gateway_v1a2_gatewayclass-gwdev.yaml"}
     end
     vm.trigger.after :destroy do |t|
       t.info = "Destroying network bridge"
-      t.run = {inline: "../scripts/brmgr.sh destroy"}
+      t.run = {inline: "scripts/brmgr.sh destroy"}
     end
 
     vm.vm.hostname = 'epic-gateway.localdomain'
