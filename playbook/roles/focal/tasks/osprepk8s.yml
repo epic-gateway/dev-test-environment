@@ -69,3 +69,9 @@
     path: /etc/hosts
     regexp: 'ubuntu2004.localdomain'
     state: absent
+
+- name: add ws_hostname to the hosts file
+  lineinfile:
+    path: /etc/hosts
+    search_string: "{{ ws_ip }} {{ ws_hostname }}"
+    line: "{{ ws_ip }} {{ ws_hostname }}.localdomain {{ ws_hostname }}"
