@@ -20,13 +20,15 @@ marin3r_image: "quay.io/epic-gateway/marin3r:{{ marin3r_version }}"
 eds_image: quay.io/epic-gateway/eds-server:v0.8.2
 envoy_image: quay.io/epic-gateway/envoy:v1.23.2-epic1
 
-# ServicePrefix values
+# ServicePrefix values. Gateways and LoadBalancer services will
+# allocate addresses from this pool.
 service_prefix_name: default
 service_prefix_subnet: 192.168.77.0/24
 service_prefix_pool: 192.168.77.2-192.168.77.77
 service_prefix_aggregation: "/32"
 
-# PureLB values
+# PureLB values. We use PureLB to announce the web service address, so
+# it will usually be the first address in this pool.
 purelb_subnet: 192.168.254.0/24
 purelb_pool: 192.168.254.200-192.168.254.201
 purelb_aggregation: "/32"

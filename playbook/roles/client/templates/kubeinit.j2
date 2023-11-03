@@ -6,12 +6,6 @@ networking:
   serviceSubnet: {{ svc_cidr }}
 kubernetesVersion: {{ k8s_version_kubeadm }}
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
-kind: InitConfiguration
-nodeRegistration:
-  kubeletExtraArgs:
-    node-ip: "{{ k8s_nodeaddr }}"
----
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
 mode: ipvs

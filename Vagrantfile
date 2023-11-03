@@ -10,12 +10,14 @@ GROUPS = {
   epic: ['gateway'],
   client: ['gwclient']
 }
-GATEWAY_IP = '192.168.254.21'
-CLIENT_IP = '192.168.254.121'
-PURELB_IP = '192.168.254.210-192.168.254.211'
+GATEWAY_IP = '192.168.254.32'
+CLIENT_IP = '192.168.254.64'
 VARS = {
-  gateway_ip: GATEWAY_IP,
-  ws_ip: GATEWAY_IP,
+  service_prefix_subnet: '192.168.77.0/24',
+  service_prefix_pool: '192.168.77.2-192.168.77.77',
+  purelb_subnet: '192.168.254.160/27',
+  purelb_pool: '192.168.254.160-192.168.254.190',
+  ws_ip: '192.168.254.160',
   ws_hostname: 'gwdev-ctl',
   sample_gw_config: 'gateway_v1a2_gatewayclass-gwdev.yaml'
 }
@@ -56,8 +58,7 @@ Vagrant.configure("2") do |config|
       ansible.playbook = PLAYBOOK
       ansible.groups = GROUPS
       ansible.extra_vars = VARS.merge({
-        k8s_cluster_vip: GATEWAY_IP,
-        purelb_pool: PURELB_IP,
+        k8s_cluster_vip: GATEWAY_IP
       })
     end
   end
@@ -75,8 +76,7 @@ Vagrant.configure("2") do |config|
       ansible.playbook = PLAYBOOK
       ansible.groups = GROUPS
       ansible.extra_vars = VARS.merge({
-        k8s_cluster_vip: CLIENT_IP,
-        k8s_nodeaddr: "#{CLIENT_IP},fd00:254::121",
+        k8s_cluster_vip: CLIENT_IP
       })
     end
   end

@@ -21,7 +21,6 @@
   - epic_v1_epic.yaml
   - epic_v1_serviceprefix.yaml
   - epic_v1_lbservicegroup.yaml
-  - epic_v1_lbservicegroup_v6.yaml
   tags: [ lbsg ]
 - name: Create sample config singleton, with overrides
   command: kubectl apply -f epic_v1_epic.yaml
@@ -70,7 +69,4 @@
 
 - name: Create sample service group
   command: kubectl apply -f epic_v1_lbservicegroup.yaml
-  tags: [ lbsg ]
-- name: Create IPV6 sample service group
-  command: kubectl apply -f epic_v1_lbservicegroup_v6.yaml
   tags: [ lbsg ]
