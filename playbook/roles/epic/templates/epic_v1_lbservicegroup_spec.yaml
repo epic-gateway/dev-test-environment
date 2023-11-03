@@ -46,8 +46,7 @@
             no_traffic_interval: 5s
             unhealthy_threshold: 3
             healthy_threshold: 3
-            http_health_check:
-              path: /ready
+            tcp_health_check: {}
       listeners:
       - name: SET_BY_EPIC
         value: |
@@ -60,26 +59,44 @@
               protocol: {{.Protocol | ToUpper}}
           filter_chains:
           - filters:
+
+            {{- with (.Routes | TCPRoutes) }}
+            - name: envoy.filters.network.tcp_proxy
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+                stat_prefix: destination
+                weighted_clusters:
+                  clusters:
+                {{- range . }}
+                {{- range .Rules }}
+                  {{- range .BackendRefs}}
+                  - name: {{ .Name }}
+                    weight: {{ .Weight }}
+                  {{- end }}
+                {{- end }}
+                {{- end }}
+            {{- end }}{{- /* with */}}
+
+            {{- with (.Routes | HTTPRoutes) }}
             - name: envoy.http_connection_manager
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
-                stat_prefix: {{ .ServiceName }}
-                server_name: epicsf
+                stat_prefix: {{ $.ServiceName }}
+                server_name: epicuswest
                 add_user_agent: true
                 use_remote_address: true
-                via: epicsf
+                via: epicuswest
                 route_config:
                   name: local_route
                   virtual_hosts:
-                  {{- range .Routes }}
-                  {{- $route := .Spec.HTTP }}
-                  {{- range $route.Hostnames | HostnameOrDefault }}
+                  {{- range $spec := . }}
+                  {{- range .Hostnames | HostnameOrDefault }}
                   - name: "{{ . }}"
                     domains:
                     - "{{ . }}"
-                    {{- if $route.Rules}}
+                    {{- if $spec.Rules}}
                     routes:
-                    {{- range $route.Rules }}
+                    {{- range $spec.Rules }}
                     -
                       {{- if .Matches }}
                       match:
@@ -192,10 +209,10 @@
                         {{- end }}{{- /* if .RequestHeaderModifier */}}
                       {{- end }}{{- /* range .Filters */}}
 
-                    {{- end }}{{- /* range $route.Rules */}}
-                    {{- end }}{{- /* if $route.Rules */}}
-                  {{- end }}{{- /* range $route.Hostnames | HostnameOrDefault */}}
-                  {{- end }}{{- /* range .Routes */}}
+                    {{- end }}{{- /* range .Rules */}}
+                    {{- end }}{{- /* if .Rules */}}
+                  {{- end }}{{- /* range .Hostnames | HostnameOrDefault */}}
+                  {{- end }}{{- /* range $httpRoutes */}}
 
                 http_filters:
                 - name: envoy.filters.http.bandwidth_limit
@@ -206,3 +223,6 @@
                     limit_kbps: 1000
                     fill_interval: 0.1s
                 - name: envoy.filters.http.router
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+            {{ end }}{{- /* with */}}
