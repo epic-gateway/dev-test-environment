@@ -2,10 +2,18 @@
 
 brname=$USER-epic0
 
+# validate parameter
 if [ "X$1" = "X" ]; then
     echo "$0"
     echo "Needs a parameter: either \"up\" or \"destroy\""
     exit 1
+fi
+
+# check that brctl is installed
+which brctl > /dev/null 2>&1
+if [ $? = 1 ] ; then
+    echo "brctl not found - please install"
+    exit 2
 fi
 
 if [ "$1" = "up" ]; then
