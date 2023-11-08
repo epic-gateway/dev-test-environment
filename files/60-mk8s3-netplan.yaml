@@ -1,0 +1,11 @@
+---
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth1:
+      addresses:
+      - 192.168.254.103/24
+      - fd00:254::103/64
+      gateway4: 192.168.254.1
+      gateway6: fd00:254::1
