@@ -1,3 +1,0 @@
----
-- name:  Launch web service
-  shell: kubectl apply -f "{{ web_service_artifact }}"

@@ -1,0 +1,3 @@
+[submodule "playbook"]
+	path = playbook
+	url = https://github.com/epic-gateway/ansible-playbook.git
