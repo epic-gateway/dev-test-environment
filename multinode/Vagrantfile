@@ -57,11 +57,11 @@ LVMPOOL = "default"
   config.vm.define 'router' do |router|
     router.trigger.before :up do |uptrigger|
       uptrigger.info = "running before up"
-      uptrigger.run = {inline: "/usr/local/bin/brmgr.sh up" }
+      uptrigger.run = {inline: "../scripts/brmgr.sh up" }
     end
     router.trigger.after :destroy do |destroytrigger|
       destroytrigger.info = "running after destroy"
-      destroytrigger.run = {inline: "/usr/local/bin/brmgr.sh destroy"}
+      destroytrigger.run = {inline: "../scripts/brmgr.sh destroy"}
     end
     router.vm.hostname = 'router'
     router.vm.box = "epic-gateway/frrouter"
