@@ -19,6 +19,7 @@ VARS = {
   purelb_pool: '192.168.254.160-192.168.254.190',
   ws_ip: '192.168.254.160',
   ws_hostname: 'gwdev-ctl',
+  true_ingress_interface: 'eth1',
   sample_gw_config: 'gateway_v1a2_gatewayclass-gwdev.yaml'
 }
 NETDEV_CFG = {
