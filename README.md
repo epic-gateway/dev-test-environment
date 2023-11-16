@@ -4,7 +4,7 @@
 
 This project provides scripts to install and configure EPIC Gateway development/test environments. There are two environments:
 
-* This environment; a minimal environment with two single-VM Kubernetes clusters: one running EPIC, and one running a Gateway API client for testing. The two VMs use a network bridge to talk to one another. This environment is a good starting place if you'd like to learn about EPIC Gateway.
+* This environment; a minimal environment with two single-VM Kubernetes clusters: one running EPIC, and one running a Gateway API client for testing. The two VMs use the Vagrant management network to talk to one another. This environment is a good starting place if you'd like to learn about EPIC Gateway.
 * [Multinode](multinode/): a more realistic (but much more complex) environment with two 3-node clusters, a private internal bridge, a private external bridge, and a router for access to the bridge. Multinode is only recommended if you know you need it.
 
 # Prerequisites
@@ -13,7 +13,7 @@ This project provides scripts to install and configure EPIC Gateway development/
 
 _Hint_: on a recent Debian or Ubuntu system this command will install the tools that you need:
 ```sh
-# apt-get update && apt-get install -y git ansible bridge-utils vagrant-libvirt qemu-kvm
+# apt-get update && apt-get install -y git ansible vagrant-libvirt qemu-kvm
 ```
 
 # Setup
@@ -21,7 +21,6 @@ _Hint_: on a recent Debian or Ubuntu system this command will install the tools 
 ```sh
 $ git clone --recurse-submodules https://github.com/epic-gateway/dev-test-environment.git
 $ cd dev-test-environment
-$ scripts/brmgr.sh up # create the bridge that the VMs use to talk to one another
 $ vagrant up          # create/configure the VMs
 ```
 
@@ -74,4 +73,28 @@ Now you can check the status of the gateway:
 $ vagrant ssh gwclient -- kubectl get gateways devtest
 NAME      CLASS         ADDRESS        READY   AGE
 devtest   gwdev-http4   192.168.77.2   True    93s
+```
+
+If your gateway is ready you can make an http request to the gateway address. EPIC will proxy the request to the client which is running an http echo server:
+
+```sh
+$ vagrant ssh gateway -- curl -s 192.168.77.2/anything
+{
+  "args": {},
+  "headers": {
+    "Accept": [
+      "*/*"
+    ],
+    "Host": [
+      "192.168.77.2"
+    ],
+
+  ... etc etc ...
+
+  "url": "http://192.168.77.2/anything",
+  "data": "",
+  "files": {},
+  "form": {},
+  "json": null
+}
 ```
