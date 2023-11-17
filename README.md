@@ -78,7 +78,7 @@ devtest   gwdev-http4   192.168.77.2   True    93s
 If your gateway is ready you can make an http request to the gateway address. EPIC will proxy the request to the client which is running an http echo server:
 
 ```sh
-$ vagrant ssh gateway -- curl -s 192.168.77.2/anything
+$ vagrant ssh gateway -- curl -s 192.168.77.2/get
 {
   "args": {},
   "headers": {
@@ -91,10 +91,8 @@ $ vagrant ssh gateway -- curl -s 192.168.77.2/anything
 
   ... etc etc ...
 
-  "url": "http://192.168.77.2/anything",
-  "data": "",
-  "files": {},
-  "form": {},
-  "json": null
+  "method": "GET",
+  "origin": "192.168.121.83",
+  "url": "http://192.168.77.2/get"
 }
 ```
