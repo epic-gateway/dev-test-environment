@@ -4,4 +4,7 @@
 192.168.254.102 mk8s2
 192.168.254.103 mk8s3
 
+# adhoc client host
+192.168.254.110 adhoc
+
 # EPIC web service

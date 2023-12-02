@@ -231,4 +231,39 @@ LVMPOOL = "default"
       vm.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
     end
   end
+
+  config.vm.define :adhoc do |vm|
+    vm.vm.hostname = 'adhoc-client.localdomain'
+    vm.vm.network :public_network, auto_config: false,
+                  :dev => BRIDGE,
+                  :mode => "bridge",
+                  :type => "bridge",
+                  :trust_guest_rx_filters => "true",
+                  ip: "192.168.254.110"
+    vm.trigger.before :up do |uptrigger|
+      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.110; ssh-keygen -f ~/.ssh/known_hosts -R #{vm.vm.hostname}; true'" }
+    end
+
+    vm.vm.provider :libvirt do |lv|
+      lv.cpus = 2
+      lv.memory = 4096
+    end
+    vm.vm.provision "shell", inline: $fixsysconf
+    vm.vm.provision "shell", inline: $fixhosts
+    vm.vm.provision "shell", inline: $deleth0dhcpdefault
+    # vm.vm.provision "shell", inline: $routerasdefault
+    vm.vm.provision "file", source: "../files/60-adhoc-netplan.yaml", destination: "60-acndev.yaml"
+    vm.vm.provision "shell", inline: "mv 60-acndev.yaml /etc/netplan"
+    vm.vm.provision "shell", inline: "netplan apply"
+
+    vm.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
+    vm.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
+
+    vm.vm.provision "file", source: "../files/kubens", destination: "kubens"
+    vm.vm.provision "shell", inline: "mv kubens /usr/local/bin"
+
+    vm.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+    vm.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
+  end
+
 end

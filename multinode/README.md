@@ -40,7 +40,28 @@ The VMs have static IP addresses on $user-epic0.
 1. router VM. (192.168.254.1)  This is a prebuilt router with FRR running and a FRR configuration that will accept BGP peers based upon the defaults used in EPIC.  It is connected to the host network and routes/NAT between the host network and the VM network.  The host network provides an address via DHCP.
 2. EPIC VM. (192.168.254.11-13)  This is a VM that is prepared for the installation of EPIC.  Installation of EPIC is not automated.  It is connected to the bridge $user-epic0 and the default route is configured via the router VM
 3. mk8s VM. (192.168.254.101-3)  This VM has the same configuration as above.  In addition mk8s is installed in this VM and some based additional tools such as aliases and kubens are added.  The mk8s is ready for the installation of PureGW
+4. Ad-hoc client VM. (192.168.254.110)  This VM is used for testing the PureGW ad-hoc (i.e. non-Kubernetes) client
 
 The VMs are accessed from the host machine using vagrant ssh.
 
 Services that are exposed by epic are accessed via the host network on the router VM.  A static route to the network exposed (default 192.168.77.0/24) from your workstation to the vagrant router box is required to access LB services.
+
+## Ad-hoc Client
+
+EPIC Gateway is primarily for Kubernetes clients, but it also works with ad-hoc (i.e. non-Kubernetes) Linux clients. The Vagrantfile creates a guest called "adhoc" that can be used to experiment with this feature.
+
+You can test it like so:
+
+1. Go to https://github.com/epic-gateway/true-ingress and find the most recent release
+1. ssh to the guest: `vagrant ssh adhoc`
+1. Become root: `sudo -i`
+1. Download the install script: `wget https://github.com/epic-gateway/true-ingress/releases/download/{the release from step 1}/install-true-ingress`
+1. Examine `install-true-ingress` to ensure that we're not setting up a dogecoin miner on your machine
+1. Run the install script: `bash install-true-ingress root`
+1. Copy a valid kubectl config file to `/etc/kubnernetes/admin.conf`. The install script will also remind you to do this
+1. Run a web server: `nohup python3 -m http.server --bind ::`
+1. Create a Gateway/HTTPRoute: `epicctl create ad-hoc-gateway adhoc 80`
+1. Create an endpoint for your web server: `epicctl create ad-hoc-endpoint 192.168.254.110 8000`
+1. ssh to the epic1 node
+1. `kubectl get -n epic-root gwproxies adhoc` and make a note of the "public address"
+1. `curl {public_address}` using the address from the previous step
