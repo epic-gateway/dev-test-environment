@@ -1,5 +1,5 @@
 
-$fixsysconf = <<-SCRIPT
+FIXSYSCONF = <<-SCRIPT
 sed -i 's/disable_ipv6=1/disable_ipv6=0/' /etc/modprobe.d/local.conf
 sed -i 's/net.ipv6.conf.all.disable_ipv6 = 1/net.ipv6.conf.all.disable_ipv6 = 0/' /etc/sysctl.conf
 sed -i 's/^#net.ipv4.ip_forward/net.ipv4.ip_forward/' /etc/sysctl.conf
@@ -8,20 +8,19 @@ sed -i 's/^#net.ipv4.conf.all.log_martians/net.ipv4.conf.all.log_martians/' /etc
 sysctl -p /etc/sysctl.conf
 SCRIPT
 
-$deleth0dhcpdefault = <<-SCRIPT
+DELETEDHCP0DEFAULT = <<-SCRIPT
 sed -i '/^[[:space:]]*dhcp4:[[:space:]]true/a \\     \\ dhcp4-overrides:' /etc/netplan/01-netcfg.yaml
-sed -i '/^[[:space:]]*dhcp4-overrides:/a \\       \\ use-routes: false'  /etc/netplan/01-netcfg.yaml 
+sed -i '/^[[:space:]]*dhcp4-overrides:/a \\       \\ use-routes: false'  /etc/netplan/01-netcfg.yaml
 SCRIPT
 
-$fixhosts = <<-SCRIPT
+FIXHOSTS = <<-SCRIPT
 sed -i '/ubuntu2004/d' /etc/hosts
 sed -i 's/^127.0.2.1/127.0.1.1/' /etc/hosts
 SCRIPT
 
-$routerasdefault = <<-SCRIPT
+ROUTERASDEFAULT = <<-SCRIPT
 sed -i  '$ a \\     \\ gateway4: 192.168.254.1' /etc/netplan/50-vagrant.yaml
 SCRIPT
-
 
 NODE_HOSTNAME = 'mk8s'
 
@@ -34,7 +33,7 @@ NODE_HOSTNAME = 'mk8s'
 # when you run "microk8s.enable registry".
 EPIC_PRIVATE_REGISTRY = ENV.fetch('EPIC_PRIVATE_REGISTRY', 'localhost:32000')
 
-$epicmgr = <<-SCRIPT
+EPICMGR = <<-SCRIPT
 # create the epicmgr group so I can add the vagrant user to it
 groupadd --force --system epicmgr
 # add vagrant to some useful groups
@@ -45,12 +44,11 @@ EPIC_PRIVATE_REGISTRY="#{EPIC_PRIVATE_REGISTRY}"
 ENVVARS
 SCRIPT
 
-
-Vagrant.configure("2") do |config|
-
 BRIDGE = "#{ENV['USER']}" + "-epic0"
 EXTBRIDGE = "brext0"
 LVMPOOL = "default"
+
+Vagrant.configure("2") do |config|
 
   config.vm.box = "generic/ubuntu2004"
 
@@ -65,41 +63,41 @@ LVMPOOL = "default"
     end
     router.vm.hostname = 'router'
     router.vm.box = "epic-gateway/frrouter"
-    router.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
+    router.vm.network :public_network,
+      dev: BRIDGE,
+      mode: :bridge,
+      type: :bridge,
+      trust_guest_rx_filters: true,
       auto_config: false
     router.vm.network :public_network,
-      :dev => EXTBRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
+      dev: EXTBRIDGE,
+      mode: :bridge,
+      type: :bridge,
+      trust_guest_rx_filters: true,
       auto_config: false
-    
+
     router.vm.provider :libvirt do |lv|
       lv.cpus = 2
       lv.memory = 2048
       lv.storage_pool_name = LVMPOOL
     end
-    router.vm.provision "shell", inline: $fixsysconf
-    router.vm.provision "shell", inline: $fixhosts
-    router.vm.provision "shell", inline: $deleth0dhcpdefault
-    router.vm.provision "shell", inline: "netplan apply"
+    router.vm.provision :shell, inline: FIXSYSCONF
+    router.vm.provision :shell, inline: FIXHOSTS
+    router.vm.provision :shell, inline: DELETEDHCP0DEFAULT
+    router.vm.provision :shell, inline: "netplan apply"
   end
- 
+
   (1..3).each do |i|
     name = "epic#{i}"
     address = "192.168.254.1#{i}"
     config.vm.define name do |vm|
       vm.vm.hostname = name
       vm.vm.network :public_network,
-                       :dev => BRIDGE,
-                       :mode => "bridge",
-                       :type => "bridge",
-                       :trust_guest_rx_filters => "true",
-                       :ip => address
+                       dev: BRIDGE,
+                       mode: :bridge,
+                       type: :bridge,
+                       trust_guest_rx_filters: true,
+                       ip: address
       config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false
       vm.trigger.before :up do |uptrigger|
         uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R #{address}; ssh-keygen -f ~/.ssh/known_hosts -R #{name}; true'" }
@@ -110,32 +108,32 @@ LVMPOOL = "default"
         lv.memory = 6148
         lv.storage_pool_name = LVMPOOL
       end
-      vm.vm.provision "shell", inline: $fixsysconf
-      vm.vm.provision "shell", inline: $fixhosts
-      vm.vm.provision "shell", inline: $deleth0dhcpdefault
-      vm.vm.provision "shell", inline: $routerasdefault
-      vm.vm.provision "shell", inline: "netplan apply"
-      vm.vm.provision "shell", inline: $epicmgr
+      vm.vm.provision :shell, inline: FIXSYSCONF
+      vm.vm.provision :shell, inline: FIXHOSTS
+      vm.vm.provision :shell, inline: DELETEDHCP0DEFAULT
+      vm.vm.provision :shell, inline: ROUTERASDEFAULT
+      vm.vm.provision :shell, inline: "netplan apply"
+      vm.vm.provision :shell, inline: EPICMGR
 
-      vm.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
-      vm.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
-      vm.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-      vm.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
+      vm.vm.provision :file, source: "../files/epic_hosts", destination: "epic_hosts"
+      vm.vm.provision :shell, inline: "cat epic_hosts >> /etc/hosts"
+      vm.vm.provision :file, source: "../files/resolved.conf", destination: "resolved.conf"
+      vm.vm.provision :shell, inline: "mv resolved.conf /etc/systemd/resolved.conf"
 
-      vm.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-      vm.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
+      vm.vm.provision :file, source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+      vm.vm.provision :shell, inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
     end
   end
-  
+
   (1..3).each do |i|
     name = "#{NODE_HOSTNAME}#{i}"
     config.vm.define name do |vm|
       vm.vm.hostname = name
       vm.vm.network :public_network, auto_config: false,
-                       :dev => BRIDGE,
-                       :mode => "bridge",
-                       :type => "bridge",
-                       :trust_guest_rx_filters => "true",
+                       dev: BRIDGE,
+                       mode: :bridge,
+                       type: :bridge,
+                       trust_guest_rx_filters: true,
                        ip: "192.168.254.10#{i}"
       config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false
       vm.trigger.before :up do |uptrigger|
@@ -147,33 +145,33 @@ LVMPOOL = "default"
         lv.memory = 4096
         lv.storage_pool_name = LVMPOOL
       end
-      vm.vm.provision "shell", inline: $fixsysconf
-      vm.vm.provision "shell", inline: $fixhosts
-      vm.vm.provision "shell", inline: $deleth0dhcpdefault
-      # vm.vm.provision "shell", inline: $routerasdefault
-      vm.vm.provision "file", source: "../files/60-#{name}-netplan.yaml", destination: "60-acndev.yaml"
-      vm.vm.provision "shell", inline: "mv 60-acndev.yaml /etc/netplan"
-      vm.vm.provision "shell", inline: "netplan apply"
-      vm.vm.provision "shell", inline: $epicmgr
+      vm.vm.provision :shell, inline: FIXSYSCONF
+      vm.vm.provision :shell, inline: FIXHOSTS
+      vm.vm.provision :shell, inline: DELETEDHCP0DEFAULT
+      # vm.vm.provision :shell, inline: ROUTERASDEFAULT
+      vm.vm.provision :file, source: "../files/60-#{name}-netplan.yaml", destination: "60-acndev.yaml"
+      vm.vm.provision :shell, inline: "mv 60-acndev.yaml /etc/netplan"
+      vm.vm.provision :shell, inline: "netplan apply"
+      vm.vm.provision :shell, inline: EPICMGR
 
-      vm.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
-      vm.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
+      vm.vm.provision :file, source: "../files/mk8s_hosts", destination: "mk8s_hosts"
+      vm.vm.provision :shell, inline: "cat mk8s_hosts >> /etc/hosts"
 
-      vm.vm.provision "file", source: "../files/kubens", destination: "kubens"
-      vm.vm.provision "shell", inline: "mv kubens /usr/local/bin"
+      vm.vm.provision :file, source: "../files/kubens", destination: "kubens"
+      vm.vm.provision :shell, inline: "mv kubens /usr/local/bin"
 
-      vm.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-      vm.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
+      vm.vm.provision :file, source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+      vm.vm.provision :shell, inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
     end
   end
 
   config.vm.define :adhoc do |vm|
     vm.vm.hostname = 'adhoc-client.localdomain'
     vm.vm.network :public_network, auto_config: false,
-                  :dev => BRIDGE,
-                  :mode => "bridge",
-                  :type => "bridge",
-                  :trust_guest_rx_filters => "true",
+                  dev: BRIDGE,
+                  mode: :bridge,
+                  type: :bridge,
+                  trust_guest_rx_filters: true,
                   ip: "192.168.254.110"
     vm.trigger.before :up do |uptrigger|
       uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.110; ssh-keygen -f ~/.ssh/known_hosts -R #{vm.vm.hostname}; true'" }
@@ -183,22 +181,22 @@ LVMPOOL = "default"
       lv.cpus = 2
       lv.memory = 4096
     end
-    vm.vm.provision "shell", inline: $fixsysconf
-    vm.vm.provision "shell", inline: $fixhosts
-    vm.vm.provision "shell", inline: $deleth0dhcpdefault
-    # vm.vm.provision "shell", inline: $routerasdefault
-    vm.vm.provision "file", source: "../files/60-adhoc-netplan.yaml", destination: "60-acndev.yaml"
-    vm.vm.provision "shell", inline: "mv 60-acndev.yaml /etc/netplan"
-    vm.vm.provision "shell", inline: "netplan apply"
+    vm.vm.provision :shell, inline: FIXSYSCONF
+    vm.vm.provision :shell, inline: FIXHOSTS
+    vm.vm.provision :shell, inline: DELETEDHCP0DEFAULT
+    # vm.vm.provision :shell, inline: ROUTERASDEFAULT
+    vm.vm.provision :file, source: "../files/60-adhoc-netplan.yaml", destination: "60-acndev.yaml"
+    vm.vm.provision :shell, inline: "mv 60-acndev.yaml /etc/netplan"
+    vm.vm.provision :shell, inline: "netplan apply"
 
-    vm.vm.provision "file", source: "../files/mk8s_hosts", destination: "mk8s_hosts"
-    vm.vm.provision "shell", inline: "cat mk8s_hosts >> /etc/hosts"
+    vm.vm.provision :file, source: "../files/mk8s_hosts", destination: "mk8s_hosts"
+    vm.vm.provision :shell, inline: "cat mk8s_hosts >> /etc/hosts"
 
-    vm.vm.provision "file", source: "../files/kubens", destination: "kubens"
-    vm.vm.provision "shell", inline: "mv kubens /usr/local/bin"
+    vm.vm.provision :file, source: "../files/kubens", destination: "kubens"
+    vm.vm.provision :shell, inline: "mv kubens /usr/local/bin"
 
-    vm.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-    vm.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
+    vm.vm.provision :file, source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+    vm.vm.provision :shell, inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
 
 end
