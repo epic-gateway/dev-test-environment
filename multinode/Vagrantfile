@@ -89,109 +89,44 @@ LVMPOOL = "default"
     router.vm.provision "shell", inline: "netplan apply"
   end
  
-  config.vm.define 'epic1' do |epic1|
-    epic1.vm.hostname = 'epic1'
-    epic1.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      ip: "192.168.254.11"
-    config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false
-    epic1.trigger.before :up do |uptrigger|
-      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.11; ssh-keygen -f ~/.ssh/known_hosts -R epic1; true'" }
+  (1..3).each do |i|
+    name = "epic#{i}"
+    address = "192.168.254.1#{i}"
+    config.vm.define name do |vm|
+      vm.vm.hostname = name
+      vm.vm.network :public_network,
+                       :dev => BRIDGE,
+                       :mode => "bridge",
+                       :type => "bridge",
+                       :trust_guest_rx_filters => "true",
+                       :ip => address
+      config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false
+      vm.trigger.before :up do |uptrigger|
+        uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R #{address}; ssh-keygen -f ~/.ssh/known_hosts -R #{name}; true'" }
+      end
+
+      vm.vm.provider :libvirt do |lv|
+        lv.cpus = 4
+        lv.memory = 6148
+        lv.storage_pool_name = LVMPOOL
+      end
+      vm.vm.provision "shell", inline: $fixsysconf
+      vm.vm.provision "shell", inline: $fixhosts
+      vm.vm.provision "shell", inline: $deleth0dhcpdefault
+      vm.vm.provision "shell", inline: $routerasdefault
+      vm.vm.provision "shell", inline: "netplan apply"
+      vm.vm.provision "shell", inline: $epicmgr
+
+      vm.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
+      vm.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
+      vm.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
+      vm.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
+
+      vm.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
+      vm.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
     end
-
-    epic1.vm.provider :libvirt do |lv|
-      lv.cpus = 4
-      lv.memory = 6148
-      lv.storage_pool_name = LVMPOOL
-    end
-    epic1.vm.provision "shell", inline: $fixsysconf
-    epic1.vm.provision "shell", inline: $fixhosts
-    epic1.vm.provision "shell", inline: $deleth0dhcpdefault
-    epic1.vm.provision "shell", inline: $routerasdefault
-    epic1.vm.provision "shell", inline: "netplan apply"
-    epic1.vm.provision "shell", inline: $epicmgr
-
-    epic1.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
-    epic1.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
-    epic1.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    epic1.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-
-    epic1.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-    epic1.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
   end
-
-  config.vm.define 'epic2' do |epic2|
-    epic2.vm.hostname = 'epic2'
-    epic2.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      ip: "192.168.254.12"
-    config.vm.synced_folder './', '/vagrant', type: 'nfs'
-    epic2.trigger.before :up do |uptrigger|
-      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.12; ssh-keygen -f ~/.ssh/known_hosts -R epic2; true'" }
-    end
-
-    epic2.vm.provider :libvirt do |lv|
-      lv.cpus = 4
-      lv.memory = 6148
-      lv.storage_pool_name = LVMPOOL
-    end
-    epic2.vm.provision "shell", inline: $fixsysconf
-    epic2.vm.provision "shell", inline: $fixhosts
-    epic2.vm.provision "shell", inline: $deleth0dhcpdefault
-    epic2.vm.provision "shell", inline: $routerasdefault
-    epic2.vm.provision "shell", inline: "netplan apply"
-    epic2.vm.provision "shell", inline: $epicmgr
-
-    epic2.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
-    epic2.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
-    epic2.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    epic2.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-
-    epic2.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-    epic2.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
-  end
-
-  config.vm.define 'epic3' do |epic3|
-    epic3.vm.hostname = 'epic3'
-    epic3.vm.box = "generic/ubuntu2004"
-    epic3.vm.network :public_network, 
-      :dev => BRIDGE,
-      :mode => "bridge",
-      :type => "bridge",
-      :trust_guest_rx_filters => "true",
-      ip: "192.168.254.13"
-    config.vm.synced_folder './', '/vagrant', type: 'nfs'
-    epic3.trigger.before :up do |uptrigger|
-      uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.13; ssh-keygen -f ~/.ssh/known_hosts -R epic3; true'" }
-    end
-
-    epic3.vm.provider :libvirt do |lv|
-      lv.cpus = 4
-      lv.memory = 6148
-      lv.storage_pool_name = LVMPOOL
-    end
-    epic3.vm.provision "shell", inline: $fixsysconf
-    epic3.vm.provision "shell", inline: $fixhosts
-    epic3.vm.provision "shell", inline: $deleth0dhcpdefault
-    epic3.vm.provision "shell", inline: $routerasdefault
-    epic3.vm.provision "shell", inline: "netplan apply"
-    epic3.vm.provision "shell", inline: $epicmgr
-
-    epic3.vm.provision "file", source: "../files/epic_hosts", destination: "epic_hosts"
-    epic3.vm.provision "shell", inline: "cat epic_hosts >> /etc/hosts"
-    epic3.vm.provision "file", source: "../files/resolved.conf", destination: "resolved.conf"
-    epic3.vm.provision "shell", inline: "mv resolved.conf /etc/systemd/resolved.conf"
-
-    epic3.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "id_rsa.pub"
-    epic3.vm.provision "shell", inline: "cat id_rsa.pub >> .ssh/authorized_keys", privileged: false
-  end
-
+  
   (1..3).each do |i|
     name = "#{NODE_HOSTNAME}#{i}"
     config.vm.define name do |vm|
