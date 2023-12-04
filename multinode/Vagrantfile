@@ -1,13 +1,4 @@
 
-FIXSYSCONF = <<-SCRIPT
-sed -i 's/disable_ipv6=1/disable_ipv6=0/' /etc/modprobe.d/local.conf
-sed -i 's/net.ipv6.conf.all.disable_ipv6 = 1/net.ipv6.conf.all.disable_ipv6 = 0/' /etc/sysctl.conf
-sed -i 's/^#net.ipv4.ip_forward/net.ipv4.ip_forward/' /etc/sysctl.conf
-sed -i 's/^#net.ipv6.conf.all.forwarding/net.ipv6.conf.all.forwarding/' /etc/sysctl.conf
-sed -i 's/^#net.ipv4.conf.all.log_martians/net.ipv4.conf.all.log_martians/' /etc/sysctl.conf
-sysctl -p /etc/sysctl.conf
-SCRIPT
-
 DELETEDHCP0DEFAULT = <<-SCRIPT
 sed -i '/^[[:space:]]*dhcp4:[[:space:]]true/a \\     \\ dhcp4-overrides:' /etc/netplan/01-netcfg.yaml
 sed -i '/^[[:space:]]*dhcp4-overrides:/a \\       \\ use-routes: false'  /etc/netplan/01-netcfg.yaml
@@ -22,8 +13,6 @@ ROUTERASDEFAULT = <<-SCRIPT
 sed -i  '$ a \\     \\ gateway4: 192.168.254.1' /etc/netplan/50-vagrant.yaml
 SCRIPT
 
-NODE_HOSTNAME = 'mk8s'
-
 # This var (which can be overridden with the EPIC_PRIVATE_REGISTRY env
 # var) tells the snap package to configure containerd to use a private
 # (i.e., insecure) registry. For example, if the value of
@@ -34,10 +23,6 @@ NODE_HOSTNAME = 'mk8s'
 EPIC_PRIVATE_REGISTRY = ENV.fetch('EPIC_PRIVATE_REGISTRY', 'localhost:32000')
 
 EPICMGR = <<-SCRIPT
-# create the epicmgr group so I can add the vagrant user to it
-groupadd --force --system epicmgr
-# add vagrant to some useful groups
-usermod -G systemd-journal,root,epicmgr -a vagrant
 cat <<-ENVVARS >> /etc/environment
 # set an env var so epicmgr will allow k8s to pull images from an insecure registry
 EPIC_PRIVATE_REGISTRY="#{EPIC_PRIVATE_REGISTRY}"
@@ -81,7 +66,6 @@ Vagrant.configure("2") do |config|
       lv.memory = 2048
       lv.storage_pool_name = LVMPOOL
     end
-    router.vm.provision :shell, inline: FIXSYSCONF
     router.vm.provision :shell, inline: FIXHOSTS
     router.vm.provision :shell, inline: DELETEDHCP0DEFAULT
     router.vm.provision :shell, inline: "netplan apply"
@@ -108,7 +92,6 @@ Vagrant.configure("2") do |config|
         lv.memory = 6148
         lv.storage_pool_name = LVMPOOL
       end
-      vm.vm.provision :shell, inline: FIXSYSCONF
       vm.vm.provision :shell, inline: FIXHOSTS
       vm.vm.provision :shell, inline: DELETEDHCP0DEFAULT
       vm.vm.provision :shell, inline: ROUTERASDEFAULT
@@ -126,15 +109,14 @@ Vagrant.configure("2") do |config|
   end
 
   (1..3).each do |i|
-    name = "#{NODE_HOSTNAME}#{i}"
+    name = "mk8s#{i}"
     config.vm.define name do |vm|
       vm.vm.hostname = name
       vm.vm.network :public_network, auto_config: false,
                        dev: BRIDGE,
                        mode: :bridge,
                        type: :bridge,
-                       trust_guest_rx_filters: true,
-                       ip: "192.168.254.10#{i}"
+                       trust_guest_rx_filters: true
       config.vm.synced_folder './', '/vagrant', type: 'nfs', nfs_udp: false
       vm.trigger.before :up do |uptrigger|
         uptrigger.run = {inline: "sh -c 'ssh-keygen -f ~/.ssh/known_hosts -R 192.168.254.10#{i}; ssh-keygen -f ~/.ssh/known_hosts -R #{name}; true'" }
@@ -145,7 +127,6 @@ Vagrant.configure("2") do |config|
         lv.memory = 4096
         lv.storage_pool_name = LVMPOOL
       end
-      vm.vm.provision :shell, inline: FIXSYSCONF
       vm.vm.provision :shell, inline: FIXHOSTS
       vm.vm.provision :shell, inline: DELETEDHCP0DEFAULT
       # vm.vm.provision :shell, inline: ROUTERASDEFAULT
@@ -181,7 +162,6 @@ Vagrant.configure("2") do |config|
       lv.cpus = 2
       lv.memory = 4096
     end
-    vm.vm.provision :shell, inline: FIXSYSCONF
     vm.vm.provision :shell, inline: FIXHOSTS
     vm.vm.provision :shell, inline: DELETEDHCP0DEFAULT
     # vm.vm.provision :shell, inline: ROUTERASDEFAULT
