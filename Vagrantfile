@@ -40,6 +40,8 @@ Vagrant.configure("2") do |config|
     vm.trigger.after :destroy do |t|
       t.run = {inline: 'rm -f playbook/gateway_v1a2_gatewayclass-gwdev.yaml playbook/ws_ip'}
     end
+
+    config.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
   config.vm.define :gwclient do |vm|
@@ -55,6 +57,8 @@ Vagrant.configure("2") do |config|
       ansible.groups = GROUPS
       ansible.extra_vars = VARS
     end
+
+    config.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
 end
