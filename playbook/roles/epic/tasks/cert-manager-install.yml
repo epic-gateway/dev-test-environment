@@ -1,0 +1,7 @@
+---
+- name: install cert-manager
+  # https://cert-manager.io/docs/installation/kubernetes/#installing-with-regular-manifests
+  command: kubectl apply -f "{{ certmanager_artifact }}"
+
+- name: Wait for pods to be ready
+  command: kubectl wait -n cert-manager --for=condition=Ready --timeout=5m pods --all

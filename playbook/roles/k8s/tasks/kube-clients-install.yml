@@ -1,0 +1,55 @@
+---
+- name: install dependency packages
+  apt:
+    name:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - ipvsadm
+    install_recommends: no
+
+- name: create keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+
+- name: get gpg key
+  shell:
+    cmd: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: copy repo file
+  apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
+    state: present
+    update_cache: yes
+
+- name: install k8s executables
+  apt:
+    name:
+    - kubelet={{ k8s_version_apt }}
+    - kubeadm={{ k8s_version_apt }}
+    - kubectl={{ k8s_version_apt }}
+- name: mark for version hold
+  shell: apt-mark hold kubelet kubeadm kubectl
+
+- name: configure kubectl for all users
+  become: true
+  copy:
+    dest: /etc/profile.d/kubecfg.sh
+    mode: ugo+r
+    content: |
+      export KUBECONFIG=/etc/kubernetes/admin.conf
+      source <(kubectl completion bash)
+      alias k=kubectl
+      complete -F __start_kubectl k
+
+- name: install python client libraries
+  # I'd rather use the debian/ubuntu package but it's way too old
+  command: pip3 install kubernetes~=12.0
+
+- name: create kubernetes manifests directory
+  file:
+    path: /etc/kubernetes/manifests
+    state: directory
+    mode: '0755'

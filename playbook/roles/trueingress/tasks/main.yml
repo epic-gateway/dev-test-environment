@@ -1,0 +1,38 @@
+---
+- name: create Acnodal TrueIngress installation directory
+  file:
+    path: "{{ true_ingress_remote_path }}"
+    state: directory
+    mode: ugo+rx
+  become: true
+
+- name: create Acnodal Bird router installation directory
+  file:
+    path: "{{ bird_remote_path }}"
+    state: directory
+    mode: ugo+rx
+  become: true
+
+- name: untar True Ingress artifacts
+  unarchive:
+    src: "{{ true_ingress_artifact }}"
+    dest: "{{ true_ingress_remote_path }}"
+    extra_opts:
+    - --strip-components=1
+    remote_src: yes
+  become: true
+
+- name: mount BPF filesystem
+  mount:
+    state: mounted
+    fstype: bpf
+    src: bpf
+    path: /sys/fs/bpf
+  become: true
+
+- name: let sudo run TrueIngress commands
+  lineinfile:
+    path: /etc/sudoers
+    regexp: "^Defaults.*secure_path="
+    line: "Defaults        secure_path=\"{{ true_ingress_remote_path }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\""
+  become: true

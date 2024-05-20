@@ -1,0 +1,29 @@
+---
+# tasks file for client worker nodes
+
+- name: Wait for the controlplane playbook to write the join script
+  local_action:
+    module: wait_for
+    path: "{{ join_script }}"
+- name: Upload cluster join script
+  template:
+    src: "{{ join_script }}"
+    dest: /root/{{ join_script }}
+    mode: +x
+  become: yes
+- name: Upload admin kubectl conf
+  template:
+    src: "{{ admin_conf }}"
+    dest: /etc/kubernetes/admin.conf
+  become: yes
+- name: Join the cluster
+  shell:
+    cmd: /root/{{ join_script }}
+    creates: /etc/kubernetes/kubelet.conf
+  become: yes
+  retries: 2
+  delay: 10
+  register: result
+  until: result is not failed
+- name: Wait for the node to become ready
+  command: kubectl wait --for=condition=ready --timeout=1m node/{{ ansible_hostname }}

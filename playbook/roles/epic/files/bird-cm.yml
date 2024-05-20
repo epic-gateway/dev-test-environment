@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bird-cm
+  namespace: router
+data:
+  bird.conf: |-
+    # Configuration Skeleton for BIRD epic 
+    # includes come from PVC
+    
+    # set in env var retrieved and set in envvar.conf
+    include "/usr/local/include/bird/envvar.conf";
+    
+    
+    #  Router ID set to host addr
+    router id k8sipaddr;
+
+    # Turn on internal watchdog
+    watchdog warning 5 s;
+    watchdog timeout 30 s;
+    include "/usr/local/include/bird/logging.conf";
+    include "/usr/local/include/bird/proto_host.conf";
+    include "/usr/local/include/bird/bfd.conf";
+    include "/usr/local/include/bird/routes_static.conf";
+    include "/usr/local/include/bird/bgp_policies.conf";
+    include "/usr/local/include/bird/bgp_peers.conf";
+    

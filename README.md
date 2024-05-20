@@ -1,5 +1,3 @@
-*NOTE*: this repo uses a git submodule so please ensure that you've initialized and updated it (see below in the [Setup section](#setup)).
-
 # EPIC Gateway Development/Test Environment
 
 This project provides scripts to install and configure EPIC Gateway development/test environments. There are two environments:
@@ -19,12 +17,12 @@ _Hint_: on a recent Debian or Ubuntu system this command will install the tools 
 # Setup
 
 ```sh
-$ git clone --recurse-submodules https://github.com/epic-gateway/dev-test-environment.git
+$ git clone https://github.com/epic-gateway/dev-test-environment.git
 $ cd dev-test-environment
 $ vagrant up          # create/configure the VMs
 ```
 
-This clones the repo and submodules, creates two VMs called ```gateway``` and ```gwclient```, installs a Kubernetes cluster on each of them, installs the EPIC Gateway on ```gateway```, and installs our Kubernetes Gateway API implementation on ```gwclient```.
+This clones the repo, creates two VMs called ```gateway``` and ```gwclient```, installs a Kubernetes cluster on each of them, installs the EPIC Gateway on ```gateway```, and installs our Kubernetes Gateway API implementation on ```gwclient```.
 
 # Use
 

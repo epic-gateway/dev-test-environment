@@ -1,0 +1,8 @@
+---
+- name: Upload gwsm role/binding manifest
+  copy:
+    src: files/gwsm.yaml
+    dest: ./
+
+- name: Create gwsm role/binding
+  command: kubectl apply -f gwsm.yaml

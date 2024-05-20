@@ -1,0 +1,42 @@
+---
+- name: Install the SIG Gateway APIs
+  command: "kubectl apply -f {{ gw_api_artifact }}"
+
+- name: Install the EPIC PureGW client
+  command: "kubectl apply -f {{ gw_epic_artifact }}"
+  retries: 2
+  delay: 10
+  register: result
+  until: result is not failed
+
+- name: Make a patch to resolve the web service hostname
+  set_fact:
+    patch: "--type=merge -p '{\"spec\":{\"template\":{\"spec\":{\"hostAliases\":[{\"hostnames\":[\"{{ ws_hostname }}\"],\"ip\":\"{{ ws_ip }}\"}]}}}}'"
+
+- name: apply the patch to the deployment
+  command: "kubectl patch -n puregw-system deployment manager {{ patch }}"
+
+- name: apply the patch to the daemonset
+  command: "kubectl patch -n puregw-system daemonset agent {{ patch }}"
+
+- name: Poll the web service to make sure that it's alive
+  ansible.builtin.command: curl --insecure -s -o /dev/null -w "%{http_code}" https://{{ ws_hostname }}/api/epic
+  register: result
+  until: result.stdout == '401'
+  retries: 36
+  delay: 10
+
+- name: Wait for the epic playbook to write the sample GatewayClassConfig
+  local_action:
+    module: wait_for
+    path: "{{ sample_gw_config }}"
+- name: Upload the sample GatewayClassConfig
+  template:
+    src: "{{ sample_gw_config }}"
+    dest: "{{ sample_gw_config }}"
+- name: Apply the sample GatewayClassConfig
+  command: "kubectl apply -f {{ sample_gw_config }}"
+  retries: 2
+  delay: 10
+  register: result
+  until: result is not failed

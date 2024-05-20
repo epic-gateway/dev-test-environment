@@ -1,0 +1,21 @@
+---
+# We need to tell the client what the server's DHCP-assigned IP
+# address is. This is surprisingly difficult to do in Vagrant.
+# Because I can't find a good way to do it, I'm making two roles: one
+# for the server and one for the client(s). This is the client role
+# which waits for the server role to write its ws_ip IP address to a
+# file and then slurps that value into the ws_ip variable.
+
+- name: wait for the epicws role to write the ws_ip file
+  local_action:
+    module: wait_for
+    path: ws_ip
+
+- name: upload ws_ip file
+  copy:
+    src: ws_ip
+    dest: ./
+
+- name: set ws_ip
+  set_fact:
+    ws_ip: "{{ lookup('file', 'ws_ip') }}"

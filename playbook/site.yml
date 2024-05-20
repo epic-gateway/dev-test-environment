@@ -1,0 +1,26 @@
+- hosts: epic
+  roles:
+  - epicws
+  - focal
+  - trueingress
+  - k8s
+  - epic
+  - networkdaemon
+- hosts: epicnode
+  roles:
+  - focal
+  - trueingress
+  - k8s
+  - node
+  - networkdaemon
+- hosts: client
+  roles:
+  - clientws
+  - focal
+  - k8s
+  - client
+- hosts: node
+  roles:
+  - focal
+  - k8s
+  - node

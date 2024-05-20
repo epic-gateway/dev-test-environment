@@ -1,0 +1,24 @@
+---
+ansible_user: vagrant
+
+k8s_nic: eth1
+
+# optional private registry (for development)
+private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
+
+# Kubernetes version
+k8s_version: 1.28.5
+k8s_version_apt: "{{ k8s_version }}-1.1"
+k8s_version_kubeadm: "v{{ k8s_version }}"
+
+# TRUE_INGRESS config
+true_ingress_remote_path: /opt/acnodal/bin
+true_ingress_artifact: https://github.com/epic-gateway/true-ingress/releases/download/v0.25.0/true-ingress.tar.bz2
+true_ingress_interface: "{{ lookup('env', 'EPIC_TRUE_INGRESS_INTF') | default('eth1', True) }}"
+
+sample_gw_config: 'gateway_v1a2_gatewayclass-gwdev.yaml'
+
+# Bird config
+bird_remote_path: /opt/acnodal/bird
+
+ws_hostname: gwdev-ctl

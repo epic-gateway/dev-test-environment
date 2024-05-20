@@ -1,0 +1,32 @@
+---
+apiVersion: epic.acnodal.io/v1
+kind: ServicePrefix
+metadata:
+  name: {{ service_prefix_name }}
+  namespace: epic
+  labels:
+    app.kubernetes.io/component: serviceprefix
+    app.kubernetes.io/part-of: epic
+spec:
+  public-pool:
+    subnet: {{ service_prefix_subnet }}
+    pool: {{ service_prefix_pool }}
+    aggregation: {{ service_prefix_aggregation }}
+---
+apiVersion: epic.acnodal.io/v1
+kind: ServicePrefix
+metadata:
+  name: {{ service_prefix_name }}-ipv6
+  namespace: epic
+  labels:
+    app.kubernetes.io/component: serviceprefix
+    app.kubernetes.io/part-of: epic
+spec:
+  alt-pool:
+    aggregation: /32
+    pool: 10.42.1.2-10.42.1.254
+    subnet: 10.42.1.0/24
+  public-pool:
+    aggregation: /128
+    pool: 2001:470:154:5::1-2001:470:154:5::ffff
+    subnet: 2001:470:154:5::/64

@@ -1,0 +1,20 @@
+---
+# We need to tell the client what the server's DHCP-assigned IP
+# address is. This is surprisingly difficult to do in Vagrant.
+# Because I can't find a good way to do it, I'm making two roles: one
+# for the server and one for the client(s). This is the server role
+# which writes its ws_ip IP address to a file.
+
+- name: set default value for ws_ip
+  set_fact:
+    ws_ip: "{{ ansible_host }}"
+  when: ws_ip is not defined
+
+- name: write IP address to file
+  shell: "echo {{ ws_ip }} > ws_ip"
+
+- name: fetch the ws_ip file back to the host
+  fetch:
+    src: ws_ip
+    dest: ws_ip
+    flat: yes

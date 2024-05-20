@@ -1,0 +1,4 @@
+---
+# Prepares Ubuntu 20.04 (Focal Fossa) for EPIC
+- include_tasks: osprepk8s.yml
+  args: {apply: {become: true}}
