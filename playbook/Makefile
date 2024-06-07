@@ -18,3 +18,8 @@ epic-playbook: ## Run the EPIC playbook on a target host (specified by TARGET, e
 refresh-lbsg: ## Refresh the lbservicegroups in epic-root
 	@test -n "${TARGET}" || (echo "TARGET not set. It must contain the name or address of the host to be provisioned." ; exit 1)
 	ansible-playbook --verbose --inventory=hosts.yml --limit=${TARGET} --tags lbsg site.yml
+
+.PHONY: gwdev
+gwdev: ## Run the EPIC playbook on a gwdev multinode target host (specified by TARGET, e.g., "make multinode TARGET=epic1")
+	@test -n "${TARGET}" || (echo "TARGET not set. It must contain the name or address of the host to be provisioned." ; exit 1)
+	ansible-playbook --verbose --inventory=hosts-gwdev.yml --limit=${TARGET} site.yml
