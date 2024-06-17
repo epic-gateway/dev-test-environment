@@ -1,0 +1,22 @@
+---
+# Inventory to build gwdev environments (usually run using the Makefile)
+
+# an EPIC cluster
+epic:
+  hosts:
+    epic1: # the first node in an epic cluster
+      ws_hostname: gwdev-ctl
+      ws_ip: 192.168.254.11
+epicnode: # additional nodes in the epic cluster
+  hosts:
+    epic2:
+    epic3:
+
+# a client cluster with PureGW installed
+client:
+  hosts:
+    mk8s1: # the first client host in a multinode cluster
+node:
+  hosts:
+    mk8s2:
+    mk8s3:
