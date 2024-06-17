@@ -13,7 +13,7 @@ k8s_version_kubeadm: "v{{ k8s_version }}"
 
 # TRUE_INGRESS config
 true_ingress_remote_path: /opt/acnodal/bin
-true_ingress_artifact: https://github.com/epic-gateway/true-ingress/releases/download/v0.29.0/true-ingress.tar.bz2
+true_ingress_artifact: https://github.com/epic-gateway/true-ingress/releases/download/v0.27.0/true-ingress.tar.bz2
 true_ingress_interface: "{{ lookup('env', 'EPIC_TRUE_INGRESS_INTF') | default('eth1', True) }}"
 
 sample_gw_config: 'gateway_v1a2_gatewayclass-gwdev.yaml'
