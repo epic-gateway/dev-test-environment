@@ -102,7 +102,11 @@
                       match:
                         {{- $match := (index .Matches 0) }}
                         {{- if $match.Path.Type | PathTypePathPrefix }}
-                        prefix: "{{ $match.Path.Value }}"
+                        {{- if eq "/" ($match.Path.Value | DerefStr) }}
+                        prefix: /
+                        {{- else }}
+                        path_separated_prefix: "{{ $match.Path.Value | StripTrailingSlash }}"
+                        {{- end }}
                         {{- end }}
                         {{- if $match.Path.Type | PathTypeExact }}
                         path: "{{ $match.Path.Value }}"
