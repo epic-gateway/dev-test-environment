@@ -94,6 +94,7 @@
                   - name: "{{ . }}"
                     domains:
                     - "{{ . }}"
+                    - "{{ . }}:*"
                     {{- if $spec.Rules}}
                     routes:
                     {{- range $spec.Rules }}
