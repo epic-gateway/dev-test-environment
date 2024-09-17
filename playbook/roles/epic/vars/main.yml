@@ -14,7 +14,7 @@ ws_sample_username: user1
 marin3r_version: v0.12.2-epic21
 marin3r_image: "quay.io/epic-gateway/marin3r:{{ marin3r_version }}"
 eds_image: quay.io/epic-gateway/eds-server:v0.8.2
-envoy_image: quay.io/epic-gateway/envoy:v1.23.2-epic1
+envoy_image: quay.io/epic-gateway/envoy:v1.31.1-epic2
 
 # ServicePrefix values. Gateways and LoadBalancer services will
 # allocate addresses from this pool.
