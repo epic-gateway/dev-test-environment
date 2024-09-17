@@ -65,6 +65,7 @@
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
                 stat_prefix: destination
+                cluster_not_found_response_code: INTERNAL_SERVER_ERROR
                 weighted_clusters:
                   clusters:
                 {{- range . }}
@@ -135,6 +136,7 @@
                       {{- end }}
 
                       {{- if .BackendRefs}}
+                        cluster_not_found_response_code: INTERNAL_SERVER_ERROR
                         weighted_clusters:
                           clusters:
                           {{- range .BackendRefs}}
