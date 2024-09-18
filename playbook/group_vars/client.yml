@@ -6,9 +6,6 @@ svc_cidr: 172.25.0.0/16,fd05::/112
 cni_network: 172.24.0.0/16
 cni_IPv6network: fd04::/60
 
-# optional private registry (for development)
-private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
-
 join_script: join-client-cluster
 admin_conf: mk8s-admin.conf
 

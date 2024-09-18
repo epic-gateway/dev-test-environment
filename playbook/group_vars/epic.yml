@@ -1,7 +1,4 @@
 ---
-# optional private registry (for development)
-private_registry: "{{ lookup('env', 'EPIC_PRIVATE_REGISTRY') }}"
-
 # kubeadm init parameters
 pod_cidr: "172.20.0.0/16,fd01::/60"
 svc_cidr: "172.21.0.0/16,fd02::/112"
@@ -10,13 +7,15 @@ svc_cidr: "172.21.0.0/16,fd02::/112"
 cni_network: "172.20.0.0/16"
 cni_IPv6network: "fd01::/60"
 
-# ServicePrefix values
+# ServicePrefix values. Gateways and LoadBalancer services will
+# allocate addresses from this pool.
 service_prefix_name: default
 service_prefix_subnet: 192.168.77.0/24
 service_prefix_pool: 192.168.77.2-192.168.77.77
 service_prefix_aggregation: "/32"
 
-# PureLB values
+# PureLB values. We use PureLB to announce the web service address, so
+# it will usually be the first address in this pool.
 purelb_subnet: 192.168.254.0/24
 purelb_pool: 192.168.254.200-192.168.254.201
 purelb_aggregation: "/32"

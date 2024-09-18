@@ -1,6 +1,10 @@
 ---
 ansible_user: vagrant
 
+# Ubuntu 20.04 doesn't have "python" by default and ansible doesn't
+# seem to be able to figure out which python to use
+ansible_python_interpreter: /usr/bin/python3
+
 k8s_nic: eth1
 
 # optional private registry (for development)
@@ -21,4 +25,28 @@ sample_gw_config: 'gateway_v1a2_gatewayclass-gwdev.yaml'
 # Bird config
 bird_remote_path: /opt/acnodal/bird
 
+# Web Service
 ws_hostname: gwdev-ctl
+ws_sample_username: user1
+
+# Images
+marin3r_version: v0.12.2-epic21
+marin3r_image: "quay.io/epic-gateway/marin3r:{{ marin3r_version }}"
+eds_image: quay.io/epic-gateway/eds-server:v0.8.2
+envoy_image: quay.io/epic-gateway/envoy:v1.31.1-epic2
+
+# Resource Model
+resource_model_artifact: https://github.com/epic-gateway/resource-model/releases/download/v0.59.0/epic-resource-model.yaml
+
+# Web Service
+web_service_artifact: https://github.com/epic-gateway/web-service/releases/download/v0.11.3/web-service.yaml
+
+# Epicctl
+epicctl_artifact: https://github.com/epic-gateway/epicctl/releases/download/v0.11.1/epicctl
+epicctl_scanlogs_artifact: https://github.com/epic-gateway/epicctl/releases/download/v0.11.1/scan-logs
+
+marin3r_artifact: https://github.com/epic-gateway/marin3r/releases/download/{{ marin3r_version }}/marin3r-manifest-epic.yaml
+
+certmanager_artifact: https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.yaml
+
+purelb_artifact: https://gitlab.com/api/v4/projects/purelb%2Fpurelb/packages/helm/stable/charts/purelb-v0.9.0.tgz
