@@ -2,6 +2,15 @@
 - name: Install the SIG Gateway APIs
   command: "kubectl apply -f {{ gw_api_artifact }}"
 
+# Envoy Gateway - the Envoy Proxy's implementation of the Gateway API
+# https://gateway.envoyproxy.io/latest/tasks/quickstart/
+- name: Install Envoy Gateway "eg"
+  command: helm install eg oci://docker.io/envoyproxy/gateway-helm --version v0.0.0-latest -n envoy-gateway-system --create-namespace
+- name: Wait for eg to be ready
+  command: kubectl wait --timeout=5m -n envoy-gateway-system deployment/envoy-gateway --for=condition=Available
+- name: Install eg samples
+  command: kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/latest/quickstart.yaml -n default
+
 - name: Install the EPIC PureGW client
   command: "kubectl apply -f {{ gw_epic_artifact }}"
   retries: 2
