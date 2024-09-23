@@ -36,7 +36,7 @@ eds_image: quay.io/epic-gateway/eds-server:v0.8.2
 envoy_image: quay.io/epic-gateway/envoy:v1.31.1-epic2
 
 # Resource Model
-resource_model_artifact: https://github.com/epic-gateway/resource-model/releases/download/v0.59.0/epic-resource-model.yaml
+resource_model_artifact: https://github.com/epic-gateway/resource-model/releases/download/v0.60.0/epic-resource-model.yaml
 
 # Web Service
 web_service_artifact: https://github.com/epic-gateway/web-service/releases/download/v0.11.3/web-service.yaml
