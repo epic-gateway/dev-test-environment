@@ -19,6 +19,9 @@ service_prefix_aggregation: "/32"
 purelb_subnet: 192.168.254.0/24
 purelb_pool: 192.168.254.200-192.168.254.201
 purelb_aggregation: "/32"
+purelb_v6_subnet: fd03::/112
+purelb_v6_pool: fd03::/112
+purelb_v6_aggregation: default
 
 # LBServiceGroup values
 group_org_name: root
