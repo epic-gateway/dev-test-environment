@@ -49,4 +49,4 @@ marin3r_artifact: https://github.com/epic-gateway/marin3r/releases/download/{{ m
 
 certmanager_artifact: https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.yaml
 
-purelb_artifact: https://gitlab.com/api/v4/projects/purelb%2Fpurelb/packages/helm/stable/charts/purelb-v0.9.0.tgz
+purelb_artifact: https://gitlab.com/api/v4/projects/purelb%2Fpurelb/packages/helm/stable/charts/purelb-v0.12.0.tgz
